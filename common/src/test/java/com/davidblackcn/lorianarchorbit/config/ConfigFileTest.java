@@ -46,8 +46,8 @@ public final class ConfigFileTest {
         }
         assertEquals(PalettePreset.ITEM_TAG_A, client.client().primaryPalettePreset());
         assertEquals(PalettePreset.ITEM_TAG_B, client.client().secondaryPalettePreset());
-        assertEquals(50, client.primaryWheel().groups().size());
-        assertEquals(47, client.secondaryWheel().groups().size());
+        assertEquals(68, client.primaryWheel().groups().size());
+        assertEquals(56, client.secondaryWheel().groups().size());
         assertTrue(json(temporaryDirectory.resolve(ConfigConstants.PRIMARY_WHEEL_FILE))
                 .getAsJsonArray("groups").isEmpty());
         assertTrue(json(temporaryDirectory.resolve(ConfigConstants.SECONDARY_WHEEL_FILE))
@@ -266,7 +266,7 @@ public final class ConfigFileTest {
 
         assertTrue(manager.save(draft).successful());
 
-        assertEquals(12, manager.primaryWheel().typedGroups().size());
+        assertEquals(8, manager.primaryWheel().typedGroups().size());
         assertTrue(manager.primaryWheel().overrideGroups().isEmpty());
         assertTrue(json(temporaryDirectory.resolve(ConfigConstants.PRIMARY_WHEEL_FILE))
                 .getAsJsonArray("groups").isEmpty());

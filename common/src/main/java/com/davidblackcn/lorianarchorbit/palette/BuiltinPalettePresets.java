@@ -48,10 +48,8 @@ public final class BuiltinPalettePresets {
                 List<PaletteGroup> columns = matrix.columnsAsGroups();
                 primary.addAll(rows);
                 secondary.addAll(columns);
-                if (matrix.id().equals("color")) {
-                    colorOnly.addAll(rows);
-                }
             }
+            colorOnly.addAll(parseExplicit(root.getAsJsonArray("color_explicit")));
             primary.addAll(parseExplicit(root.getAsJsonArray("primary_explicit")));
             secondary.addAll(parseExplicit(root.getAsJsonArray("secondary_explicit")));
             return new PresetData(List.copyOf(primary), List.copyOf(secondary), List.copyOf(colorOnly));

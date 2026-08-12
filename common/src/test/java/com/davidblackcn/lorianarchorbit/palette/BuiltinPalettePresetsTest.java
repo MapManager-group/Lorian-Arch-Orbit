@@ -19,7 +19,7 @@ public final class BuiltinPalettePresetsTest {
         List<PaletteGroup> groups = BuiltinPalettePresets.groups(PalettePreset.ITEM_TAG_A);
         PaletteGroup planks = group(groups, "builtin_wood_form_planks");
 
-        assertEquals(50, groups.size());
+        assertEquals(68, groups.size());
         assertContains(planks, "minecraft:oak_planks");
         assertContains(planks, "minecraft:birch_planks");
         assertContains(planks, "minecraft:acacia_planks");
@@ -33,6 +33,10 @@ public final class BuiltinPalettePresetsTest {
         assertContains(group(groups, "builtin_color_material_beds"), "minecraft:red_bed");
         assertContains(group(groups, "builtin_color_material_banners"), "minecraft:blue_banner");
         assertContains(group(groups, "builtin_building_stone"), "minecraft:polished_diorite");
+        assertContains(group(groups, "builtin_masonry_form_walls"), "minecraft:cinnabar_brick_wall");
+        assertContains(group(groups, "builtin_masonry_form_slabs"), "minecraft:sulfur_brick_slab");
+        assertContains(group(groups, "builtin_copper_form_lanterns"), "minecraft:waxed_oxidized_copper_lantern");
+        assertContains(group(groups, "builtin_building_ores"), "minecraft:nether_quartz_ore");
     }
 
     @Test
@@ -40,7 +44,7 @@ public final class BuiltinPalettePresetsTest {
         List<PaletteGroup> groups = BuiltinPalettePresets.groups(PalettePreset.ITEM_TAG_B);
         PaletteGroup oak = group(groups, "builtin_wood_family_oak");
 
-        assertEquals(47, groups.size());
+        assertEquals(56, groups.size());
         assertContains(oak, "minecraft:oak_log");
         assertContains(oak, "minecraft:oak_planks");
         assertContains(oak, "minecraft:oak_fence");
@@ -51,10 +55,15 @@ public final class BuiltinPalettePresetsTest {
         assertContains(group(groups, "builtin_stone_family_stone"), "minecraft:smooth_stone");
         assertContains(group(groups, "builtin_stone_family_granite"), "minecraft:polished_granite_stairs");
         assertContains(group(groups, "builtin_stone_family_granite"), "minecraft:granite_wall");
+        assertContains(group(groups, "builtin_stone_family_stone"), "minecraft:mossy_stone_brick_stairs");
+        assertContains(group(groups, "builtin_stone_family_cinnabar"), "minecraft:chiseled_cinnabar");
+        assertContains(group(groups, "builtin_stone_family_sulfur"), "minecraft:sulfur_spike");
+        assertContains(group(groups, "builtin_copper_state_waxed_oxidized"),
+                "minecraft:waxed_oxidized_copper_golem_statue");
     }
 
     @Test
-    void everyBuiltInMemberExistsAndColorPresetContainsColorRows() {
+    void everyBuiltInMemberExistsAndVisualColorPresetIsComplete() {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
         for (PalettePreset preset : PalettePreset.values()) {
@@ -67,7 +76,13 @@ public final class BuiltinPalettePresetsTest {
                 }
             }
         }
-        assertEquals(12, BuiltinPalettePresets.groups(PalettePreset.COLOR_CATEGORIES).size());
+        List<PaletteGroup> colors = BuiltinPalettePresets.groups(PalettePreset.COLOR_CATEGORIES);
+        assertEquals(8, colors.size());
+        assertEquals(34, group(colors, "builtin_visual_color_red").members().size());
+        assertEquals(25, group(colors, "builtin_visual_color_yellow").members().size());
+        assertContains(group(colors, "builtin_visual_color_red"), "minecraft:cinnabar_bricks");
+        assertContains(group(colors, "builtin_visual_color_yellow"), "minecraft:potent_sulfur");
+        assertContains(group(colors, "builtin_visual_color_cyan_blue"), "minecraft:prismarine_bricks");
     }
 
     private static PaletteGroup group(List<PaletteGroup> groups, String id) {
