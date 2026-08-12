@@ -3,6 +3,7 @@
   "id": "lorian_arch_orbit",
   "version": "${version}",
   "name": "Lorian’s Arch Orbit",
+  "icon": "assets/lorian_arch_orbit/icon.png",
   "description": "Building-assistance tools for creative builders, map makers, and modpack teams.",
   "authors": [
     "DavidBlackCN"

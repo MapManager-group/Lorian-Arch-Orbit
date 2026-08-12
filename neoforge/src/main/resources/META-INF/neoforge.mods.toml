@@ -7,6 +7,7 @@ modId = "lorian_arch_orbit"
 version = "${version}"
 displayName = "Lorian’s Arch Orbit"
 authors = "DavidBlackCN"
+logoFile="assets/lorian_arch_orbit/icon.png"
 description = '''
 Building-assistance tools for creative builders, map makers, and modpack teams.
 '''
