@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "lorian_arch_orbit",
+  "version": "${version}",
+  "name": "Lorian’s Arch Orbit",
+  "description": "Building-assistance tools for creative builders, map makers, and modpack teams.",
+  "authors": [
+    "DavidBlackCN"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.davidblackcn.lorianarchorbit.fabric.LorianArchOrbitFabric"
+    ],
+    "client": [
+      "com.davidblackcn.lorianarchorbit.fabric.client.LorianArchOrbitFabricClient"
+    ],
+    "modmenu": [
+      "com.davidblackcn.lorianarchorbit.fabric.client.LorianArchOrbitModMenu"
+    ],
+    "fabric-datagen": [
+      "com.davidblackcn.lorianarchorbit.fabric.datagen.LorianArchOrbitDataGenerator"
+    ]
+  },
+  "mixins": [
+    "lorian_arch_orbit.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "~26.2",
+    "java": ">=25",
+    "architectury": ">=21.0.7",
+    "fabric-api": ">=0.157.0+26.2"
+  },
+  "recommends": {
+    "yet_another_config_lib_v3": ">=3.9.6",
+    "modmenu": ">=20.0.1"
+  }
+}

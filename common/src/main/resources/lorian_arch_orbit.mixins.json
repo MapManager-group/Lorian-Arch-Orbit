@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "com.davidblackcn.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "minVersion": "0.8",
+  "client": [
+    "client.MinecraftPickMixin"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

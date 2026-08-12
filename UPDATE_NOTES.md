@@ -1,0 +1,32 @@
+- 🏗️ build(core): establish the 0.1.0-alpha Fabric and NeoForge project foundation
+- ✨ feat(core): add the shared feature lifecycle and state management foundation
+- ✨ feat(config): add safe versioned configuration and shared YACL settings
+- ✨ feat(interaction): add shared gesture, wheel arbitration, and adaptive radial HUD foundations
+- ✨ feat(palette): add two-layer component-aware item wheels and an in-game palette editor
+- 🐛 fix(palette): prevent duplicate background blur when opening the palette editor
+- ✨ feat(palette): refine adaptive transparent wheels with immediate opening and exclusive scrolling
+- ✨ feat(palette): enlarge wheel visuals and animate directional scrolling with a 20-item recommendation
+- ✨ feat(palette): show every wheel member and redesign the editor with creative tabs, live preview, and overflow-safe member rows
+- ✨ feat(palette): add configurable built-in wood presets and animated editor interactions
+- ✨ feat(palette): add layered fallback presets for wood, color, copper, stone, and building families
+- 🐛 fix(editor): make creative-tab arrow clicks visibly respond after page changes
+- ✨ feat(palette): complete dyed material defaults with beds, banners, uncolored bases, and stone-family variants
+- ✨ feat(editor): add draggable item and group scrollbars with a taller responsive group list
+- ✨ feat(palette): add versioned clipboard and JSON sharing with previewed conflict-safe imports
+- ✨ feat(smart-pick): add component-aware adjacent, range, and context wheels while preserving vanilla short-press picking
+- 🔧 feat(config): add configurable smart-pick timing, scan limits, history weighting, and opt-in performance statistics
+- 🐛 fix(smart-pick): defer vanilla pick-key binding until client options finish initializing
+- ✨ feat(smart-pick): open the candidate wheel immediately on pick-key press without a long-press delay
+- 🐛 fix(smart-pick): use a brief intent delay so vanilla middle-click taps never flash the candidate wheel
+- 🐛 fix(smart-pick): execute vanilla pick immediately, then open the wheel only after the 100 ms hold intent
+- ✨ feat(reach): add server-authorized block reach adjustment with a hold shortcut, scroll control, and crosshair HUD
+- 🔒 feat(network): validate reach requests with protocol negotiation, permissions, rate limits, and lifecycle cleanup
+- 🐛 fix(network): prevent duplicate reach payload registration during Fabric client startup
+- 🐛 fix(reach): prevent saved values and rate limiting from causing abrupt distance jumps while scrolling
+- ✨ feat(reach): allow vanilla five-block reach and show a transparent compact distance HUD
+- 🐛 fix(reach): hot-reload server reach settings and resync capabilities to connected players
+- ✨ feat(connected-textures): repair missing connection faces for standard-state walls, beds, and doors on Fabric and NeoForge
+- ♻️ refactor(config): migrate the wall visual fix into configurable connected-texture wall, bed, and door options
+- 🐛 fix(connected-textures): reload models safely when toggled and copy source-face UVs for correctly textured connection faces
+- 🐛 fix(connected-textures): source door seam textures from the matching horizontal end face instead of a vertical side
+- 🐛 fix(connected-textures): use each bed foot's colored end texture for both halves of the repaired bed seam

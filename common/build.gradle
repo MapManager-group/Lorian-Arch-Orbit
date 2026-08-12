@@ -1,0 +1,80 @@
+architectury {
+    common rootProject.enabled_platforms.split(',')
+}
+
+sourceSets {
+    main {
+        resources.srcDir 'src/generated/resources'
+    }
+}
+
+configurations {
+    junitConsole
+}
+
+dependencies {
+    // Keep the shared source set compatible with Architectury's Fabric-side compile classpath.
+    // Do not use loader-specific runtime APIs from common code.
+    implementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
+
+    // Architectury API. This is optional, and you can comment it out if you don't need it.
+    implementation "dev.architectury:architectury:$rootProject.architectury_api_version"
+
+    // Minecraft supplies Gson at runtime; declare the exact resolved version so the
+    // standalone configuration tests do not depend on an incidental transitive edge.
+    implementation "com.google.code.gson:gson:$rootProject.gson_version"
+
+    // YACL is a client library. Keep it compile-only in common so dedicated servers do not receive it.
+    compileOnly "dev.isxander:yet-another-config-lib:$rootProject.yacl_version+26.2-fabric"
+
+    junitConsole "org.junit.platform:junit-platform-console-standalone:$rootProject.junit_platform_version"
+
+}
+
+testing {
+    suites {
+        test {
+            useJUnitJupiter(rootProject.junit_version)
+        }
+    }
+}
+
+tasks.named('test', Test) {
+    classpath = files(
+            sourceSets.test.output,
+            sourceSets.main.output,
+            configurations.testRuntimeClasspath.filter {
+                it.name.startsWith('junit-') || it.name.startsWith('opentest4j-') ||
+                        it.name.startsWith('gson-')
+            }
+    )
+}
+
+def windowsNonAsciiPath = System.getProperty('os.name').startsWith('Windows') &&
+        rootProject.projectDir.absolutePath.chars().anyMatch { it > 127 }
+
+// Gradle's forked test worker cannot load test classes from this workspace's
+// non-ASCII Windows path. Keep the normal Test task everywhere else and use the
+// same JUnit Platform engine in a direct Java process only for that environment.
+tasks.register('unitTest', JavaExec) {
+    group = 'verification'
+    description = 'Runs pure common unit tests through the JUnit Platform console.'
+    dependsOn tasks.named('testClasses')
+    classpath = files(
+            configurations.junitConsole,
+            configurations.testRuntimeClasspath,
+            sourceSets.test.output,
+            sourceSets.main.output
+    )
+    mainClass = 'org.junit.platform.console.ConsoleLauncher'
+    args 'execute', '--scan-classpath', '--disable-banner', '--details', 'summary', '--fail-if-no-tests'
+}
+
+if (windowsNonAsciiPath) {
+    tasks.named('test') {
+        enabled = false
+    }
+    tasks.named('check') {
+        dependsOn tasks.named('unitTest')
+    }
+}

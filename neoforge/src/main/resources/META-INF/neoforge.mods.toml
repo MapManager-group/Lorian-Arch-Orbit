@@ -1,0 +1,43 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "MIT"
+
+[[mods]]
+modId = "lorian_arch_orbit"
+version = "${version}"
+displayName = "Lorian’s Arch Orbit"
+authors = "DavidBlackCN"
+description = '''
+Building-assistance tools for creative builders, map makers, and modpack teams.
+'''
+
+[[dependencies.lorian_arch_orbit]]
+modId = "neoforge"
+type = "required"
+versionRange = "[26.2.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.lorian_arch_orbit]]
+modId = "minecraft"
+type = "required"
+versionRange = "[26.2,26.3)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.lorian_arch_orbit]]
+modId = "architectury"
+type = "required"
+versionRange = "[21.0.7,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.lorian_arch_orbit]]
+modId = "yet_another_config_lib_v3"
+type = "required"
+versionRange = "[3.9.6,)"
+ordering = "AFTER"
+side = "CLIENT"
+
+[[mixins]]
+config = "lorian_arch_orbit.mixins.json"

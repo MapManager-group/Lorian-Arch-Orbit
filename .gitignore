@@ -1,0 +1,19 @@
+# Gradle and build output
+.gradle/
+build/
+**/build/
+**/bin/
+
+# Local development environments
+.idea/
+*.iml
+.vscode/
+out/
+
+# Runtime files
+run/
+logs/
+*.log
+
+# test-data
+test-data/

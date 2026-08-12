@@ -1,0 +1,120 @@
+{
+  "matrices": [
+    {
+      "id": "wood",
+      "primary_prefix": "builtin_wood_form_",
+      "secondary_prefix": "builtin_wood_family_",
+      "columns": [
+        {"id": "oak", "name": "Oak Family"},
+        {"id": "spruce", "name": "Spruce Family"},
+        {"id": "birch", "name": "Birch Family"},
+        {"id": "jungle", "name": "Jungle Family"},
+        {"id": "acacia", "name": "Acacia Family"},
+        {"id": "cherry", "name": "Cherry Family"},
+        {"id": "dark_oak", "name": "Dark Oak Family"},
+        {"id": "pale_oak", "name": "Pale Oak Family"},
+        {"id": "mangrove", "name": "Mangrove Family"},
+        {"id": "bamboo", "name": "Bamboo Family"},
+        {"id": "crimson", "name": "Crimson Family"},
+        {"id": "warped", "name": "Warped Family"}
+      ],
+      "rows": [
+        {"id": "logs", "name": "Logs by Wood Type", "template": "minecraft:{column}_log", "cells": {"bamboo": "minecraft:bamboo_block", "crimson": "minecraft:crimson_stem", "warped": "minecraft:warped_stem"}},
+        {"id": "stripped_logs", "name": "Stripped Logs by Wood Type", "template": "minecraft:stripped_{column}_log", "cells": {"bamboo": "minecraft:stripped_bamboo_block", "crimson": "minecraft:stripped_crimson_stem", "warped": "minecraft:stripped_warped_stem"}},
+        {"id": "wood", "name": "Wood by Wood Type", "template": "minecraft:{column}_wood", "cells": {"bamboo": "", "crimson": "minecraft:crimson_hyphae", "warped": "minecraft:warped_hyphae"}},
+        {"id": "stripped_wood", "name": "Stripped Wood by Wood Type", "template": "minecraft:stripped_{column}_wood", "cells": {"bamboo": "", "crimson": "minecraft:stripped_crimson_hyphae", "warped": "minecraft:stripped_warped_hyphae"}},
+        {"id": "planks", "name": "Planks by Wood Type", "template": "minecraft:{column}_planks"},
+        {"id": "stairs", "name": "Stairs by Wood Type", "template": "minecraft:{column}_stairs"},
+        {"id": "slabs", "name": "Slabs by Wood Type", "template": "minecraft:{column}_slab"},
+        {"id": "shelves", "name": "Shelves by Wood Type", "template": "minecraft:{column}_shelf"},
+        {"id": "fences", "name": "Fences by Wood Type", "template": "minecraft:{column}_fence"},
+        {"id": "fence_gates", "name": "Fence Gates by Wood Type", "template": "minecraft:{column}_fence_gate"},
+        {"id": "doors", "name": "Doors by Wood Type", "template": "minecraft:{column}_door"},
+        {"id": "trapdoors", "name": "Trapdoors by Wood Type", "template": "minecraft:{column}_trapdoor"},
+        {"id": "pressure_plates", "name": "Pressure Plates by Wood Type", "template": "minecraft:{column}_pressure_plate"},
+        {"id": "buttons", "name": "Buttons by Wood Type", "template": "minecraft:{column}_button"},
+        {"id": "signs", "name": "Signs by Wood Type", "template": "minecraft:{column}_sign"},
+        {"id": "hanging_signs", "name": "Hanging Signs by Wood Type", "template": "minecraft:{column}_hanging_sign"},
+        {"id": "foliage", "name": "Foliage by Wood Type", "template": "minecraft:{column}_leaves", "cells": {"bamboo": "", "crimson": "minecraft:nether_wart_block", "warped": "minecraft:warped_wart_block"}},
+        {"id": "saplings", "name": "Saplings by Wood Type", "template": "minecraft:{column}_sapling", "cells": {"mangrove": "minecraft:mangrove_propagule", "bamboo": "minecraft:bamboo", "crimson": "minecraft:crimson_fungus", "warped": "minecraft:warped_fungus"}}
+      ]
+    },
+    {
+      "id": "color",
+      "primary_prefix": "builtin_color_material_",
+      "secondary_prefix": "builtin_color_family_",
+      "columns": [
+        {"id": "white", "name": "White Blocks"}, {"id": "orange", "name": "Orange Blocks"},
+        {"id": "magenta", "name": "Magenta Blocks"}, {"id": "light_blue", "name": "Light Blue Blocks"},
+        {"id": "yellow", "name": "Yellow Blocks"}, {"id": "lime", "name": "Lime Blocks"},
+        {"id": "pink", "name": "Pink Blocks"}, {"id": "gray", "name": "Gray Blocks"},
+        {"id": "light_gray", "name": "Light Gray Blocks"}, {"id": "cyan", "name": "Cyan Blocks"},
+        {"id": "purple", "name": "Purple Blocks"}, {"id": "blue", "name": "Blue Blocks"},
+        {"id": "brown", "name": "Brown Blocks"}, {"id": "green", "name": "Green Blocks"},
+        {"id": "red", "name": "Red Blocks"}, {"id": "black", "name": "Black Blocks"}
+      ],
+      "rows": [
+        {"id": "wool", "name": "Wool by Color", "template": "minecraft:{column}_wool"},
+        {"id": "stained_glass", "name": "Glass by Color", "template": "minecraft:{column}_stained_glass", "primary_members": ["minecraft:glass"]},
+        {"id": "terracotta", "name": "Terracotta by Color", "template": "minecraft:{column}_terracotta", "primary_members": ["minecraft:terracotta"]},
+        {"id": "stained_glass_pane", "name": "Glass Panes by Color", "template": "minecraft:{column}_stained_glass_pane", "primary_members": ["minecraft:glass_pane"]},
+        {"id": "carpet", "name": "Carpet by Color", "template": "minecraft:{column}_carpet"},
+        {"id": "concrete", "name": "Concrete by Color", "template": "minecraft:{column}_concrete"},
+        {"id": "concrete_powder", "name": "Concrete Powder by Color", "template": "minecraft:{column}_concrete_powder"},
+        {"id": "shulker_box", "name": "Shulker Boxes by Color", "template": "minecraft:{column}_shulker_box", "primary_members": ["minecraft:shulker_box"]},
+        {"id": "glazed_terracotta", "name": "Glazed Terracotta by Color", "template": "minecraft:{column}_glazed_terracotta"},
+        {"id": "candles", "name": "Candles by Color", "template": "minecraft:{column}_candle", "primary_members": ["minecraft:candle"]},
+        {"id": "beds", "name": "Beds by Color", "template": "minecraft:{column}_bed"},
+        {"id": "banners", "name": "Banners by Color", "template": "minecraft:{column}_banner"}
+      ]
+    },
+    {
+      "id": "copper",
+      "primary_prefix": "builtin_copper_form_",
+      "secondary_prefix": "builtin_copper_state_",
+      "columns": [
+        {"id": "copper", "name": "Copper"}, {"id": "exposed", "name": "Exposed Copper"},
+        {"id": "weathered", "name": "Weathered Copper"}, {"id": "oxidized", "name": "Oxidized Copper"},
+        {"id": "waxed", "name": "Waxed Copper"}, {"id": "waxed_exposed", "name": "Waxed Exposed Copper"},
+        {"id": "waxed_weathered", "name": "Waxed Weathered Copper"}, {"id": "waxed_oxidized", "name": "Waxed Oxidized Copper"}
+      ],
+      "rows": [
+        {"id": "blocks", "name": "Copper Blocks by State", "cells": {"copper":"minecraft:copper_block","exposed":"minecraft:exposed_copper","weathered":"minecraft:weathered_copper","oxidized":"minecraft:oxidized_copper","waxed":"minecraft:waxed_copper_block","waxed_exposed":"minecraft:waxed_exposed_copper","waxed_weathered":"minecraft:waxed_weathered_copper","waxed_oxidized":"minecraft:waxed_oxidized_copper"}},
+        {"id": "cut", "name": "Cut Copper by State", "cells": {"copper":"minecraft:cut_copper","exposed":"minecraft:exposed_cut_copper","weathered":"minecraft:weathered_cut_copper","oxidized":"minecraft:oxidized_cut_copper","waxed":"minecraft:waxed_cut_copper","waxed_exposed":"minecraft:waxed_exposed_cut_copper","waxed_weathered":"minecraft:waxed_weathered_cut_copper","waxed_oxidized":"minecraft:waxed_oxidized_cut_copper"}},
+        {"id": "stairs", "name": "Copper Stairs by State", "cells": {"copper":"minecraft:cut_copper_stairs","exposed":"minecraft:exposed_cut_copper_stairs","weathered":"minecraft:weathered_cut_copper_stairs","oxidized":"minecraft:oxidized_cut_copper_stairs","waxed":"minecraft:waxed_cut_copper_stairs","waxed_exposed":"minecraft:waxed_exposed_cut_copper_stairs","waxed_weathered":"minecraft:waxed_weathered_cut_copper_stairs","waxed_oxidized":"minecraft:waxed_oxidized_cut_copper_stairs"}},
+        {"id": "slabs", "name": "Copper Slabs by State", "cells": {"copper":"minecraft:cut_copper_slab","exposed":"minecraft:exposed_cut_copper_slab","weathered":"minecraft:weathered_cut_copper_slab","oxidized":"minecraft:oxidized_cut_copper_slab","waxed":"minecraft:waxed_cut_copper_slab","waxed_exposed":"minecraft:waxed_exposed_cut_copper_slab","waxed_weathered":"minecraft:waxed_weathered_cut_copper_slab","waxed_oxidized":"minecraft:waxed_oxidized_cut_copper_slab"}}
+      ]
+    }
+  ],
+  "primary_explicit": [
+    {"id":"builtin_building_stone","name":"Stone Variants","members":["minecraft:stone","minecraft:granite","minecraft:polished_granite","minecraft:diorite","minecraft:polished_diorite","minecraft:andesite","minecraft:polished_andesite","minecraft:tuff","minecraft:calcite"]},
+    {"id":"builtin_building_dirt","name":"Soil Variants","members":["minecraft:dirt","minecraft:coarse_dirt","minecraft:rooted_dirt","minecraft:podzol","minecraft:mycelium","minecraft:crimson_nylium","minecraft:warped_nylium"]},
+    {"id":"builtin_building_ores","name":"Ores","members":["minecraft:coal_ore","minecraft:iron_ore","minecraft:copper_ore","minecraft:gold_ore","minecraft:redstone_ore","minecraft:emerald_ore","minecraft:lapis_ore","minecraft:diamond_ore","minecraft:deepslate_coal_ore","minecraft:deepslate_iron_ore","minecraft:deepslate_copper_ore","minecraft:deepslate_gold_ore","minecraft:deepslate_redstone_ore","minecraft:deepslate_emerald_ore","minecraft:deepslate_lapis_ore","minecraft:deepslate_diamond_ore"]},
+    {"id":"builtin_building_raw_metal","name":"Raw Metal Blocks","members":["minecraft:raw_iron_block","minecraft:raw_copper_block","minecraft:raw_gold_block"]},
+    {"id":"builtin_building_mineral","name":"Mineral Blocks","members":["minecraft:coal_block","minecraft:iron_block","minecraft:copper_block","minecraft:gold_block","minecraft:redstone_block","minecraft:lapis_block","minecraft:emerald_block","minecraft:diamond_block"]},
+    {"id":"builtin_building_stone_bricks","name":"Stone Bricks","members":["minecraft:stone_bricks","minecraft:mossy_stone_bricks","minecraft:cracked_stone_bricks","minecraft:chiseled_stone_bricks"]},
+    {"id":"builtin_building_sandstone","name":"Sandstone","members":["minecraft:sandstone","minecraft:chiseled_sandstone","minecraft:cut_sandstone","minecraft:smooth_sandstone"]},
+    {"id":"builtin_building_red_sandstone","name":"Red Sandstone","members":["minecraft:red_sandstone","minecraft:chiseled_red_sandstone","minecraft:cut_red_sandstone","minecraft:smooth_red_sandstone"]},
+    {"id":"builtin_building_quartz","name":"Quartz Blocks","members":["minecraft:quartz_block","minecraft:chiseled_quartz_block","minecraft:quartz_bricks","minecraft:quartz_pillar","minecraft:smooth_quartz"]},
+    {"id":"builtin_building_prismarine","name":"Prismarine","members":["minecraft:prismarine","minecraft:prismarine_bricks","minecraft:dark_prismarine"]},
+    {"id":"builtin_building_blackstone","name":"Blackstone","members":["minecraft:blackstone","minecraft:polished_blackstone","minecraft:chiseled_polished_blackstone","minecraft:polished_blackstone_bricks","minecraft:cracked_polished_blackstone_bricks"]},
+    {"id":"builtin_building_sponge","name":"Sponge","members":["minecraft:sponge","minecraft:wet_sponge"]},
+    {"id":"builtin_building_froglight","name":"Froglights","members":["minecraft:ochre_froglight","minecraft:verdant_froglight","minecraft:pearlescent_froglight"]},
+    {"id":"builtin_building_lantern","name":"Lanterns","members":["minecraft:lantern","minecraft:soul_lantern"]},
+    {"id":"builtin_building_campfire","name":"Campfires","members":["minecraft:campfire","minecraft:soul_campfire"]},
+    {"id":"builtin_building_coral_blocks","name":"Coral Blocks","members":["minecraft:tube_coral_block","minecraft:brain_coral_block","minecraft:bubble_coral_block","minecraft:fire_coral_block","minecraft:horn_coral_block","minecraft:dead_tube_coral_block","minecraft:dead_brain_coral_block","minecraft:dead_bubble_coral_block","minecraft:dead_fire_coral_block","minecraft:dead_horn_coral_block"]}
+  ],
+  "secondary_explicit": [
+    {"id":"builtin_stone_family_stone","name":"Stone Family","members":["minecraft:stone","minecraft:smooth_stone","minecraft:stone_slab","minecraft:smooth_stone_slab","minecraft:stone_stairs","minecraft:stone_button","minecraft:stone_pressure_plate"]},
+    {"id":"builtin_stone_family_granite","name":"Granite Family","members":["minecraft:granite","minecraft:polished_granite","minecraft:granite_slab","minecraft:polished_granite_slab","minecraft:granite_stairs","minecraft:polished_granite_stairs","minecraft:granite_wall"]},
+    {"id":"builtin_stone_family_diorite","name":"Diorite Family","members":["minecraft:diorite","minecraft:polished_diorite","minecraft:diorite_slab","minecraft:polished_diorite_slab","minecraft:diorite_stairs","minecraft:polished_diorite_stairs","minecraft:diorite_wall"]},
+    {"id":"builtin_stone_family_andesite","name":"Andesite Family","members":["minecraft:andesite","minecraft:polished_andesite","minecraft:andesite_slab","minecraft:polished_andesite_slab","minecraft:andesite_stairs","minecraft:polished_andesite_stairs","minecraft:andesite_wall"]},
+    {"id":"builtin_stone_family_tuff","name":"Tuff Family","members":["minecraft:tuff","minecraft:tuff_slab","minecraft:tuff_stairs","minecraft:tuff_wall","minecraft:chiseled_tuff","minecraft:polished_tuff","minecraft:polished_tuff_slab","minecraft:polished_tuff_stairs","minecraft:polished_tuff_wall","minecraft:tuff_bricks","minecraft:tuff_brick_slab","minecraft:tuff_brick_stairs","minecraft:tuff_brick_wall","minecraft:chiseled_tuff_bricks"]},
+    {"id":"builtin_stone_family_deepslate","name":"Deepslate Family","members":["minecraft:deepslate","minecraft:cobbled_deepslate","minecraft:cobbled_deepslate_slab","minecraft:cobbled_deepslate_stairs","minecraft:cobbled_deepslate_wall","minecraft:polished_deepslate","minecraft:polished_deepslate_slab","minecraft:polished_deepslate_stairs","minecraft:polished_deepslate_wall","minecraft:deepslate_bricks","minecraft:deepslate_brick_slab","minecraft:deepslate_brick_stairs","minecraft:deepslate_brick_wall","minecraft:cracked_deepslate_bricks","minecraft:deepslate_tiles","minecraft:deepslate_tile_slab","minecraft:deepslate_tile_stairs","minecraft:deepslate_tile_wall","minecraft:cracked_deepslate_tiles","minecraft:chiseled_deepslate"]},
+    {"id":"builtin_stone_family_sandstone","name":"Sandstone Family","members":["minecraft:sandstone","minecraft:cut_sandstone","minecraft:chiseled_sandstone","minecraft:smooth_sandstone","minecraft:sandstone_slab","minecraft:cut_sandstone_slab","minecraft:smooth_sandstone_slab","minecraft:sandstone_stairs","minecraft:smooth_sandstone_stairs","minecraft:sandstone_wall"]},
+    {"id":"builtin_stone_family_red_sandstone","name":"Red Sandstone Family","members":["minecraft:red_sandstone","minecraft:cut_red_sandstone","minecraft:chiseled_red_sandstone","minecraft:smooth_red_sandstone","minecraft:red_sandstone_slab","minecraft:cut_red_sandstone_slab","minecraft:smooth_red_sandstone_slab","minecraft:red_sandstone_stairs","minecraft:smooth_red_sandstone_stairs","minecraft:red_sandstone_wall"]},
+    {"id":"builtin_stone_family_quartz","name":"Quartz Family","members":["minecraft:quartz_block","minecraft:chiseled_quartz_block","minecraft:quartz_bricks","minecraft:quartz_pillar","minecraft:smooth_quartz","minecraft:quartz_slab","minecraft:smooth_quartz_slab","minecraft:quartz_stairs","minecraft:smooth_quartz_stairs"]},
+    {"id":"builtin_stone_family_prismarine","name":"Prismarine Family","members":["minecraft:prismarine","minecraft:prismarine_slab","minecraft:prismarine_stairs","minecraft:prismarine_wall","minecraft:prismarine_bricks","minecraft:prismarine_brick_slab","minecraft:prismarine_brick_stairs","minecraft:dark_prismarine","minecraft:dark_prismarine_slab","minecraft:dark_prismarine_stairs"]},
+    {"id":"builtin_stone_family_blackstone","name":"Blackstone Family","members":["minecraft:blackstone","minecraft:blackstone_slab","minecraft:blackstone_stairs","minecraft:blackstone_wall","minecraft:polished_blackstone","minecraft:polished_blackstone_slab","minecraft:polished_blackstone_stairs","minecraft:polished_blackstone_wall","minecraft:polished_blackstone_button","minecraft:polished_blackstone_pressure_plate","minecraft:chiseled_polished_blackstone","minecraft:polished_blackstone_bricks","minecraft:polished_blackstone_brick_slab","minecraft:polished_blackstone_brick_stairs","minecraft:polished_blackstone_brick_wall","minecraft:cracked_polished_blackstone_bricks"]}
+  ]
+}
