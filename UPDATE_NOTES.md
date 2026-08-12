@@ -30,3 +30,4 @@
 - 🐛 fix(connected-textures): reload models safely when toggled and copy source-face UVs for correctly textured connection faces
 - 🐛 fix(connected-textures): source door seam textures from the matching horizontal end face instead of a vertical side
 - 🐛 fix(connected-textures): use each bed foot's colored end texture for both halves of the repaired bed seam
+- 🛠️ ci(build): run the configured shared unit-test task in GitHub Actions before building both loader artifacts

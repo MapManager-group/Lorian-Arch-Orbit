@@ -50,8 +50,11 @@ jobs:
       - name: Make Gradle Wrapper executable
         run: chmod +x gradlew
 
-      - name: Build Fabric and NeoForge jars
-        run: ./gradlew clean build --no-daemon --console=plain
+      - name: Run shared unit tests and build Fabric and NeoForge jars
+        # :common:test uses Gradle's forked test worker, whose classpath is intentionally
+        # narrowed for local Windows compatibility. The project-wide verification task is
+        # :common:unitTest, which runs the same tests with the bundled JUnit Platform.
+        run: ./gradlew clean common:unitTest fabric:build neoforge:build --no-daemon --console=plain
 
       - name: Upload built jars
         uses: actions/upload-artifact@v4
