@@ -1,43 +1,91 @@
 # Lorian’s Arch Orbit
 
-A building-assistance mod for Creative builders, map makers, and modpack teams. It supports Minecraft 26.2 on Fabric and NeoForge, and each major feature can be disabled independently.
+> [!NOTE]
+> This is a project by AI. If you mind this, please do not use this mod.
+
+<img src="https://cdn.jsdelivr.net/gh/MapManager-group/Lorian-Arch-Orbit@main/docs/image/icon.png" width="400" alt="The color wheel is moving on its own w~">
+
+A building-assistance mod for Creative builders, map makers, and modpack teams. It supports Minecraft 26.2 on Fabric and NeoForge; each major feature can be toggled independently and hot-reloaded.
 
 ## Features
 
-- Primary and secondary item palette wheels: hold `R`, then scroll to select. Press `P` for the visual editor and JSON/share-code import or export.
-- Smart pick: tap middle mouse for vanilla Pick Block, or hold it for about 100 ms to open the candidate wheel.
-- Block reach: hold `G` and scroll to select 5–128 blocks. The mod must be installed and authorized on both client and server.
-- Connected-texture fixes: restores missing joining faces on standard wall, bed, and door models. Chests are not supported yet.
-- Invisible-block display: press `V` to toggle barriers and light blocks; either type can be filtered in the configuration.
+`O` opens the configuration screen by default. All keybindings can be changed in Minecraft's Controls settings.  
+Except for **interaction reach modification**, all features are client-side.
 
-Press `O` to open the configuration screen. Every binding can be changed in Minecraft Controls.
+### Primary / Secondary Item Color Wheels
 
-## Installation
+- Hold `R` by default to open the **primary color wheel**; press `R` twice to open the **secondary color wheel**; use the scroll wheel to select items
+- Press `P` by default to open the **visual color wheel editor**, which supports **JSON / share-code import and export**
 
-Install the JAR for your loader and Architectury API. Fabric also requires Fabric API. YACL is recommended on clients; Mod Menu is optional on Fabric. NeoForge exposes the configuration from its mod list.
+![](./docs/image/1.png)
 
-Only block reach needs the server component. A dedicated server needs Architectury API and this mod, but not YACL, Mod Menu, or other client-only dependencies.
+![](./docs/image/2.png)
+
+### Smart Middle-Click Pick Block
+
+- A short middle-click keeps the vanilla Pick Block behavior; holding for about 100 ms opens the **candidate wheel** to select nearby blocks
+- The candidate wheel provides three modes: **adjacent mode, range mode, and context mode**; context mode is enabled by default
+
+![](./docs/image/3.png)
+
+### Interaction Reach Modification
+
+- Hold `G` by default and use the mouse scroll wheel to dynamically adjust the interaction reach from 5 to 128 blocks
+- This feature requires the mod to be installed on both the client and the server, and is authorized by the server configuration
+- This feature is disabled by default, because on the Fabric side Axiom's `Infinite Reach` can replace it
+
+![](./docs/image/4.png)
+
+### Connected-Texture Fixes
+
+- Completes the connected faces of standard walls, beds, and door models
+- All fixes can be changed and reloaded dynamically in the configuration
+
+![](./docs/image/5.png)
+
+### Invisible-Block Display
+
+- Press `V` by default to toggle barriers and light blocks at the same time; the types can be filtered in the configuration
+
+![](./docs/image/6.png)
+
+
+## Dependencies
+
+### Fabric
+
+- [Fabric API](https://modrinth.com/mod/fabric-api)
+- [Mod Menu](https://modrinth.com/mod/modmenu)
+- [Architectury API](https://modrinth.com/mod/architectury-api)
+- [YetAnotherConfigLib (YACL)](https://modrinth.com/mod/yacl)
+
+### NeoForge
+
+- [Architectury API](https://modrinth.com/mod/architectury-api)
+- [YetAnotherConfigLib (YACL)](https://modrinth.com/mod/yacl)
+
 
 ## Documentation
 
-The project documentation is maintained in Chinese:
-
 - [Configuration and troubleshooting](CONFIGURATION.md)
-- [Forward migration guide](docs/UPWARD_MIGRATION.md)
-- [Backport guide](docs/DOWNWARD_MIGRATION.md)
+- [Upward migration guide](docs/UPWARD_MIGRATION.md)
+- [Downward migration guide](docs/DOWNWARD_MIGRATION.md)
 - [Update notes](UPDATE_NOTES.md)
 
-## Modpack integration
 
-A [Preliminary Art Form 26.2 preset](integration/preliminary-art-form-26.2/README.md) is included. Remove LotTweaks and Visual Barriers because their features overlap. The default `V` binding also conflicts with WorldEdit CUI, so one binding must be changed in the pack's `options.txt`.
+## TODO
+
+1. Chest connected-texture fixes
+2. Structure-block display
+3. Custom tool & command wheel
+
 
 ## Credits
 
-- [LotTweaks](https://github.com/aruma256/LotTweaks) for behavioral references around palettes, smart pick, and reach.
-- [Visible Barriers](https://github.com/AmyMialeeMods/visiblebarriers) for invisible-block visibility behavior.
-- [Preliminary Art Form](https://github.com/MapManager-group/Preliminary-Art-Form-Modpack) as the original target modpack and compatibility environment.
-- Block-group and connection-face reproduction material in the development workspace was used only for behavioral analysis. This project's code, model definitions, and atlas configuration are independently implemented; Minecraft supplies the runtime block icons and base textures.
+- [LotTweaks](https://github.com/aruma256/LotTweaks): behavioral reference for the color wheel, smart pick, and interaction reach.
+- [Visible Barriers](https://github.com/AmyMialeeMods/visiblebarriers): behavioral reference for invisible-block display.
+- The lovely Jiu Hu (酒狐): contributed this project's icon.
 
 ## License
 
-Copyright © 2026 DavidBlackCN. Released under the [MIT License](LICENSE). Minecraft names, icons, and game assets belong to their respective rights holders.
+[MIT License](LICENSE).
