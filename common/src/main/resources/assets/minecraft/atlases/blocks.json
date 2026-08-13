@@ -1,0 +1,89 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/barrier",
+      "sprite": "lorian_arch_orbit:block/barrier"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_00",
+      "sprite": "lorian_arch_orbit:block/light_00"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_01",
+      "sprite": "lorian_arch_orbit:block/light_01"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_02",
+      "sprite": "lorian_arch_orbit:block/light_02"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_03",
+      "sprite": "lorian_arch_orbit:block/light_03"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_04",
+      "sprite": "lorian_arch_orbit:block/light_04"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_05",
+      "sprite": "lorian_arch_orbit:block/light_05"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_06",
+      "sprite": "lorian_arch_orbit:block/light_06"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_07",
+      "sprite": "lorian_arch_orbit:block/light_07"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_08",
+      "sprite": "lorian_arch_orbit:block/light_08"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_09",
+      "sprite": "lorian_arch_orbit:block/light_09"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_10",
+      "sprite": "lorian_arch_orbit:block/light_10"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_11",
+      "sprite": "lorian_arch_orbit:block/light_11"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_12",
+      "sprite": "lorian_arch_orbit:block/light_12"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_13",
+      "sprite": "lorian_arch_orbit:block/light_13"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_14",
+      "sprite": "lorian_arch_orbit:block/light_14"
+    },
+    {
+      "type": "minecraft:single",
+      "resource": "minecraft:item/light_15",
+      "sprite": "lorian_arch_orbit:block/light_15"
+    }
+  ]
+}

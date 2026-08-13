@@ -133,7 +133,7 @@ public final class PaletteEditorScreen extends Screen {
     public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         graphics.centeredText(font, title, width / 2, 8, 0xFFFFFFFF);
-        graphics.text(font, Component.literal(layer == Layer.PRIMARY ? "Primary" : "Secondary"),
+        graphics.text(font, text(layer == Layer.PRIMARY ? "layer.primary" : "layer.secondary"),
                 GROUP_LEFT, 10, 0xFF7FD4FF);
         EditorLayout layout = layout();
         updateScrollbarDragging(layout, mouseY);

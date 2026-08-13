@@ -32,3 +32,10 @@
 - 🐛 fix(connected-textures): use each bed foot's colored end texture for both halves of the repaired bed seam
 - 🛠️ ci(build): run the configured shared unit-test task in GitHub Actions before building both loader artifacts
 - ✨ feat(palette): add eight cross-material visual color groups and complete masonry, copper, cinnabar, and sulfur defaults
+- ✨ feat(invisible-blocks): add one shortcut to display barrier and light blocks with independent visibility filters
+- 🐛 fix(invisible-blocks): rebuild extracted geometry immediately, bake two-layer marker models with atlas-local sprite aliases, and report state in the action bar
+- 💄 style(invisible-blocks): use translucent stained-glass backing while preserving barrier marks and per-face light-level indicators
+- 🐛 fix(invisible-blocks): skip vanilla breaking-hit particles for empty-shape barrier and light markers to prevent client crashes
+- 🚀 release(build): prepare reproducible Fabric and NeoForge 1.0.0 artifacts with Minecraft 26.2 in their filenames
+- 💬 fix(localization): align Chinese and English UI text, simplify palette terminology, and honor the configured smart-pick hold threshold
+- 📝 docs(release): add bilingual project overviews, configuration troubleshooting, Preliminary Art Form defaults, and forward/backport guides

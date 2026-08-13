@@ -46,6 +46,10 @@ public final class ConfigFileTest {
         }
         assertEquals(PalettePreset.ITEM_TAG_A, client.client().primaryPalettePreset());
         assertEquals(PalettePreset.ITEM_TAG_B, client.client().secondaryPalettePreset());
+        assertEquals(100, client.client().smartPickHoldThresholdMs());
+        assertFalse(client.client().invisibleBlocksVisible());
+        assertTrue(client.client().showBarriers());
+        assertTrue(client.client().showLightBlocks());
         assertEquals(68, client.primaryWheel().groups().size());
         assertEquals(56, client.secondaryWheel().groups().size());
         assertTrue(json(temporaryDirectory.resolve(ConfigConstants.PRIMARY_WHEEL_FILE))

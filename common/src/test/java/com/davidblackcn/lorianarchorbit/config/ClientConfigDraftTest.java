@@ -43,6 +43,8 @@ public final class ClientConfigDraftTest {
         draft.setPrimaryPalettePreset(PalettePreset.COLOR_CATEGORIES);
         draft.setSecondaryPalettePreset(PalettePreset.ITEM_TAG_A);
         draft.setSmartPickDebugStats(true);
+        draft.setInvisibleBlocksVisible(true);
+        draft.setShowLightBlocks(false);
 
         assertTrue(manager.save(draft).successful());
         assertFalse(manager.client().featureEnabled("palette_wheel"));
@@ -50,6 +52,9 @@ public final class ClientConfigDraftTest {
         assertEquals(PalettePreset.COLOR_CATEGORIES, manager.client().primaryPalettePreset());
         assertEquals(PalettePreset.ITEM_TAG_A, manager.client().secondaryPalettePreset());
         assertTrue(manager.client().smartPickDebugStats());
+        assertTrue(manager.client().invisibleBlocksVisible());
+        assertTrue(manager.client().showBarriers());
+        assertFalse(manager.client().showLightBlocks());
 
         ClientConfigDraft reset = new ClientConfigDraft(manager.client());
         reset.restoreDefaults();
@@ -59,5 +64,8 @@ public final class ClientConfigDraftTest {
         assertEquals(PalettePreset.ITEM_TAG_A, manager.client().primaryPalettePreset());
         assertEquals(PalettePreset.ITEM_TAG_B, manager.client().secondaryPalettePreset());
         assertFalse(manager.client().smartPickDebugStats());
+        assertFalse(manager.client().invisibleBlocksVisible());
+        assertTrue(manager.client().showBarriers());
+        assertTrue(manager.client().showLightBlocks());
     }
 }

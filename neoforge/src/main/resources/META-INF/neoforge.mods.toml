@@ -35,7 +35,7 @@ side = "BOTH"
 
 [[dependencies.lorian_arch_orbit]]
 modId = "yet_another_config_lib_v3"
-type = "required"
+type = "optional"
 versionRange = "[3.9.6,)"
 ordering = "AFTER"
 side = "CLIENT"

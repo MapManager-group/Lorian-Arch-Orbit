@@ -7,6 +7,7 @@ import com.davidblackcn.lorianarchorbit.config.ClientConfigSnapshot;
 import com.davidblackcn.lorianarchorbit.config.ConfigChange;
 import com.davidblackcn.lorianarchorbit.config.ConfigLoadResult;
 import com.davidblackcn.lorianarchorbit.client.connected.ConnectedTextureRuntime;
+import com.davidblackcn.lorianarchorbit.client.invisible.InvisibleBlocksRuntime;
 import com.davidblackcn.lorianarchorbit.feature.FeatureManager;
 import com.davidblackcn.lorianarchorbit.feature.FeatureServices;
 import com.davidblackcn.lorianarchorbit.feature.RuntimeSide;
@@ -56,6 +57,7 @@ public final class ClientConfigRuntime {
         );
         ClientPaletteRuntime.initialize(category);
         ClientReachRuntime.initialize(category);
+        InvisibleBlocksRuntime.initialize(category);
         openConfig = new KeyMapping(
                 "key.lorian_arch_orbit.open_config", InputConstants.KEY_O, category
         );
@@ -102,6 +104,10 @@ public final class ClientConfigRuntime {
         return configManager;
     }
 
+    public static boolean initialized() {
+        return configManager != null;
+    }
+
     public static ConfigLoadResult save(ClientConfigDraft draft) {
         return configManager().save(draft);
     }
@@ -117,6 +123,7 @@ public final class ClientConfigRuntime {
     private static void onClientTick(Minecraft minecraft) {
         ClientPaletteRuntime.tick(minecraft);
         ClientReachRuntime.tick(minecraft);
+        InvisibleBlocksRuntime.tick(minecraft);
         while (openConfig.consumeClick()) {
             minecraft.setScreenAndShow(createScreen(null));
         }
@@ -146,6 +153,9 @@ public final class ClientConfigRuntime {
             if (namespace.equals(ConnectedTextureRuntime.FEATURE_ID)) {
                 ConnectedTextureRuntime.configsChanged();
             }
+            if (namespace.equals("invisible_blocks")) {
+                InvisibleBlocksRuntime.configsChanged();
+            }
             if (snapshot.enabledFeatures().containsKey(namespace)) {
                 featureManager.setUserEnabled(namespace, snapshot.featureEnabled(namespace));
             } else if (namespace.equals("ui") && !snapshot.hudEnabled()) {
@@ -168,6 +178,7 @@ public final class ClientConfigRuntime {
         ClientSmartPickRuntime.closeRuntime();
         ClientReachRuntime.closeRuntime();
         ClientPaletteRuntime.closeRuntime();
+        InvisibleBlocksRuntime.closeRuntime();
         ClientInteractionRuntime.close();
     }
 }

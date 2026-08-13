@@ -32,7 +32,6 @@ import java.util.List;
 
 public final class ClientSmartPickRuntime {
     private static final String OWNER = "smart_pick";
-    private static final int ACTIVATION_DELAY_MS = 100;
     private static final int RANGE_VISIBLE = 12;
     private static final int HISTORY_SIZE = 16;
     private static final System.Logger LOGGER = System.getLogger("lorian_arch_orbit.smart_pick");
@@ -101,7 +100,7 @@ public final class ClientSmartPickRuntime {
     private static void registerGesture() {
         registration = ClientInteractionRuntime.inputs().register(
                 OWNER,
-                new PressTiming(ACTIVATION_DELAY_MS, 250),
+                new PressTiming(ClientConfigRuntime.configManager().client().smartPickHoldThresholdMs(), 250),
                 pickKey::saveString,
                 pickKey::isDown,
                 ClientSmartPickRuntime::enabled,

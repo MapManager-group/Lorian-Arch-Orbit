@@ -1,0 +1,10 @@
+{
+  "parent": "lorian_arch_orbit:block/invisible_marker",
+  "textures": {
+    "background": {
+      "force_translucent": true,
+      "sprite": "minecraft:block/yellow_stained_glass"
+    },
+    "marker": "lorian_arch_orbit:block/light_06"
+  }
+}

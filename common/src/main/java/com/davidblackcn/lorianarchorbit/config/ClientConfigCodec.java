@@ -101,7 +101,7 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
                 smartPick, "candidate_limit", 12, 8, 24, "features.smart_pick.candidate_limit", warnings
         );
         int holdThreshold = JsonConfigSupport.integer(
-                smartPick, "hold_threshold_ms", 180, 50, 1000, "features.smart_pick.hold_threshold_ms", warnings
+                smartPick, "hold_threshold_ms", 100, 50, 1000, "features.smart_pick.hold_threshold_ms", warnings
         );
         boolean historyWeight = JsonConfigSupport.bool(
                 smartPick, "history_weight", true, "features.smart_pick.history_weight", warnings
