@@ -36,6 +36,9 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
         if (version < 2) {
             migrateVersionOne(root);
         }
+        if (version < 3) {
+            migrateVersionTwo(root);
+        }
 
         List<String> warnings = new ArrayList<>();
         root.addProperty("config_version", ConfigConstants.CURRENT_VERSION);
@@ -120,6 +123,18 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
         boolean fixDoors = JsonConfigSupport.bool(
                 connected, "doors", true, "features.connected_texture_fix.doors", warnings
         );
+        boolean fixPistons = JsonConfigSupport.bool(
+                connected, "pistons", true, "features.connected_texture_fix.pistons", warnings
+        );
+        boolean portalFallback = legacyPortalDefault(connected, warnings);
+        boolean fixNetherPortals = JsonConfigSupport.bool(
+                connected, "nether_portals", portalFallback,
+                "features.connected_texture_fix.nether_portals", warnings
+        );
+        boolean fixEndPortals = JsonConfigSupport.bool(
+                connected, "end_portals", portalFallback,
+                "features.connected_texture_fix.end_portals", warnings
+        );
 
         JsonObject invisible = features.getAsJsonObject("invisible_blocks");
         boolean currentlyVisible = JsonConfigSupport.bool(
@@ -151,6 +166,9 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
                 fixWalls,
                 fixBeds,
                 fixDoors,
+                fixPistons,
+                fixNetherPortals,
+                fixEndPortals,
                 currentlyVisible,
                 showBarriers,
                 showLightBlocks,
@@ -202,7 +220,10 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
                     || previous.showLightBlocks() != next.showLightBlocks();
             case "connected_texture_fix" -> previous.fixWalls() != next.fixWalls()
                     || previous.fixBeds() != next.fixBeds()
-                    || previous.fixDoors() != next.fixDoors();
+                    || previous.fixDoors() != next.fixDoors()
+                    || previous.fixPistons() != next.fixPistons()
+                    || previous.fixNetherPortals() != next.fixNetherPortals()
+                    || previous.fixEndPortals() != next.fixEndPortals();
             default -> throw new IllegalArgumentException("Unknown client feature ID: " + id);
         };
     }
@@ -260,6 +281,37 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
             connected.addProperty("doors", true);
             features.add("connected_texture_fix", connected);
         }
+        root.addProperty("config_version", 2);
+    }
+
+    private static void migrateVersionTwo(JsonObject root) {
+        JsonObject features = root.has("features") && root.get("features").isJsonObject()
+                ? root.getAsJsonObject("features")
+                : new JsonObject();
+        root.add("features", features);
+        JsonObject connected = JsonConfigSupport.object(features, "connected_texture_fix", new ArrayList<>());
+        if (!connected.has("chests")) {
+            connected.addProperty("chests", true);
+        }
+        if (!connected.has("pistons")) {
+            connected.addProperty("pistons", true);
+        }
+        if (!connected.has("nether_portals")) {
+            connected.addProperty("nether_portals", true);
+        }
+        if (!connected.has("end_portals")) {
+            connected.addProperty("end_portals", true);
+        }
         root.addProperty("config_version", ConfigConstants.CURRENT_VERSION);
+    }
+
+    private static boolean legacyPortalDefault(JsonObject connected, List<String> warnings) {
+        JsonElement legacy = connected.get("portals");
+        if (legacy == null) return true;
+        if (legacy.isJsonPrimitive() && legacy.getAsJsonPrimitive().isBoolean()) {
+            return legacy.getAsBoolean();
+        }
+        warnings.add("features.connected_texture_fix.portals must be a boolean; using true");
+        return true;
     }
 }

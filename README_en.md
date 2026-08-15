@@ -38,7 +38,7 @@ Except for **interaction reach modification**, all features are client-side.
 
 ### Connected-Texture Fixes
 
-- Completes the connected faces of standard walls, beds, and door models
+- Completes connected faces for standard walls, beds, doors, extended pistons, the four narrow Nether Portal edge faces, and the five non-top End Portal faces
 - All fixes can be changed and reloaded dynamically in the configuration
 
 ![](./docs/image/5.png)
@@ -75,7 +75,7 @@ Except for **interaction reach modification**, all features are client-side.
 
 ## TODO
 
-1. Chest connected-texture fixes
+1. Chest connected-texture fixes (unresolved: with block updates disabled, removing one double-chest half still requires opening the remaining chest before its exposed joining face updates)
 2. Structure-block display
 3. Custom tool & command wheel
 

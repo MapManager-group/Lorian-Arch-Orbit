@@ -58,6 +58,12 @@ public final class ClientConfigScreen {
                 draft::fixBeds, draft::setFixBeds);
         addBoolean(behavior, resettable, "connected_texture_fix.doors", true,
                 draft::fixDoors, draft::setFixDoors);
+        addBoolean(behavior, resettable, "connected_texture_fix.pistons", true,
+                draft::fixPistons, draft::setFixPistons);
+        addBoolean(behavior, resettable, "connected_texture_fix.nether_portals", true,
+                draft::fixNetherPortals, draft::setFixNetherPortals);
+        addBoolean(behavior, resettable, "connected_texture_fix.end_portals", true,
+                draft::fixEndPortals, draft::setFixEndPortals);
         addEnum(behavior, resettable, "palette_wheel.animation", PaletteAnimation.CLOCKWISE,
                 PaletteAnimation.class, draft::paletteAnimation, draft::setPaletteAnimation);
         addPreset(behavior, resettable, "palette_wheel.primary_default_preset", PalettePreset.ITEM_TAG_A,

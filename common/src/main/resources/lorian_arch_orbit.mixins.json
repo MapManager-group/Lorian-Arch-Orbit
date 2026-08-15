@@ -6,7 +6,8 @@
   "client": [
     "client.MinecraftPickMixin",
     "client.BlockStateRenderShapeMixin",
-    "client.ClientLevelBreakingEffectMixin"
+    "client.ClientLevelBreakingEffectMixin",
+    "client.EndPortalRendererMixin"
   ],
   "mixins": [
   ],

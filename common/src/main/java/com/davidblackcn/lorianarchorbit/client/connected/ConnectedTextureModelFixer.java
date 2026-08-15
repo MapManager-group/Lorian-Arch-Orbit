@@ -3,13 +3,18 @@ package com.davidblackcn.lorianarchorbit.client.connected;
 import net.minecraft.client.renderer.FaceInfo;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.DirectionalBlock;
+import net.minecraft.world.level.block.NetherPortalBlock;
 import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.piston.PistonBaseBlock;
+import net.minecraft.world.level.block.piston.PistonHeadBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -38,6 +43,7 @@ public final class ConnectedTextureModelFixer {
         if (kind == null) return original;
         List<BlockStateModelPart> parts = collectParts(original);
         List<BakedQuad> existing = collectQuads(parts);
+        List<BakedQuad> unculled = collectUnculledQuads(parts);
         if (kind == ConnectionFixKind.BED && state.getValue(BedBlock.PART) == BedPart.HEAD) {
             return wrapBedHead(state, original, parts, existing);
         }
@@ -45,6 +51,9 @@ public final class ConnectedTextureModelFixer {
             case WALL -> wallFaces(state, existing);
             case BED -> bedFootFaces(state, existing);
             case DOOR -> doorFaces(state, existing);
+            case PISTON -> pistonFaces(state, existing, unculled);
+            case NETHER_PORTAL -> netherPortalFaces(state, existing);
+            case END_PORTAL -> List.of();
         };
         if (additions.isEmpty()) return original;
         return new WrappedModel(original, new AddedPart(
@@ -59,6 +68,10 @@ public final class ConnectedTextureModelFixer {
         if (standardWall(state)) return ConnectionFixKind.WALL;
         if (standardBed(state)) return ConnectionFixKind.BED;
         if (standardDoor(state)) return ConnectionFixKind.DOOR;
+        if (standardExtendedPistonBase(state) || standardExtendedPistonHead(state)) return ConnectionFixKind.PISTON;
+        if (state.getBlock() instanceof NetherPortalBlock && state.hasProperty(NetherPortalBlock.AXIS)) {
+            return ConnectionFixKind.NETHER_PORTAL;
+        }
         return null;
     }
 
@@ -75,6 +88,20 @@ public final class ConnectedTextureModelFixer {
     private static boolean standardDoor(BlockState state) {
         return state.hasProperty(DoorBlock.HALF) && state.hasProperty(DoorBlock.FACING)
                 && state.hasProperty(DoorBlock.HINGE) && state.hasProperty(DoorBlock.OPEN);
+    }
+
+    private static boolean standardExtendedPistonBase(BlockState state) {
+        return state.getBlock() instanceof PistonBaseBlock
+                && state.hasProperty(DirectionalBlock.FACING)
+                && state.hasProperty(PistonBaseBlock.EXTENDED)
+                && state.getValue(PistonBaseBlock.EXTENDED);
+    }
+
+    private static boolean standardExtendedPistonHead(BlockState state) {
+        return state.getBlock() instanceof PistonHeadBlock
+                && state.hasProperty(DirectionalBlock.FACING)
+                && state.hasProperty(PistonHeadBlock.SHORT)
+                && !state.getValue(PistonHeadBlock.SHORT);
     }
 
     private static List<BakedQuad> wallFaces(BlockState state, List<BakedQuad> existing) {
@@ -157,6 +184,83 @@ public final class ConnectedTextureModelFixer {
         return result;
     }
 
+    private static List<BakedQuad> pistonFaces(
+            BlockState state, List<BakedQuad> existing, List<BakedQuad> unculled
+    ) {
+        Direction facing = state.getValue(DirectionalBlock.FACING);
+        List<BakedQuad> result = new ArrayList<>(1);
+        if (state.getBlock() instanceof PistonBaseBlock) {
+            Bounds bounds = pistonBaseConnectionBounds(facing);
+            BakedQuad reference = existing.stream().filter(quad -> covers(quad, bounds)).findFirst().orElse(null);
+            if (reference == null) reference = bestReference(existing, pistonSideDirection(facing));
+            addIfUncovered(result, unculled, reference, bounds);
+        } else {
+            Bounds bounds = pistonHeadConnectionBounds(facing);
+            BakedQuad reference = bestReference(existing, facing.getOpposite());
+            if (reference != null && existing.stream().noneMatch(quad -> covers(quad, bounds))) {
+                result.add(bakeCenterCrop(bounds, reference));
+            }
+        }
+        return result;
+    }
+
+    private static List<BakedQuad> netherPortalFaces(BlockState state, List<BakedQuad> existing) {
+        Direction.Axis axis = state.getValue(NetherPortalBlock.AXIS);
+        BakedQuad reference = bestReference(existing, axis == Direction.Axis.X ? Direction.NORTH : Direction.EAST);
+        if (reference == null) return List.of();
+        List<BakedQuad> result = new ArrayList<>(4);
+        for (PortalFace face : netherPortalConnectionFaces(axis)) {
+            addCroppedIfMissing(result, existing, reference, face);
+        }
+        return result;
+    }
+
+    /**
+     * The portal slab is four texels thick. Every added edge preserves that density by taking a
+     * centred 4x16 or 16x4 slice from an existing full 16x16 portal face, never stretching a
+     * whole face across the narrow edge.
+     */
+    static List<PortalFace> netherPortalConnectionFaces(Direction.Axis axis) {
+        return switch (axis) {
+            case X -> List.of(
+                    new PortalFace(new Bounds(0, 0, 6 / 16F, 0, 1, 10 / 16F, Direction.WEST), 1 / 4F, 1),
+                    new PortalFace(new Bounds(1, 0, 6 / 16F, 1, 1, 10 / 16F, Direction.EAST), 1 / 4F, 1),
+                    new PortalFace(new Bounds(0, 0, 6 / 16F, 1, 0, 10 / 16F, Direction.DOWN), 1, 1 / 4F),
+                    new PortalFace(new Bounds(0, 1, 6 / 16F, 1, 1, 10 / 16F, Direction.UP), 1, 1 / 4F)
+            );
+            case Z -> List.of(
+                    new PortalFace(new Bounds(6 / 16F, 0, 0, 10 / 16F, 1, 0, Direction.NORTH), 1 / 4F, 1),
+                    new PortalFace(new Bounds(6 / 16F, 0, 1, 10 / 16F, 1, 1, Direction.SOUTH), 1 / 4F, 1),
+                    new PortalFace(new Bounds(6 / 16F, 0, 0, 10 / 16F, 0, 1, Direction.DOWN), 1 / 4F, 1),
+                    new PortalFace(new Bounds(6 / 16F, 1, 0, 10 / 16F, 1, 1, Direction.UP), 1 / 4F, 1)
+            );
+            case Y -> throw new IllegalArgumentException("Nether portals only support horizontal axes");
+        };
+    }
+
+    static Direction pistonSideDirection(Direction facing) {
+        return facing.getAxis() == Direction.Axis.Y ? Direction.NORTH : Direction.UP;
+    }
+
+    static Bounds pistonBaseConnectionBounds(Direction facing) {
+        float plane = facing.getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 4 / 16F : 12 / 16F;
+        return switch (facing.getAxis()) {
+            case X -> new Bounds(plane, 0, 0, plane, 1, 1, facing);
+            case Y -> new Bounds(0, plane, 0, 1, plane, 1, facing);
+            case Z -> new Bounds(0, 0, plane, 1, 1, plane, facing);
+        };
+    }
+
+    static Bounds pistonHeadConnectionBounds(Direction facing) {
+        float plane = facing.getAxisDirection() == Direction.AxisDirection.NEGATIVE ? 20 / 16F : -4 / 16F;
+        Direction direction = facing.getOpposite();
+        return switch (facing.getAxis()) {
+            case X -> new Bounds(plane, 6 / 16F, 6 / 16F, plane, 10 / 16F, 10 / 16F, direction);
+            case Y -> new Bounds(6 / 16F, plane, 6 / 16F, 10 / 16F, plane, 10 / 16F, direction);
+            case Z -> new Bounds(6 / 16F, 6 / 16F, plane, 10 / 16F, 10 / 16F, plane, direction);
+        };
+    }
+
     static Direction doorSourceDirection(Direction connectionDirection) {
         if (connectionDirection.getAxis() != Direction.Axis.Y) {
             throw new IllegalArgumentException("Door connection face must be horizontal");
@@ -179,6 +283,22 @@ public final class ConnectedTextureModelFixer {
     ) {
         if (reference != null && existing.stream().noneMatch(quad -> covers(quad, bounds))) {
             result.add(bake(bounds, reference));
+        }
+    }
+
+    private static void addIfUncovered(
+            List<BakedQuad> result, List<BakedQuad> existing, BakedQuad reference, Bounds bounds
+    ) {
+        if (reference != null && existing.stream().noneMatch(quad -> covers(quad, bounds))) {
+            result.add(bake(bounds, reference));
+        }
+    }
+
+    private static void addCroppedIfMissing(
+            List<BakedQuad> result, List<BakedQuad> existing, BakedQuad reference, PortalFace face
+    ) {
+        if (existing.stream().noneMatch(quad -> covers(quad, face.bounds))) {
+            result.add(bakeCenteredCrop(face.bounds, reference, face.uScale, face.vScale));
         }
     }
 
@@ -215,6 +335,47 @@ public final class ConnectedTextureModelFixer {
         );
     }
 
+    private static BakedQuad bakeCenterCrop(Bounds bounds, BakedQuad reference) {
+        return bakeCenteredCrop(bounds, reference, 1 / 4F, 1 / 4F);
+    }
+
+    private static BakedQuad bakeCenteredCrop(
+            Bounds bounds, BakedQuad reference, float uScale, float vScale
+    ) {
+        Vector3f from = new Vector3f(bounds.minX, bounds.minY, bounds.minZ);
+        Vector3f to = new Vector3f(bounds.maxX, bounds.maxY, bounds.maxZ);
+        FaceInfo face = FaceInfo.fromFacing(bounds.direction);
+        Vector3fc[] positions = new Vector3fc[4];
+        long[] packedUvs = new long[4];
+        float centerU = 0;
+        float centerV = 0;
+        for (int vertex = 0; vertex < 4; vertex++) {
+            centerU += UVPair.unpackU(reference.packedUV(vertex));
+            centerV += UVPair.unpackV(reference.packedUV(vertex));
+        }
+        centerU /= 4;
+        centerV /= 4;
+        for (int vertex = 0; vertex < 4; vertex++) {
+            positions[vertex] = face.getVertexInfo(vertex).select(from, to);
+            packedUvs[vertex] = centerCropUv(reference.packedUV(vertex), centerU, centerV, uScale, vScale);
+        }
+        return new BakedQuad(
+                positions[0], positions[1], positions[2], positions[3],
+                packedUvs[0], packedUvs[1], packedUvs[2], packedUvs[3],
+                bounds.direction, reference.materialInfo()
+        );
+    }
+
+    static long centerCropUv(long packedUv, float centerU, float centerV) {
+        return centerCropUv(packedUv, centerU, centerV, 1 / 4F, 1 / 4F);
+    }
+
+    static long centerCropUv(long packedUv, float centerU, float centerV, float uScale, float vScale) {
+        float u = UVPair.unpackU(packedUv);
+        float v = UVPair.unpackV(packedUv);
+        return UVPair.pack(centerU + (u - centerU) * uScale, centerV + (v - centerV) * vScale);
+    }
+
     private static BakedQuad bestReference(List<BakedQuad> quads, Direction direction) {
         return quads.stream().filter(quad -> quad.direction() == direction)
                 .max(java.util.Comparator.comparingDouble(ConnectedTextureModelFixer::area)).orElse(null);
@@ -249,6 +410,14 @@ public final class ConnectedTextureModelFixer {
         return quads;
     }
 
+    private static List<BakedQuad> collectUnculledQuads(List<BlockStateModelPart> parts) {
+        List<BakedQuad> quads = new ArrayList<>();
+        for (BlockStateModelPart part : parts) {
+            quads.addAll(part.getQuads(null));
+        }
+        return quads;
+    }
+
     private static boolean ambientOcclusion(List<BlockStateModelPart> parts, BakedQuad reference) {
         for (BlockStateModelPart part : parts) {
             if (part.getQuads(null).contains(reference)) return part.useAmbientOcclusion();
@@ -263,9 +432,12 @@ public final class ConnectedTextureModelFixer {
         return Math.abs(first - second) <= EPSILON;
     }
 
-    private record Bounds(
+    record Bounds(
             float minX, float minY, float minZ, float maxX, float maxY, float maxZ, Direction direction
     ) {
+    }
+
+    record PortalFace(Bounds bounds, float uScale, float vScale) {
     }
 
     private record WrappedModel(

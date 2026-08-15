@@ -39,3 +39,5 @@
 - 🚀 release(build): prepare reproducible Fabric and NeoForge 1.0.0 artifacts with Minecraft 26.2 in their filenames
 - 💬 fix(localization): align Chinese and English UI text, simplify palette terminology, and honor the configured smart-pick hold threshold
 - 📝 docs(release): add bilingual project overviews, configuration troubleshooting, Preliminary Art Form defaults, and forward/backport guides
+- ⏸️ chore(connected-textures): defer the unreliable retained double-chest joining-face repair pending a later rendering redesign
+- ✨ feat(connected-textures): add independently configurable Nether Portal edge and End Portal non-top face repairs with pixel-exact Nether Portal UV crops

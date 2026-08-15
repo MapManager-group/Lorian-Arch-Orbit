@@ -127,6 +127,30 @@ public final class ClientConfigDraft {
         feature("connected_texture_fix").addProperty("doors", enabled);
     }
 
+    public boolean fixPistons() {
+        return snapshot().fixPistons();
+    }
+
+    public void setFixPistons(boolean enabled) {
+        feature("connected_texture_fix").addProperty("pistons", enabled);
+    }
+
+    public boolean fixNetherPortals() {
+        return snapshot().fixNetherPortals();
+    }
+
+    public void setFixNetherPortals(boolean enabled) {
+        feature("connected_texture_fix").addProperty("nether_portals", enabled);
+    }
+
+    public boolean fixEndPortals() {
+        return snapshot().fixEndPortals();
+    }
+
+    public void setFixEndPortals(boolean enabled) {
+        feature("connected_texture_fix").addProperty("end_portals", enabled);
+    }
+
     public void setSmartPickDebugStats(boolean enabled) {
         feature("smart_pick").addProperty("debug_stats", enabled);
     }
@@ -181,6 +205,9 @@ public final class ClientConfigDraft {
         setFixWalls(defaults.fixWalls());
         setFixBeds(defaults.fixBeds());
         setFixDoors(defaults.fixDoors());
+        setFixPistons(defaults.fixPistons());
+        setFixNetherPortals(defaults.fixNetherPortals());
+        setFixEndPortals(defaults.fixEndPortals());
         setInvisibleBlocksVisible(defaults.invisibleBlocksVisible());
         setShowBarriers(defaults.showBarriers());
         setShowLightBlocks(defaults.showLightBlocks());

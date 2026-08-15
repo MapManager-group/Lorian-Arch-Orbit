@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 
 public final class ConnectedTextureRuntime {
     public static final String FEATURE_ID = "connected_texture_fix";
-
     private ConnectedTextureRuntime() {
     }
 
@@ -17,6 +16,9 @@ public final class ConnectedTextureRuntime {
             case WALL -> config.fixWalls();
             case BED -> config.fixBeds();
             case DOOR -> config.fixDoors();
+            case PISTON -> config.fixPistons();
+            case NETHER_PORTAL -> config.fixNetherPortals();
+            case END_PORTAL -> config.fixEndPortals();
         };
     }
 
@@ -24,4 +26,5 @@ public final class ConnectedTextureRuntime {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.level != null) minecraft.reloadResourcePacks();
     }
+
 }

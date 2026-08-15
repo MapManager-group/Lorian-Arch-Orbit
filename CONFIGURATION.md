@@ -1,6 +1,6 @@
 # 配置文件与故障排查
 
-配置目录为 `.minecraft/config/lorian_arch_orbit/`。当前配置 schema 为 `2`；未知字段会保留，非法字段会回退到安全默认值并写入日志。
+配置目录为 `.minecraft/config/lorian_arch_orbit/`。当前配置 schema 为 `3`；未知字段会保留，非法字段会回退到安全默认值并写入日志。
 
 ## 文件
 
@@ -21,7 +21,7 @@
 - `features.palette_wheel.animation`：`clockwise`、`expand` 或 `none`。
 - `features.palette_wheel.primary_default_preset` / `secondary_default_preset`：`item_tag_a`（同类方块）、`item_tag_b`（同系列方块）或 `color_categories`（颜色分类）。这些内部枚举名为兼容已有配置而保留，界面不显示开发代号。
 - `features.smart_pick.mode`：`adjacent`、`range` 或 `context`。
-- `features.connected_texture_fix.walls|beds|doors`：各类连接面修复开关。
+- `features.connected_texture_fix.walls|beds|doors|pistons|nether_portals|end_portals`：各类连接面修复开关；活塞修复伸出的普通与粘性活塞底座和活塞头之间的连接截面，两个传送门修复可独立开关且默认开启。旧配置中的 `chests` 字段会保留但不再使用；此前的单一 `portals` 字段会作为两个新开关的默认值。
 - `features.invisible_blocks.currently_visible`：上次显示状态；`show_barriers` 与 `show_light_blocks` 控制类型。
 - `ui.hud_enabled`：是否允许功能显示 HUD。
 
@@ -41,7 +41,7 @@
 
 ## 升级与兼容
 
-- schema `0`、`1` 会自动迁移到 `2`，同时保留未知字段和原文件备份。
+- schema `0`、`1`、`2` 会自动迁移到 `3`，同时保留未知字段和原文件备份。
 - 高于当前版本的 schema 会被拒绝，不会用旧程序覆盖新配置。
 - 当前交互距离协议版本为 `1`。协议不一致会安全拒绝距离请求；修改数据包结构或语义时必须提升协议版本。
 - 色轮分享格式单独版本化；不支持的分享版本只拒绝导入，不修改现有色轮。

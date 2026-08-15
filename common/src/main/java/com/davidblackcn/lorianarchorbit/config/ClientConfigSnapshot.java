@@ -21,6 +21,9 @@ public final class ClientConfigSnapshot {
     private final boolean fixWalls;
     private final boolean fixBeds;
     private final boolean fixDoors;
+    private final boolean fixPistons;
+    private final boolean fixNetherPortals;
+    private final boolean fixEndPortals;
     private final boolean invisibleBlocksVisible;
     private final boolean showBarriers;
     private final boolean showLightBlocks;
@@ -42,6 +45,9 @@ public final class ClientConfigSnapshot {
             boolean fixWalls,
             boolean fixBeds,
             boolean fixDoors,
+            boolean fixPistons,
+            boolean fixNetherPortals,
+            boolean fixEndPortals,
             boolean invisibleBlocksVisible,
             boolean showBarriers,
             boolean showLightBlocks,
@@ -62,6 +68,9 @@ public final class ClientConfigSnapshot {
         this.fixWalls = fixWalls;
         this.fixBeds = fixBeds;
         this.fixDoors = fixDoors;
+        this.fixPistons = fixPistons;
+        this.fixNetherPortals = fixNetherPortals;
+        this.fixEndPortals = fixEndPortals;
         this.invisibleBlocksVisible = invisibleBlocksVisible;
         this.showBarriers = showBarriers;
         this.showLightBlocks = showLightBlocks;
@@ -130,6 +139,18 @@ public final class ClientConfigSnapshot {
 
     public boolean fixDoors() {
         return fixDoors;
+    }
+
+    public boolean fixPistons() {
+        return fixPistons;
+    }
+
+    public boolean fixNetherPortals() {
+        return fixNetherPortals;
+    }
+
+    public boolean fixEndPortals() {
+        return fixEndPortals;
     }
 
     public boolean invisibleBlocksVisible() {

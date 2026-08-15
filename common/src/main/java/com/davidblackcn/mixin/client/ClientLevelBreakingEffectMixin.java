@@ -22,4 +22,5 @@ public abstract class ClientLevelBreakingEffectMixin {
         ClientLevel level = (ClientLevel) (Object) this;
         if (InvisibleBlocksRuntime.isSupportedState(level.getBlockState(position))) callback.cancel();
     }
+
 }

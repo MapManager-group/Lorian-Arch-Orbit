@@ -50,6 +50,9 @@ public final class ConfigFileTest {
         assertFalse(client.client().invisibleBlocksVisible());
         assertTrue(client.client().showBarriers());
         assertTrue(client.client().showLightBlocks());
+        assertTrue(client.client().fixPistons());
+        assertTrue(client.client().fixNetherPortals());
+        assertTrue(client.client().fixEndPortals());
         assertEquals(68, client.primaryWheel().groups().size());
         assertEquals(56, client.secondaryWheel().groups().size());
         assertTrue(json(temporaryDirectory.resolve(ConfigConstants.PRIMARY_WHEEL_FILE))
@@ -141,12 +144,66 @@ public final class ConfigFileTest {
         assertTrue(file.current().fixWalls());
         assertTrue(file.current().fixBeds());
         assertTrue(file.current().fixDoors());
+        assertTrue(file.current().fixPistons());
+        assertTrue(file.current().fixNetherPortals());
+        assertTrue(file.current().fixEndPortals());
 
         JsonObject features = json(path).getAsJsonObject("features");
         assertFalse(features.has("wall_visual_fix"));
         JsonObject connected = features.getAsJsonObject("connected_texture_fix");
         assertEquals(7, connected.get("future_option").getAsInt());
         assertTrue(Files.isRegularFile(path.resolveSibling("client.json.bak")));
+    }
+
+    @Test
+    public void versionTwoConnectedTextureOptionsGainPistonAndPortalDefaults() throws IOException {
+        Path path = temporaryDirectory.resolve(ConfigConstants.CLIENT_FILE);
+        Files.writeString(path, """
+                {
+                  "config_version": 2,
+                  "features": {
+                    "connected_texture_fix": {
+                      "enabled": false,
+                      "walls": false,
+                      "future_option": 7
+                    }
+                  }
+                }
+                """);
+        ConfigFile<ClientConfigSnapshot> file = clientFile(ignored -> { });
+
+        assertTrue(file.load().successful());
+        assertFalse(file.current().featureEnabled("connected_texture_fix"));
+        assertFalse(file.current().fixWalls());
+        assertTrue(file.current().fixPistons());
+        assertTrue(file.current().fixNetherPortals());
+        assertTrue(file.current().fixEndPortals());
+
+        JsonObject connected = json(path).getAsJsonObject("features")
+                .getAsJsonObject("connected_texture_fix");
+        assertEquals(7, connected.get("future_option").getAsInt());
+        assertTrue(connected.get("pistons").getAsBoolean());
+        assertTrue(connected.get("nether_portals").getAsBoolean());
+        assertTrue(connected.get("end_portals").getAsBoolean());
+        assertTrue(Files.isRegularFile(path.resolveSibling("client.json.bak")));
+    }
+
+    @Test
+    public void legacyCombinedPortalToggleSeedsBothIndependentOptions() throws IOException {
+        Path path = temporaryDirectory.resolve(ConfigConstants.CLIENT_FILE);
+        Files.writeString(path, """
+                {
+                  "config_version": 3,
+                  "features": {
+                    "connected_texture_fix": {"portals": false}
+                  }
+                }
+                """);
+        ConfigFile<ClientConfigSnapshot> file = clientFile(ignored -> { });
+
+        assertTrue(file.load().successful());
+        assertFalse(file.current().fixNetherPortals());
+        assertFalse(file.current().fixEndPortals());
     }
 
     @Test
