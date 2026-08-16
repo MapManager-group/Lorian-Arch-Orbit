@@ -45,3 +45,4 @@
 - 🐛 fix(editor): space the group and item columns apart and align creative-tab paging with the item scrollbar
 - ✨ feat(editor): show an additional creative category per page and add a draggable member-list scrollbar
 - 🐛 fix(editor): balance creative-tab paging controls and scroll member rows one at a time with edge auto-scroll during drag sorting
+- 🐛 fix(localization): localize the keybinding category name in the controls screen
