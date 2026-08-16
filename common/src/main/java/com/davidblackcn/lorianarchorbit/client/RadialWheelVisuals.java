@@ -4,8 +4,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.item.ItemStack;
 
 public final class RadialWheelVisuals {
-    public static final float ITEM_SCALE = 1.5F;
-    public static final int ITEM_HALF_SIZE = 15;
+    public static final float ITEM_SCALE = 1.2F;
+    public static final int ITEM_HALF_SIZE = 10;
     public static final int MINIMUM_RADIUS = 57;
 
     private RadialWheelVisuals() {

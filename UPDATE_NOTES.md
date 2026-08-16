@@ -41,3 +41,7 @@
 - 📝 docs(release): add bilingual project overviews, configuration troubleshooting, Preliminary Art Form defaults, and forward/backport guides
 - ⏸️ chore(connected-textures): defer the unreliable retained double-chest joining-face repair pending a later rendering redesign
 - ✨ feat(connected-textures): add independently configurable Nether Portal edge and End Portal non-top face repairs with pixel-exact Nether Portal UV crops
+- 🐛 fix(palette): scale wheel icons down and make the palette editor adapt to compact GUI resolutions without overlapping controls
+- 🐛 fix(editor): space the group and item columns apart and align creative-tab paging with the item scrollbar
+- ✨ feat(editor): show an additional creative category per page and add a draggable member-list scrollbar
+- 🐛 fix(editor): balance creative-tab paging controls and scroll member rows one at a time with edge auto-scroll during drag sorting
