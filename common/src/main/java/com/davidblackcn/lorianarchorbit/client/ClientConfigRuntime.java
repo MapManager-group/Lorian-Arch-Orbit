@@ -7,7 +7,6 @@ import com.davidblackcn.lorianarchorbit.config.ClientConfigSnapshot;
 import com.davidblackcn.lorianarchorbit.config.ConfigChange;
 import com.davidblackcn.lorianarchorbit.config.ConfigLoadResult;
 import com.davidblackcn.lorianarchorbit.client.connected.ConnectedTextureRuntime;
-import com.davidblackcn.lorianarchorbit.client.connected.ChestRenderDiagnostics;
 import com.davidblackcn.lorianarchorbit.client.invisible.InvisibleBlocksRuntime;
 import com.davidblackcn.lorianarchorbit.feature.FeatureManager;
 import com.davidblackcn.lorianarchorbit.feature.FeatureServices;
@@ -39,7 +38,6 @@ public final class ClientConfigRuntime {
     }
 
     public static synchronized void initialize() {
-        ChestRenderDiagnostics.initialize();
         if (configManager != null) {
             return;
         }
@@ -80,41 +78,7 @@ public final class ClientConfigRuntime {
                                     Component.translatable("command.lorian_arch_orbit.reload.failure")
                             );
                             return 0;
-                        }))
-                    .then(ClientCommandRegistrationEvent.literal("chest_debug")
-                            .then(ClientCommandRegistrationEvent.literal("status").executes(command -> {
-                                command.getSource().arch$sendSuccess(
-                                        () -> Component.literal(ChestRenderDiagnostics.statusReport()), false
-                                );
-                                return 1;
-                            }))
-                            .then(ClientCommandRegistrationEvent.literal("force_on").executes(command -> {
-                                ChestRenderDiagnostics.setForceSealed(true);
-                                command.getSource().arch$sendSuccess(
-                                        () -> Component.literal(
-                                                "Chest diagnostic forced SEALED replacement enabled."
-                                        ),
-                                        false
-                                );
-                                return 1;
-                            }))
-                            .then(ClientCommandRegistrationEvent.literal("force_off").executes(command -> {
-                                ChestRenderDiagnostics.setForceSealed(false);
-                                command.getSource().arch$sendSuccess(
-                                        () -> Component.literal(
-                                                "Chest diagnostic forced SEALED replacement disabled."
-                                        ),
-                                        false
-                                );
-                                return 1;
-                            }))
-                            .then(ClientCommandRegistrationEvent.literal("reset").executes(command -> {
-                                ChestRenderDiagnostics.resetCounters();
-                                command.getSource().arch$sendSuccess(
-                                        () -> Component.literal("Chest diagnostic counters reset."), false
-                                );
-                                return 1;
-                            })));
+                        }));
             if (Platform.isDevelopmentEnvironment()) {
                 root.then(ClientCommandRegistrationEvent.literal("preview_hud").executes(command -> {
                     boolean visible = ClientInteractionRuntime.toggleDevelopmentPreview();

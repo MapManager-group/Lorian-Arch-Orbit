@@ -55,3 +55,5 @@
 - 🐛 fix(connected-textures): detect orphaned chest halves through Vanilla combine results and map cap UVs by matching face corners
 - 🐛 fix(connected-textures): replace orphan chest cap overlays with sealed Vanilla-compatible double-chest models
 - 🧪 test(connected-textures): add production chest-render counters, one-shot logs, and forced sealed-model diagnostics
+- 🐛 fix(connected-textures): render double-chest connection caps with Vanilla face UVs and opposite-half sprites
+- 🧹 chore(connected-textures): remove temporary production chest diagnostics after in-game validation
