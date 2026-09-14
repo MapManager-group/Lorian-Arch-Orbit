@@ -52,3 +52,4 @@
 - 🐛 fix(localization): localize the keybinding category name in the controls screen
 - ✨ feat(connected-textures): restore exposed horizontal faces between stacked straight and corner glass panes with an independent default-enabled option
 - 🐛 fix(connected-textures): restore exposed joining faces on orphaned double-chest halves without changing their block state
+- 🐛 fix(connected-textures): detect orphaned chest halves through Vanilla combine results and map cap UVs by matching face corners

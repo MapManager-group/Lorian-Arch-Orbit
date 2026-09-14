@@ -89,13 +89,28 @@ public final class ChestConnectionCapModel extends ChestModel {
         ModelPart.Vertex[] copied = new ModelPart.Vertex[targetVertices.length];
         for (int index = 0; index < targetVertices.length; index++) {
             ModelPart.Vertex position = targetVertices[index];
-            ModelPart.Vertex uv = sourceVertices[index];
+            // WEST and EAST use different vertex orders. Match the physical corner so
+            // the opposite exterior texture is copied without mirroring or crossing UVs.
+            ModelPart.Vertex uv = findMatchingSideVertex(position, sourceVertices);
             copied[index] = new ModelPart.Vertex(
                     position.x(), position.y(), position.z(), uv.u(), uv.v()
             );
         }
         target.polygons[0] = new ModelPart.Polygon(copied, targetFace.normal());
         return target;
+    }
+
+    private static ModelPart.Vertex findMatchingSideVertex(
+            ModelPart.Vertex target,
+            ModelPart.Vertex[] sourceVertices
+    ) {
+        for (ModelPart.Vertex source : sourceVertices) {
+            if (Float.compare(target.y(), source.y()) == 0
+                    && Float.compare(target.z(), source.z()) == 0) {
+                return source;
+            }
+        }
+        throw new IllegalStateException("Opposite chest face has no matching Y/Z vertex");
     }
 
     static ModelPart.Cube faceCube(

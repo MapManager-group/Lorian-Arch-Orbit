@@ -10,12 +10,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public final class ChestConnectionCapModelTest {
     @Test
-    public void leftAndRightCapsContainOnlyTheirMissingFaceWithOppositeUv() {
-        assertCap(ChestType.LEFT, 0.0F, Direction.WEST);
-        assertCap(ChestType.RIGHT, 1.0F, Direction.EAST);
+    public void leftCapUsesEastWoodUvWithoutMirroring() {
+        ChestConnectionCapModel model = ChestConnectionCapModel.create(ChestType.LEFT);
+
+        assertFace(onlyCube(model.root().getChild("bottom")), Direction.WEST, 0.0F);
+        assertUvRectangle(
+                onlyCube(model.root().getChild("bottom")).polygons[0],
+                0.0F, 10.0F, 1.0F, 15.0F,
+                29.0F, 43.0F, 33.0F, 43.0F
+        );
+        assertFace(onlyCube(model.root().getChild("lid")), Direction.WEST, 0.0F);
+        assertUvRectangle(
+                onlyCube(model.root().getChild("lid")).polygons[0],
+                0.0F, 5.0F, 0.0F, 14.0F,
+                29.0F, 43.0F, 14.0F, 19.0F
+        );
+        assertFace(onlyCube(model.root().getChild("lock")), Direction.WEST, 0.0F);
+        assertUvRectangle(
+                onlyCube(model.root().getChild("lock")).polygons[0],
+                -2.0F, 2.0F, 14.0F, 15.0F,
+                2.0F, 3.0F, 1.0F, 5.0F
+        );
+    }
+
+    @Test
+    public void rightCapUsesWestWoodUvWithoutMirroring() {
+        ChestConnectionCapModel model = ChestConnectionCapModel.create(ChestType.RIGHT);
+
+        assertFace(onlyCube(model.root().getChild("bottom")), Direction.EAST, 16.0F);
+        assertUvRectangle(
+                onlyCube(model.root().getChild("bottom")).polygons[0],
+                0.0F, 10.0F, 1.0F, 15.0F,
+                14.0F, 0.0F, 33.0F, 43.0F
+        );
+        assertFace(onlyCube(model.root().getChild("lid")), Direction.EAST, 16.0F);
+        assertUvRectangle(
+                onlyCube(model.root().getChild("lid")).polygons[0],
+                0.0F, 5.0F, 0.0F, 14.0F,
+                14.0F, 0.0F, 14.0F, 19.0F
+        );
+        assertFace(onlyCube(model.root().getChild("lock")), Direction.EAST, 16.0F);
+        assertUvRectangle(
+                onlyCube(model.root().getChild("lock")).polygons[0],
+                -2.0F, 2.0F, 14.0F, 15.0F,
+                1.0F, 0.0F, 1.0F, 5.0F
+        );
     }
 
     @Test
@@ -28,56 +71,53 @@ public final class ChestConnectionCapModelTest {
         assertEquals(-(float) Math.PI / 4.0F, model.root().getChild("lock").xRot, 0.000001F);
     }
 
-    private static void assertCap(ChestType type, float x, Direction missingFace) {
-        ChestConnectionCapModel model = ChestConnectionCapModel.create(type);
-        ModelPart.Cube bottom = onlyCube(model.root().getChild("bottom"));
-        ModelPart.Cube lid = onlyCube(model.root().getChild("lid"));
-        ModelPart.Cube lock = onlyCube(model.root().getChild("lock"));
-
-        assertEquals(1, bottom.polygons.length);
-        assertEquals(1, lid.polygons.length);
-        assertEquals(1, lock.polygons.length);
-        assertEquals(missingFace.getUnitVec3f(), bottom.polygons[0].normal());
-
-        float targetX = missingFace == Direction.WEST ? x : x + 15.0F;
-        for (ModelPart.Vertex vertex : bottom.polygons[0].vertices()) {
-            assertEquals(targetX, vertex.x());
+    private static void assertFace(ModelPart.Cube cube, Direction direction, float planeX) {
+        assertEquals(1, cube.polygons.length);
+        ModelPart.Polygon polygon = cube.polygons[0];
+        assertEquals(direction.getUnitVec3f(), polygon.normal());
+        for (ModelPart.Vertex vertex : polygon.vertices()) {
+            assertEquals(planeX, vertex.x());
         }
+    }
 
-        ModelPart.Cube oppositeBottom = ChestConnectionCapModel.faceCube(
-                0, 19, x, 0.0F, 1.0F, 15.0F, 10.0F, 14.0F, missingFace.getOpposite()
-        );
-        assertUvEquals(oppositeBottom.polygons[0], bottom.polygons[0]);
+    private static void assertUvRectangle(
+            ModelPart.Polygon polygon,
+            float minY,
+            float maxY,
+            float minZ,
+            float maxZ,
+            float uvAtMinZ,
+            float uvAtMaxZ,
+            float minV,
+            float maxV
+    ) {
+        assertVertexUv(polygon, minY, minZ, uvAtMinZ, minV);
+        assertVertexUv(polygon, minY, maxZ, uvAtMaxZ, minV);
+        assertVertexUv(polygon, maxY, minZ, uvAtMinZ, maxV);
+        assertVertexUv(polygon, maxY, maxZ, uvAtMaxZ, maxV);
+    }
 
-        ModelPart.Cube oppositeLid = ChestConnectionCapModel.faceCube(
-                0, 0, x, 0.0F, 0.0F, 15.0F, 5.0F, 14.0F, missingFace.getOpposite()
-        );
-        assertUvEquals(oppositeLid.polygons[0], lid.polygons[0]);
-
-        float lockX = type == ChestType.RIGHT ? 15.0F : 0.0F;
-        ModelPart.Cube oppositeLock = ChestConnectionCapModel.faceCube(
-                0, 0, lockX, -2.0F, 14.0F, 1.0F, 4.0F, 1.0F, missingFace.getOpposite()
-        );
-        assertUvEquals(oppositeLock.polygons[0], lock.polygons[0]);
+    private static void assertVertexUv(
+            ModelPart.Polygon polygon,
+            float y,
+            float z,
+            float expectedPixelU,
+            float expectedPixelV
+    ) {
+        for (ModelPart.Vertex vertex : polygon.vertices()) {
+            if (Float.compare(vertex.y(), y) == 0 && Float.compare(vertex.z(), z) == 0) {
+                assertEquals(expectedPixelU / 64.0F, vertex.u());
+                assertEquals(expectedPixelV / 64.0F, vertex.v());
+                return;
+            }
+        }
+        fail("Missing vertex at Y=" + y + ", Z=" + z);
     }
 
     private static ModelPart.Cube onlyCube(ModelPart part) {
-        List<ModelPart.Cube> cubes = cubes(part);
-        assertEquals(1, cubes.size());
-        return cubes.getFirst();
-    }
-
-    private static List<ModelPart.Cube> cubes(ModelPart part) {
         List<ModelPart.Cube> cubes = new ArrayList<>();
         part.visit(new PoseStack(), (pose, path, index, cube) -> cubes.add(cube));
-        return cubes;
-    }
-
-    private static void assertUvEquals(ModelPart.Polygon expected, ModelPart.Polygon actual) {
-        assertEquals(expected.vertices().length, actual.vertices().length);
-        for (int index = 0; index < expected.vertices().length; index++) {
-            assertEquals(expected.vertices()[index].u(), actual.vertices()[index].u());
-            assertEquals(expected.vertices()[index].v(), actual.vertices()[index].v());
-        }
+        assertEquals(1, cubes.size());
+        return cubes.getFirst();
     }
 }

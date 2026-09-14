@@ -3,10 +3,30 @@ package com.davidblackcn.lorianarchorbit.client.connected;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.DoubleBlockCombiner;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
 
 public final class ChestConnectionFaceFix {
+    private static final DoubleBlockCombiner.Combiner<ChestBlockEntity, Boolean> IS_DOUBLE =
+            new DoubleBlockCombiner.Combiner<>() {
+                @Override
+                public Boolean acceptDouble(ChestBlockEntity first, ChestBlockEntity second) {
+                    return true;
+                }
+
+                @Override
+                public Boolean acceptSingle(ChestBlockEntity single) {
+                    return false;
+                }
+
+                @Override
+                public Boolean acceptNone() {
+                    return false;
+                }
+            };
+
     private ChestConnectionFaceFix() {
     }
 
@@ -16,46 +36,17 @@ public final class ChestConnectionFaceFix {
         BlockPos partnerPos = ChestBlock.getConnectedBlockPos(pos, state);
         if (!level.hasChunkAt(partnerPos)) return false;
 
-        return shouldRenderConnectionFace(
-                state,
-                pos,
-                level.getBlockState(partnerPos),
-                partnerPos,
-                true
-        );
+        ChestBlock chest = (ChestBlock) state.getBlock();
+        return shouldRenderConnectionFace(state, true, chest.combine(state, level, pos, true));
     }
 
     static boolean shouldRenderConnectionFace(
             BlockState state,
-            BlockPos pos,
-            BlockState partner,
-            BlockPos partnerPos,
-            boolean partnerChunkAvailable
+            boolean partnerChunkAvailable,
+            DoubleBlockCombiner.NeighborCombineResult<? extends ChestBlockEntity> combined
     ) {
         if (!isConnectedChest(state) || !partnerChunkAvailable) return false;
-        return !isValidPartner(state, pos, partner, partnerPos);
-    }
-
-    static boolean isValidPartner(
-            BlockState state,
-            BlockPos pos,
-            BlockState partner,
-            BlockPos partnerPos
-    ) {
-        if (!(state.getBlock() instanceof ChestBlock chest)
-                || !(partner.getBlock() instanceof ChestBlock partnerChest)) {
-            return false;
-        }
-
-        ChestType type = state.getValue(ChestBlock.TYPE);
-        ChestType partnerType = partner.getValue(ChestBlock.TYPE);
-        return type != ChestType.SINGLE
-                && partnerType == type.getOpposite()
-                && chest.chestCanConnectTo(partner)
-                && partnerChest.chestCanConnectTo(state)
-                && state.getValue(ChestBlock.FACING) == partner.getValue(ChestBlock.FACING)
-                && ChestBlock.getConnectedBlockPos(pos, state).equals(partnerPos)
-                && ChestBlock.getConnectedBlockPos(partnerPos, partner).equals(pos);
+        return !combined.apply(IS_DOUBLE);
     }
 
     private static boolean isConnectedChest(BlockState state) {
