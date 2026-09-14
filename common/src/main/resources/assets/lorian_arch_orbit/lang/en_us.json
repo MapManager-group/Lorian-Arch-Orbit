@@ -48,6 +48,8 @@
   "config.lorian_arch_orbit.connected_texture_fix.beds.description": "Repairs joining faces for vanilla and mod blocks using the standard bed states.",
   "config.lorian_arch_orbit.connected_texture_fix.doors.name": "Fix door connections",
   "config.lorian_arch_orbit.connected_texture_fix.doors.description": "Repairs joining faces for vanilla and mod blocks using the standard door states.",
+  "config.lorian_arch_orbit.connected_texture_fix.glass_panes.name": "Fix glass pane connections",
+  "config.lorian_arch_orbit.connected_texture_fix.glass_panes.description": "Restores exposed horizontal faces where stacked glass panes have different outlines, including corners.",
   "config.lorian_arch_orbit.connected_texture_fix.pistons.name": "Fix piston connections",
   "config.lorian_arch_orbit.connected_texture_fix.pistons.description": "Repairs the contacting faces of extended normal and sticky piston bases and heads.",
   "config.lorian_arch_orbit.connected_texture_fix.nether_portals.name": "Fix Nether Portal connections",

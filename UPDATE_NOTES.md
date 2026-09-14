@@ -50,3 +50,4 @@
 - ✨ feat(editor): show an additional creative category per page and add a draggable member-list scrollbar
 - 🐛 fix(editor): balance creative-tab paging controls and scroll member rows one at a time with edge auto-scroll during drag sorting
 - 🐛 fix(localization): localize the keybinding category name in the controls screen
+- ✨ feat(connected-textures): restore exposed horizontal faces between stacked straight and corner glass panes with an independent default-enabled option

@@ -48,6 +48,8 @@
   "config.lorian_arch_orbit.connected_texture_fix.beds.description": "为采用标准床状态的原版及模组方块补齐床头与床尾连接端面。",
   "config.lorian_arch_orbit.connected_texture_fix.doors.name": "修复门连接",
   "config.lorian_arch_orbit.connected_texture_fix.doors.description": "为采用标准门状态的原版及模组方块补齐上下半部连接端面。",
+  "config.lorian_arch_orbit.connected_texture_fix.glass_panes.name": "修复玻璃板连接",
+  "config.lorian_arch_orbit.connected_texture_fix.glass_panes.description": "补齐上下玻璃板轮廓不同时裸露的水平连接面，包括转角玻璃板。",
   "config.lorian_arch_orbit.connected_texture_fix.pistons.name": "修复活塞连接",
   "config.lorian_arch_orbit.connected_texture_fix.pistons.description": "为普通与粘性活塞的伸出底座和活塞头补齐相接端面。",
   "config.lorian_arch_orbit.connected_texture_fix.nether_portals.name": "修复地狱传送门连接",

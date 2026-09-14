@@ -58,6 +58,8 @@ public final class ClientConfigScreen {
                 draft::fixBeds, draft::setFixBeds);
         addBoolean(behavior, resettable, "connected_texture_fix.doors", true,
                 draft::fixDoors, draft::setFixDoors);
+        addBoolean(behavior, resettable, "connected_texture_fix.glass_panes", true,
+                draft::fixGlassPanes, draft::setFixGlassPanes);
         addBoolean(behavior, resettable, "connected_texture_fix.pistons", true,
                 draft::fixPistons, draft::setFixPistons);
         addBoolean(behavior, resettable, "connected_texture_fix.nether_portals", true,

@@ -10,12 +10,14 @@ public final class ConnectedTextureRuntime {
     }
 
     public static boolean enabled(ConnectionFixKind kind) {
+        if (!ClientConfigRuntime.initialized()) return false;
         ClientConfigSnapshot config = ClientConfigRuntime.configManager().client();
         if (!config.featureEnabled(FEATURE_ID)) return false;
         return switch (kind) {
             case WALL -> config.fixWalls();
             case BED -> config.fixBeds();
             case DOOR -> config.fixDoors();
+            case GLASS_PANE -> config.fixGlassPanes();
             case PISTON -> config.fixPistons();
             case NETHER_PORTAL -> config.fixNetherPortals();
             case END_PORTAL -> config.fixEndPortals();

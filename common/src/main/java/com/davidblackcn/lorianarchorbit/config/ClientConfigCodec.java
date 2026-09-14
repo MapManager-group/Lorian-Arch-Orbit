@@ -123,6 +123,9 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
         boolean fixDoors = JsonConfigSupport.bool(
                 connected, "doors", true, "features.connected_texture_fix.doors", warnings
         );
+        boolean fixGlassPanes = JsonConfigSupport.bool(
+                connected, "glass_panes", true, "features.connected_texture_fix.glass_panes", warnings
+        );
         boolean fixPistons = JsonConfigSupport.bool(
                 connected, "pistons", true, "features.connected_texture_fix.pistons", warnings
         );
@@ -166,6 +169,7 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
                 fixWalls,
                 fixBeds,
                 fixDoors,
+                fixGlassPanes,
                 fixPistons,
                 fixNetherPortals,
                 fixEndPortals,
@@ -221,6 +225,7 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
             case "connected_texture_fix" -> previous.fixWalls() != next.fixWalls()
                     || previous.fixBeds() != next.fixBeds()
                     || previous.fixDoors() != next.fixDoors()
+                    || previous.fixGlassPanes() != next.fixGlassPanes()
                     || previous.fixPistons() != next.fixPistons()
                     || previous.fixNetherPortals() != next.fixNetherPortals()
                     || previous.fixEndPortals() != next.fixEndPortals();

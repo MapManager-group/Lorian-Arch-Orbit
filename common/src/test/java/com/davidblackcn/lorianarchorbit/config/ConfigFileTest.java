@@ -51,6 +51,7 @@ public final class ConfigFileTest {
         assertTrue(client.client().showBarriers());
         assertTrue(client.client().showLightBlocks());
         assertTrue(client.client().fixPistons());
+        assertTrue(client.client().fixGlassPanes());
         assertTrue(client.client().fixNetherPortals());
         assertTrue(client.client().fixEndPortals());
         assertEquals(68, client.primaryWheel().groups().size());
@@ -145,6 +146,7 @@ public final class ConfigFileTest {
         assertTrue(file.current().fixBeds());
         assertTrue(file.current().fixDoors());
         assertTrue(file.current().fixPistons());
+        assertTrue(file.current().fixGlassPanes());
         assertTrue(file.current().fixNetherPortals());
         assertTrue(file.current().fixEndPortals());
 
@@ -176,6 +178,7 @@ public final class ConfigFileTest {
         assertFalse(file.current().featureEnabled("connected_texture_fix"));
         assertFalse(file.current().fixWalls());
         assertTrue(file.current().fixPistons());
+        assertTrue(file.current().fixGlassPanes());
         assertTrue(file.current().fixNetherPortals());
         assertTrue(file.current().fixEndPortals());
 

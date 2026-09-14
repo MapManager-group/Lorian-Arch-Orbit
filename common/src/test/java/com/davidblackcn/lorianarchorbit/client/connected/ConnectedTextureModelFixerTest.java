@@ -3,6 +3,7 @@ package com.davidblackcn.lorianarchorbit.client.connected;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.piston.PistonBaseBlock;
 import net.minecraft.world.level.block.piston.PistonHeadBlock;
+import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.SharedConstants;
@@ -10,6 +11,7 @@ import net.minecraft.core.Direction;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -34,6 +36,26 @@ public final class ConnectedTextureModelFixerTest {
         assertNull(ConnectedTextureModelFixer.kind(Blocks.PISTON_HEAD.defaultBlockState()
                 .setValue(PistonHeadBlock.SHORT, true)));
         assertNull(ConnectedTextureModelFixer.kind(Blocks.STONE.defaultBlockState()));
+    }
+
+    @Test
+    public void glassPaneFixOnlyKeepsMismatchedVerticalConnectionFaces() {
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
+        var straight = Blocks.GLASS_PANE.defaultBlockState()
+                .setValue(CrossCollisionBlock.NORTH, true)
+                .setValue(CrossCollisionBlock.SOUTH, true);
+        var corner = Blocks.GLASS_PANE.defaultBlockState()
+                .setValue(CrossCollisionBlock.NORTH, true)
+                .setValue(CrossCollisionBlock.EAST, true);
+
+        assertTrue(GlassPaneConnectionFix.shouldRenderSharedFace(straight, corner, Direction.UP));
+        assertTrue(GlassPaneConnectionFix.shouldRenderSharedFace(corner, straight, Direction.DOWN));
+        assertFalse(GlassPaneConnectionFix.shouldRenderSharedFace(straight, straight, Direction.UP));
+        assertFalse(GlassPaneConnectionFix.shouldRenderSharedFace(straight, corner, Direction.NORTH));
+        assertFalse(GlassPaneConnectionFix.shouldRenderSharedFace(
+                straight, Blocks.IRON_BARS.defaultBlockState(), Direction.UP
+        ));
     }
 
     @Test
