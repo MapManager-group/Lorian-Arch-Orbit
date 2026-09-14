@@ -22,6 +22,9 @@
     ],
     "fabric-datagen": [
       "com.davidblackcn.lorianarchorbit.fabric.datagen.LorianArchOrbitDataGenerator"
+    ],
+    "radial": [
+      "com.davidblackcn.lorianarchorbit.fabric.client.compat.radial.LorianRadialEntrypoint"
     ]
   },
   "mixins": [
@@ -37,5 +40,8 @@
   "recommends": {
     "yet_another_config_lib_v3": ">=3.9.6",
     "modmenu": ">=20.0.1"
+  },
+  "suggests": {
+    "radial": ">=3.1.0+26.2 <3.2.0"
   }
 }

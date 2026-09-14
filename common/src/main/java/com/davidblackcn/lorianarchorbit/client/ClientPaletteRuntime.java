@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public final class ClientPaletteRuntime {
     private static final String OWNER = "palette_wheel";
@@ -63,6 +64,26 @@ public final class ClientPaletteRuntime {
         }
     }
 
+    public static KeyMapping wheelKey() {
+        return openWheel;
+    }
+
+    public static boolean canHandleCurrentInput(Minecraft minecraft) {
+        if (openWheel == null
+                || !enabled()
+                || minecraft.player == null
+                || minecraft.gameMode == null
+                || !minecraft.player.isCreative()) {
+            return false;
+        }
+        ItemStack held = minecraft.player.getInventory().getSelectedItem();
+        if (held.isEmpty()) {
+            return false;
+        }
+        return resolve(minecraft, Layer.PRIMARY, held).isPresent()
+                || resolve(minecraft, Layer.SECONDARY, held).isPresent();
+    }
+
     public static synchronized void configsChanged() {
         close(false);
     }
@@ -97,20 +118,41 @@ public final class ClientPaletteRuntime {
         if (minecraft.player == null || minecraft.gameMode == null || !minecraft.player.isCreative()) {
             return;
         }
-        WheelConfigSnapshot config = layer == Layer.PRIMARY
-                ? ClientConfigRuntime.configManager().primaryWheel()
-                : ClientConfigRuntime.configManager().secondaryWheel();
         ItemStack held = minecraft.player.getInventory().getSelectedItem();
         if (held.isEmpty()) {
             return;
         }
+        ResolvedPalette resolved = resolve(minecraft, layer, held).orElse(null);
+        if (resolved == null) {
+            return;
+        }
+        List<PaletteEntry> entries = resolved.entries();
+        int selectedIndex = resolved.selectedIndex();
+        WheelLease claimed = ClientInteractionRuntime.wheel().claim(
+                OWNER, WheelPriority.PALETTE_WHEEL, ClientPaletteRuntime::onScroll, ClientPaletteRuntime::revoked
+        ).orElse(null);
+        if (claimed == null) {
+            return;
+        }
+        lease = claimed;
+        radial = new RadialMenuSnapshot<>(entries, selectedIndex);
+        ClientInteractionRuntime.hud().showRadial(
+                OWNER, hudSnapshot(radial), animationMode(), nowMillis
+        );
+        showSelectedName();
+    }
+
+    private static Optional<ResolvedPalette> resolve(Minecraft minecraft, Layer layer, ItemStack held) {
+        WheelConfigSnapshot config = layer == Layer.PRIMARY
+                ? ClientConfigRuntime.configManager().primaryWheel()
+                : ClientConfigRuntime.configManager().secondaryWheel();
         var match = PaletteLookup.find(
                 config.typedGroups(), held,
                 ClientPaletteItemCodec::itemMatches,
                 (member, stack) -> ClientPaletteItemCodec.exactMatches(minecraft, member, stack)
         );
         if (match.isEmpty()) {
-            return;
+            return Optional.empty();
         }
         PaletteGroup group = match.get().group();
         List<PaletteEntry> entries = new ArrayList<>();
@@ -139,20 +181,9 @@ public final class ClientPaletteRuntime {
             }
         }
         if (!PaletteWheelRules.canOpen(entries.size())) {
-            return;
+            return Optional.empty();
         }
-        WheelLease claimed = ClientInteractionRuntime.wheel().claim(
-                OWNER, WheelPriority.PALETTE_WHEEL, ClientPaletteRuntime::onScroll, ClientPaletteRuntime::revoked
-        ).orElse(null);
-        if (claimed == null) {
-            return;
-        }
-        lease = claimed;
-        radial = new RadialMenuSnapshot<>(entries, selectedIndex);
-        ClientInteractionRuntime.hud().showRadial(
-                OWNER, hudSnapshot(radial), animationMode(), nowMillis
-        );
-        showSelectedName();
+        return Optional.of(new ResolvedPalette(entries, selectedIndex));
     }
 
     private static synchronized boolean onScroll(double amountX, double amountY) {
@@ -167,7 +198,9 @@ public final class ClientPaletteRuntime {
             ClientInteractionRuntime.hud().rotateRadial(
                     OWNER, hudSnapshot(radial), selectionSteps, ClientInteractionRuntime.nowMillis()
             );
-            radial.selected().ifPresent(ClientPaletteRuntime::replaceSelectedSlot);
+            radial.selected().ifPresent(entry -> CreativeInventoryHelper.replaceSelectedSlot(
+                    Minecraft.getInstance(), entry.stack
+            ));
             showSelectedName();
         }
         return true;
@@ -180,17 +213,6 @@ public final class ClientPaletteRuntime {
         radial.selected().ifPresent(selected ->
                 ClientInteractionRuntime.hud().showNumeric(OWNER, selected.stack.getHoverName())
         );
-    }
-
-    private static void replaceSelectedSlot(PaletteEntry entry) {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player == null || minecraft.gameMode == null || !minecraft.player.isCreative()) {
-            return;
-        }
-        ItemStack replacement = entry.stack.copy();
-        int slot = minecraft.player.getInventory().getSelectedSlot();
-        minecraft.player.getInventory().setSelectedItem(replacement);
-        minecraft.gameMode.handleCreativeModeItemAdd(replacement, 36 + slot);
     }
 
     private static synchronized void close(boolean animate) {
@@ -237,6 +259,12 @@ public final class ClientPaletteRuntime {
     private record PaletteEntry(PaletteMember member, ItemStack stack) {
         private PaletteEntry {
             stack = stack.copy();
+        }
+    }
+
+    private record ResolvedPalette(List<PaletteEntry> entries, int selectedIndex) {
+        private ResolvedPalette {
+            entries = List.copyOf(entries);
         }
     }
 }

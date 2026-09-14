@@ -48,6 +48,7 @@ dependencies {
     // The configuration UI is implemented in stage 3; resolve its API now without adding server runtime classes.
     compileOnly "dev.isxander:yet-another-config-lib:$rootProject.yacl_version+26.2-fabric"
     compileOnly "com.terraformersmc:modmenu:$rootProject.mod_menu_version"
+    compileOnly "maven.modrinth:radial:$rootProject.radial_version"
     clientDevelopmentRuntime "dev.isxander:yet-another-config-lib:$rootProject.yacl_version+26.2-fabric"
     clientDevelopmentRuntime "com.terraformersmc:modmenu:$rootProject.mod_menu_version"
 

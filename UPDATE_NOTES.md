@@ -1,3 +1,7 @@
+- ✨ feat(compat): add optional Radial 3.1.x integration for Minecraft 26.2
+- ✨ feat(input): arbitrate a shared R key from current palette eligibility while preserving independently bound keys
+- ✨ feat(radial): add the localized Pick Item slot mode with component-aware item parsing
+- ♻️ refactor(inventory): share creative selected-slot synchronization without `/give` permissions
 - 🏗️ build(core): establish the 0.1.0-alpha Fabric and NeoForge project foundation
 - ✨ feat(core): add the shared feature lifecycle and state management foundation
 - ✨ feat(config): add safe versioned configuration and shared YACL settings
