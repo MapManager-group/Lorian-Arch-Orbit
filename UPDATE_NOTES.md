@@ -54,3 +54,4 @@
 - 🐛 fix(connected-textures): restore exposed joining faces on orphaned double-chest halves without changing their block state
 - 🐛 fix(connected-textures): detect orphaned chest halves through Vanilla combine results and map cap UVs by matching face corners
 - 🐛 fix(connected-textures): replace orphan chest cap overlays with sealed Vanilla-compatible double-chest models
+- 🧪 test(connected-textures): add production chest-render counters, one-shot logs, and forced sealed-model diagnostics

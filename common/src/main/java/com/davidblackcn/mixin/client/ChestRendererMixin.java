@@ -2,6 +2,7 @@ package com.davidblackcn.mixin.client;
 
 import com.davidblackcn.lorianarchorbit.client.connected.ConnectedTextureRuntime;
 import com.davidblackcn.lorianarchorbit.client.connected.ConnectionFixKind;
+import com.davidblackcn.lorianarchorbit.client.connected.ChestRenderDiagnostics;
 import com.davidblackcn.lorianarchorbit.client.connected.SealedDoubleChestModel;
 import net.minecraft.client.renderer.MultiblockChestResources;
 import net.minecraft.client.renderer.blockentity.ChestRenderer;
@@ -28,11 +29,17 @@ public abstract class ChestRendererMixin {
             MultiblockChestResources<?> vanillaModels,
             ChestType type
     ) {
+        ChestRenderDiagnostics.onRedirect(type);
+        boolean enabled = ConnectedTextureRuntime.enabled(ConnectionFixKind.CHEST);
+        ChestRenderDiagnostics.recordRuntimeEnabled(type, enabled);
         Object vanillaModel = vanillaModels.select(type);
         if (type == ChestType.SINGLE
-                || !ConnectedTextureRuntime.enabled(ConnectionFixKind.CHEST)) {
+                || (!ChestRenderDiagnostics.forceSealed() && !enabled)) {
+            ChestRenderDiagnostics.recordVanillaReturn(type, enabled);
             return vanillaModel;
         }
-        return SealedDoubleChestModel.select(type);
+        SealedDoubleChestModel model = SealedDoubleChestModel.select(type);
+        ChestRenderDiagnostics.recordSealedReturn(type, enabled);
+        return model;
     }
 }
