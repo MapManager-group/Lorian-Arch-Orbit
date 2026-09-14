@@ -51,7 +51,7 @@ public final class ConnectedTextureModelFixer {
             case WALL -> wallFaces(state, existing);
             case BED -> bedFootFaces(state, existing);
             case DOOR -> doorFaces(state, existing);
-            case GLASS_PANE -> List.of();
+            case GLASS_PANE, CHEST -> List.of();
             case PISTON -> pistonFaces(state, existing, unculled);
             case NETHER_PORTAL -> netherPortalFaces(state, existing);
             case END_PORTAL -> List.of();

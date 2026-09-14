@@ -18,6 +18,7 @@ public final class ConnectedTextureRuntime {
             case BED -> config.fixBeds();
             case DOOR -> config.fixDoors();
             case GLASS_PANE -> config.fixGlassPanes();
+            case CHEST -> config.fixChests();
             case PISTON -> config.fixPistons();
             case NETHER_PORTAL -> config.fixNetherPortals();
             case END_PORTAL -> config.fixEndPortals();

@@ -7,6 +7,8 @@
     "client.MinecraftPickMixin",
     "client.BlockStateRenderShapeMixin",
     "client.ClientLevelBreakingEffectMixin",
+    "client.ChestRendererMixin",
+    "client.ChestRenderStateMixin",
     "client.EndPortalRendererMixin",
     "client.GlassPaneFaceCullingMixin"
   ],

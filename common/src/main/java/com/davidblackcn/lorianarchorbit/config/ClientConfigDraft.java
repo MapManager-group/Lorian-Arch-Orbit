@@ -135,6 +135,14 @@ public final class ClientConfigDraft {
         feature("connected_texture_fix").addProperty("glass_panes", enabled);
     }
 
+    public boolean fixChests() {
+        return snapshot().fixChests();
+    }
+
+    public void setFixChests(boolean enabled) {
+        feature("connected_texture_fix").addProperty("chests", enabled);
+    }
+
     public boolean fixPistons() {
         return snapshot().fixPistons();
     }
@@ -214,6 +222,7 @@ public final class ClientConfigDraft {
         setFixBeds(defaults.fixBeds());
         setFixDoors(defaults.fixDoors());
         setFixGlassPanes(defaults.fixGlassPanes());
+        setFixChests(defaults.fixChests());
         setFixPistons(defaults.fixPistons());
         setFixNetherPortals(defaults.fixNetherPortals());
         setFixEndPortals(defaults.fixEndPortals());

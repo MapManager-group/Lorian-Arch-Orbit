@@ -5,6 +5,7 @@ public enum ConnectionFixKind {
     BED,
     DOOR,
     GLASS_PANE,
+    CHEST,
     PISTON,
     NETHER_PORTAL,
     END_PORTAL

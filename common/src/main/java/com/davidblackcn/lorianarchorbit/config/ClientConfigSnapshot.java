@@ -22,6 +22,7 @@ public final class ClientConfigSnapshot {
     private final boolean fixBeds;
     private final boolean fixDoors;
     private final boolean fixGlassPanes;
+    private final boolean fixChests;
     private final boolean fixPistons;
     private final boolean fixNetherPortals;
     private final boolean fixEndPortals;
@@ -47,6 +48,7 @@ public final class ClientConfigSnapshot {
             boolean fixBeds,
             boolean fixDoors,
             boolean fixGlassPanes,
+            boolean fixChests,
             boolean fixPistons,
             boolean fixNetherPortals,
             boolean fixEndPortals,
@@ -71,6 +73,7 @@ public final class ClientConfigSnapshot {
         this.fixBeds = fixBeds;
         this.fixDoors = fixDoors;
         this.fixGlassPanes = fixGlassPanes;
+        this.fixChests = fixChests;
         this.fixPistons = fixPistons;
         this.fixNetherPortals = fixNetherPortals;
         this.fixEndPortals = fixEndPortals;
@@ -146,6 +149,10 @@ public final class ClientConfigSnapshot {
 
     public boolean fixGlassPanes() {
         return fixGlassPanes;
+    }
+
+    public boolean fixChests() {
+        return fixChests;
     }
 
     public boolean fixPistons() {
