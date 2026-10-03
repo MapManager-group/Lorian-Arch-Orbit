@@ -224,7 +224,8 @@ public final class ClientHudOverlayManager {
                 : Math.max(0.0, 1.0 - (double) (nowMillis - overlay.closingStartedAtMillis) / ANIMATION_MILLIS);
         var slots = RadialGeometry.slots(
                 snapshot, center, radius, overlay.animation, nowMillis,
-                overlay.rotation.offsetRadians(nowMillis)
+                overlay.rotation.offsetRadians(nowMillis) + (overlay.adaptive
+                        ? ClientConfigRuntime.configManager().client().paletteTargetPosition().angleOffset() : 0)
         );
         for (var slot : slots) {
             if (slot.progress() * closeProgress <= 0.01) {
@@ -241,6 +242,12 @@ public final class ClientHudOverlayManager {
                         minecraft.font, label, slotX, slotY - minecraft.font.lineHeight / 2, 0xFFFFFFFF
                 );
             }
+        }
+        if (overlay.adaptive && !snapshot.entries().isEmpty()) {
+            double openProgress = overlay.animation.entryProgress(0, snapshot.entries().size(), nowMillis);
+            RadialWheelVisuals.renderTargetArrow(graphics, center.x(), center.y(), radius * openProgress * closeProgress,
+                    ClientConfigRuntime.configManager().client().paletteTargetPosition(),
+                    ClientConfigRuntime.configManager().client().paletteArrowStyle(), nowMillis);
         }
     }
 

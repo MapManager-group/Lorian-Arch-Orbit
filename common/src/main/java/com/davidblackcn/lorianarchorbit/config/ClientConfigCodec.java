@@ -71,6 +71,14 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
                 "features.palette_wheel.animation",
                 warnings
         );
+        PaletteTargetPosition targetPosition = JsonConfigSupport.enumValue(
+                palette, "target_position", PaletteTargetPosition.BOTTOM, PaletteTargetPosition.class,
+                "features.palette_wheel.target_position", warnings
+        );
+        PaletteArrowStyle arrowStyle = JsonConfigSupport.enumValue(
+                palette, "arrow_style", PaletteArrowStyle.SHIFT, PaletteArrowStyle.class,
+                "features.palette_wheel.arrow_style", warnings
+        );
         PalettePreset primaryPreset = JsonConfigSupport.enumValue(
                 palette,
                 "primary_default_preset",
@@ -161,6 +169,8 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
                 enabled,
                 reachDistance,
                 animation,
+                targetPosition,
+                arrowStyle,
                 primaryPreset,
                 secondaryPreset,
                 smartPickMode,
@@ -215,6 +225,8 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
         return switch (id) {
             case "reach_extension" -> previous.reachDistance() != next.reachDistance();
             case "palette_wheel" -> previous.paletteAnimation() != next.paletteAnimation()
+                    || previous.paletteTargetPosition() != next.paletteTargetPosition()
+                    || previous.paletteArrowStyle() != next.paletteArrowStyle()
                     || previous.primaryPalettePreset() != next.primaryPalettePreset()
                     || previous.secondaryPalettePreset() != next.secondaryPalettePreset();
             case "smart_pick" -> previous.smartPickMode() != next.smartPickMode()

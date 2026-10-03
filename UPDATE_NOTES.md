@@ -60,3 +60,8 @@
 - 🧹 chore(connected-textures): remove temporary production chest diagnostics after in-game validation
 - 🐛 fix(ui): adapt palette wheels and workbench screens to window sizes and GUI scales
 - 🐛 fix(editor): keep item browsing safe before joining a world on Minecraft 26.2
+- 🐛 fix(ui): reserve palette wheel clearance for top HUD overlays and hotbar item names
+- ✨ feat(palette): add an animated green target arrow and configurable target position
+- 🐛 fix(palette): decouple target arrow motion from wheel rotation and use a muted green triangle
+- 💄 style(palette): redraw the target marker as a dark green notched arrowhead with beveled pixel edges
+- ✨ feat(palette): add selectable Pointer and Shift indicators with Shift as the default

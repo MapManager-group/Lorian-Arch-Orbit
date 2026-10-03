@@ -33,3 +33,36 @@
 `Code Review: PASS WITH RISKS`。审查新增文件和完整差异，未发现本轮改动的剩余 BLOCKER / MAJOR；配置 schema、色轮文件格式、快捷键与保存语义不变。修正了复核中发现的非配色 HUD 动画分支、窄栏长文本、重复 Mixin 注册和鼠标取整问题。剩余风险为上述未执行的人工矩阵及开发客户端退出异常。
 
 `UPDATE_NOTES.md` 已按 Gitmoji + Conventional Commits 格式追加尺寸适配与主菜单安全浏览说明；没有提交或推送 Git。
+
+## 后续：上下安全区与目标方向
+
+- `PaletteRadialLayout` 扩大上下 HUD 留白；已用本机 26.2 `Hud.extractSelectedItemName` 核实物品名称为窗口高度减 59（创造模式减 45）。保留顶部常规多行 HUD 空间，不引入 Jade 依赖。
+- `PaletteTargetPosition` 与配置 codec/draft/snapshot、配置页面、中英文翻译接通 `features.palette_wheel.target_position`。默认 bottom，支持 top/left/right；新增可选字段，不提升配置版本，不更改色轮成员格式。旧文件、无效值回退、枚举往返、恢复默认及配置变更通知均有测试。
+- `PaletteTargetIndicator`、`RadialWheelVisuals` 在配色 HUD 与编辑器预览绘制绿色像素箭头，随选中槽位移动并轻微往复；原版/智能选取等其他轮盘不受影响。
+- 最终 `./gradlew.bat build --offline`：**PASS，138/138 测试成功**，两平台发布 jar 已生成；`git diff --check` 与新增中英文翻译检查通过。本轮没有新增或修改 Mixin。
+- Fabric 独立开发客户端：实际检查预览的下、上、左、右四个方向；底部默认箭头、小窗口与最大化显示正常；右侧模式滚动后目标由橡木切换为云杉并停在右侧。通过开发目录配置热重载切换方向，测试后恢复原文件，SHA-256 与备份一致。
+- 检测到用户操作桌面后停止界面自动化，未继续检查配置控件点击/保存，也未主动关闭测试客户端。本轮未执行 NeoForge 游戏内回归或带 Jade 的 HUD 持续按键实测，相关方向和安全区由共享几何测试覆盖；Jade 的自定义位置、过高面板不在通用留白的保证范围内。
+- 按 `CODE_REVIEW.md` 自检：**PASS WITH RISKS**，无本轮 BLOCKER / MAJOR；剩余风险为上述实机未覆盖项。`UPDATE_NOTES.md` 已追加安全区修复和目标箭头/方向配置两条记录；未提交或推送 Git。
+
+## 后续：箭头动效解耦与三角形外观
+
+- `PaletteTargetIndicator` 改为由目标方向、半径和当前时间计算位置，不再读取旋转中的选中槽位坐标。保留箭头自身 900 毫秒周期、3 逻辑单位行程的径向往复，滚动不改变朝向或重置相位；箭尖与目标图标中心保持至少 16 逻辑单位距离。
+- `RadialWheelVisuals` 使用无尾杆、低饱和灰绿色三角形和深色像素描边。HUD 与编辑器预览均在槽位循环之外绘制一次箭头，四个配置方向共用实现。没有新增配置字段或修改 Mixin、依赖。
+- `PaletteTargetIndicatorTest` 覆盖四方向、极小半径隐藏、正反向连续滚动与重复物品，以及往复运动的轴线、范围和完整周期。使用 JDK 25 执行 `.\gradlew.bat build --offline`：**PASS，140/140 测试成功，0 skipped / 0 failed**；Fabric 与 NeoForge 发布 jar 均已生成。`git diff --check`、中英文 JSON 解析通过。
+- 本次没有重新操作游戏客户端，未进行最终三角形外观和连续滚动的实机视觉复测；此前检测到用户使用桌面后已停止界面自动化，不将上一轮客户端检查记作本次复测。
+- 按 `CODE_REVIEW.md` 自检：**PASS WITH RISKS**，无 BLOCKER / MAJOR / MINOR；剩余风险为上述未执行的视觉复测。`UPDATE_NOTES.md` 已追加箭头解耦和外观修复记录；没有提交或推送 Git。
+
+## 后续：深绿色箭标重绘
+
+- 本次仅调整 `RadialWheelVisuals` 的像素外观，以及中英文说明、`CONFIGURATION.md`、`DESIGN.md` 和验证/更新记录；保留此前未提交的功能改动。采用 11×8 像素内凹箭头，森林深绿主体、深色描边、克制的亮边和阴影。每个像素仅绘制一次，避免重叠半透明描边使轮廓粗细不均。
+- 从最终代码的图案和颜色生成离线预览，检查上下左右四方向在浅色、深色背景及 3×、7× 像素倍率下的轮廓。箭尖仍锚定既有目标位置，往复动效及滚动解耦逻辑未改动。
+- JDK 25 执行 `.\gradlew.bat build --offline`：**PASS，140/140 测试成功，0 skipped / 0 failed**；Fabric / NeoForge 发布 jar 已生成。中英文 JSON 解析与 `git diff --check` 通过。
+- 按 `CODE_REVIEW.md` 自检：**PASS WITH RISKS**，无 BLOCKER / MAJOR / MINOR；未新增依赖或修改 Mixin、配置格式。本轮使用离线预览检查外观，没有接管用户桌面进行游戏内复测；实际场景中的视觉效果仍待实机确认。`UPDATE_NOTES.md` 已追加深绿色箭标重绘记录；未提交或推送 Git。
+
+## 后续：Pointer / Shift 样式切换
+
+- 按两张参考图分别绘制手形指针和短尖头宽底座的 Shift 箭头，保留深绿色、像素描边和独立往复动效。`RadialWheelVisuals` 为两种图案分别指定指尖/箭尖锚点，避免手形偏心导致四方向指向错位；HUD 与编辑器预览读取同一配置。
+- 新增 `PaletteArrowStyle` 和 `features.palette_wheel.arrow_style` 可选字段；配置页面“行为 → 指示箭头样式”提供 Pointer / Shift，默认 Shift。同步 codec、snapshot、draft、恢复默认和变更通知、中英文说明；旧配置缺失或非法值回退 Shift，schema 仍为 3，未知字段和目标方向保留。
+- 新增 `PaletteArrowStyleConfigTest`：默认值、旧文件、非法值、未知字段保留、两个样式在四方向下的序列化往返、通知范围及恢复默认。使用 JDK 25 执行 `.\gradlew.bat build --offline`：**PASS，142/142 测试成功，0 skipped / 0 failed**，Fabric / NeoForge 发布 jar 已生成。中英文 JSON 解析和 `git diff --check` 通过。
+- 从实际代码图案和颜色生成离线预览，检查两种样式在四个方向、深浅背景下的外观。未接管用户桌面进行游戏内配置点击/保存或最终视觉复测；不将离线预览记为客户端检查。
+- 按 `CODE_REVIEW.md` 自检：**PASS WITH RISKS**，无 BLOCKER / MAJOR / MINOR；剩余风险为上述实机未验证项。只修改 `26.2`，保留前序未提交改动；未修改依赖、Mixin 或色轮文件格式，未提交或推送 Git。`UPDATE_NOTES.md` 已追加两种指示样式及默认值说明。

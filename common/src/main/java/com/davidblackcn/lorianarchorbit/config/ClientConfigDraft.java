@@ -39,6 +39,18 @@ public final class ClientConfigDraft {
         feature("palette_wheel").addProperty("animation", animation.name().toLowerCase(java.util.Locale.ROOT));
     }
 
+    public PaletteTargetPosition paletteTargetPosition() { return snapshot().paletteTargetPosition(); }
+
+    public void setPaletteTargetPosition(PaletteTargetPosition position) {
+        feature("palette_wheel").addProperty("target_position", position.name().toLowerCase(java.util.Locale.ROOT));
+    }
+
+    public PaletteArrowStyle paletteArrowStyle() { return snapshot().paletteArrowStyle(); }
+
+    public void setPaletteArrowStyle(PaletteArrowStyle style) {
+        feature("palette_wheel").addProperty("arrow_style", style.name().toLowerCase(java.util.Locale.ROOT));
+    }
+
     public PalettePreset primaryPalettePreset() {
         return snapshot().primaryPalettePreset();
     }
@@ -210,6 +222,8 @@ public final class ClientConfigDraft {
         }
         setReachDistance(defaults.reachDistance());
         setPaletteAnimation(defaults.paletteAnimation());
+        setPaletteTargetPosition(defaults.paletteTargetPosition());
+        setPaletteArrowStyle(defaults.paletteArrowStyle());
         setPrimaryPalettePreset(defaults.primaryPalettePreset());
         setSecondaryPalettePreset(defaults.secondaryPalettePreset());
         setSmartPickMode(defaults.smartPickMode());

@@ -4,6 +4,8 @@ import com.davidblackcn.lorianarchorbit.config.ClientConfigDraft;
 import com.davidblackcn.lorianarchorbit.config.ClientConfigSnapshot;
 import com.davidblackcn.lorianarchorbit.config.PaletteAnimation;
 import com.davidblackcn.lorianarchorbit.config.PalettePreset;
+import com.davidblackcn.lorianarchorbit.config.PaletteTargetPosition;
+import com.davidblackcn.lorianarchorbit.config.PaletteArrowStyle;
 import com.davidblackcn.lorianarchorbit.config.SmartPickMode;
 import dev.isxander.yacl3.api.ButtonOption;
 import dev.isxander.yacl3.api.ConfigCategory;
@@ -70,6 +72,26 @@ public final class ClientConfigScreen {
                 draft::fixEndPortals, draft::setFixEndPortals);
         addEnum(behavior, resettable, "palette_wheel.animation", PaletteAnimation.CLOCKWISE,
                 PaletteAnimation.class, draft::paletteAnimation, draft::setPaletteAnimation);
+        Option<PaletteTargetPosition> targetPosition = Option.<PaletteTargetPosition>createBuilder()
+                .name(text("palette_wheel.target_position.name"))
+                .description(description("palette_wheel.target_position"))
+                .binding(PaletteTargetPosition.BOTTOM, draft::paletteTargetPosition, draft::setPaletteTargetPosition)
+                .controller(option -> EnumControllerBuilder.create(option).enumClass(PaletteTargetPosition.class)
+                        .valueFormatter(position -> text("palette_wheel.target_position."
+                                + position.name().toLowerCase(java.util.Locale.ROOT))))
+                .build();
+        resettable.add(targetPosition);
+        behavior.option(targetPosition);
+        Option<PaletteArrowStyle> arrowStyle = Option.<PaletteArrowStyle>createBuilder()
+                .name(text("palette_wheel.arrow_style.name"))
+                .description(description("palette_wheel.arrow_style"))
+                .binding(PaletteArrowStyle.SHIFT, draft::paletteArrowStyle, draft::setPaletteArrowStyle)
+                .controller(option -> EnumControllerBuilder.create(option).enumClass(PaletteArrowStyle.class)
+                        .valueFormatter(style -> text("palette_wheel.arrow_style."
+                                + style.name().toLowerCase(java.util.Locale.ROOT))))
+                .build();
+        resettable.add(arrowStyle);
+        behavior.option(arrowStyle);
         addPreset(behavior, resettable, "palette_wheel.primary_default_preset", PalettePreset.ITEM_TAG_A,
                 draft::primaryPalettePreset, draft::setPrimaryPalettePreset);
         addPreset(behavior, resettable, "palette_wheel.secondary_default_preset", PalettePreset.ITEM_TAG_B,

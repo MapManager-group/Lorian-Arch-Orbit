@@ -404,11 +404,17 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
         previewVisibleCount = ring.visibleCount();
         var slots = RadialGeometry.slots(snapshot, new HudPoint(centerX, centerY), radius,
                 new RadialAnimationState(RadialAnimationMode.OFF, now, 1), now,
-                previewRotation.offsetRadians(now));
+                previewRotation.offsetRadians(now)
+                        + ClientConfigRuntime.configManager().client().paletteTargetPosition().angleOffset());
         for (var slot : slots) {
             RadialWheelVisuals.renderItem(graphics, slot.value(), slot.x(), slot.y());
         }
         ItemStack selectedStack = stacks.get(previewSelection);
+        if (!selectedStack.isEmpty()) {
+            RadialWheelVisuals.renderTargetArrow(graphics, centerX, centerY, radius,
+                    ClientConfigRuntime.configManager().client().paletteTargetPosition(),
+                    ClientConfigRuntime.configManager().client().paletteArrowStyle(), now);
+        }
         Component label = selectedStack.isEmpty()
                 ? Component.literal(group.members().get(previewSelection).itemId())
                 : selectedStack.getHoverName();

@@ -22,9 +22,12 @@ class PaletteRadialLayoutTest {
                     if (ring.visibleCount() > 1) {
                         assertTrue(2 * ring.radius() * Math.sin(Math.PI / ring.visibleCount()) >= PaletteRadialLayout.SLOT_SPACING - 1e-8);
                     }
-                    if (30 / viewport.scale() + 10 <= viewport.height() / 2) {
-                        assertTrue((viewport.height() / 2.0 + ring.radius() + 10) * viewport.pixelScale()
-                                <= viewport.height() * viewport.pixelScale() - 30 * guiScale + 1e-8);
+                    double hudScale = Math.max(1, 1 / viewport.scale());
+                    if (PaletteRadialLayout.BOTTOM_HUD_SAFE_AREA * hudScale + 10 <= viewport.height() / 2) {
+                        assertTrue(viewport.height() / 2 + ring.radius() + 10
+                                <= viewport.height() - PaletteRadialLayout.BOTTOM_HUD_SAFE_AREA * hudScale + 1e-8);
+                        assertTrue(viewport.height() / 2 - ring.radius() - 10
+                                >= PaletteRadialLayout.TOP_HUD_SAFE_AREA * hudScale - 1e-8);
                     }
                 }
             }

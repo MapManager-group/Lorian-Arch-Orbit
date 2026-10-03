@@ -10,6 +10,8 @@ public final class ClientConfigSnapshot {
     private final Map<String, Boolean> enabledFeatures;
     private final int reachDistance;
     private final PaletteAnimation paletteAnimation;
+    private final PaletteTargetPosition paletteTargetPosition;
+    private final PaletteArrowStyle paletteArrowStyle;
     private final PalettePreset primaryPalettePreset;
     private final PalettePreset secondaryPalettePreset;
     private final SmartPickMode smartPickMode;
@@ -36,6 +38,8 @@ public final class ClientConfigSnapshot {
             Map<String, Boolean> enabledFeatures,
             int reachDistance,
             PaletteAnimation paletteAnimation,
+            PaletteTargetPosition paletteTargetPosition,
+            PaletteArrowStyle paletteArrowStyle,
             PalettePreset primaryPalettePreset,
             PalettePreset secondaryPalettePreset,
             SmartPickMode smartPickMode,
@@ -61,6 +65,8 @@ public final class ClientConfigSnapshot {
         this.enabledFeatures = Map.copyOf(enabledFeatures);
         this.reachDistance = reachDistance;
         this.paletteAnimation = Objects.requireNonNull(paletteAnimation, "paletteAnimation");
+        this.paletteTargetPosition = Objects.requireNonNull(paletteTargetPosition, "paletteTargetPosition");
+        this.paletteArrowStyle = Objects.requireNonNull(paletteArrowStyle, "paletteArrowStyle");
         this.primaryPalettePreset = Objects.requireNonNull(primaryPalettePreset, "primaryPalettePreset");
         this.secondaryPalettePreset = Objects.requireNonNull(secondaryPalettePreset, "secondaryPalettePreset");
         this.smartPickMode = Objects.requireNonNull(smartPickMode, "smartPickMode");
@@ -102,6 +108,10 @@ public final class ClientConfigSnapshot {
     public PaletteAnimation paletteAnimation() {
         return paletteAnimation;
     }
+
+    public PaletteTargetPosition paletteTargetPosition() { return paletteTargetPosition; }
+
+    public PaletteArrowStyle paletteArrowStyle() { return paletteArrowStyle; }
 
     public PalettePreset primaryPalettePreset() {
         return primaryPalettePreset;
