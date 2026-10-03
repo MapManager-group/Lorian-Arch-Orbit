@@ -131,6 +131,7 @@ public final class ClientConfigRuntime {
 
     private static void onClientStarted(Minecraft minecraft) {
         ClientSmartPickRuntime.initialize();
+        HueBlocksRuntime.initialize();
         try {
             configManager.startWatching(minecraft::execute);
         } catch (IOException exception) {
@@ -178,6 +179,7 @@ public final class ClientConfigRuntime {
         ClientSmartPickRuntime.closeRuntime();
         ClientReachRuntime.closeRuntime();
         ClientPaletteRuntime.closeRuntime();
+        HueBlocksRuntime.close();
         InvisibleBlocksRuntime.closeRuntime();
         ClientInteractionRuntime.close();
     }

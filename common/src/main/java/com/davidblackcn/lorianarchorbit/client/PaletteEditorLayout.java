@@ -16,9 +16,9 @@ final class PaletteEditorLayout {
     private static final int MAX_MEMBER_WIDTH = 280;
     private static final int MIN_BROWSER_WIDTH = GRID_CELL * 4 + 8;
     private static final int MIN_PREVIEW_WIDTH = 100;
-    private static final int NORMAL_FOOTER_WIDTH = 720;
+    private static final int NORMAL_FOOTER_WIDTH = 742;
     private static final int WIDE_GROUP_BROWSER_GAP = 20;
-    private static final int[] FOOTER_BUTTON_WIDTHS = {74, 54, 54, 54, 64, 54, 54, 54, 74, 78};
+    private static final int[] FOOTER_BUTTON_WIDTHS = {74, 54, 54, 54, 64, 54, 54, 54, 64, 74, 78};
 
     private final int groupLeft;
     private final int groupWidth;
@@ -103,7 +103,8 @@ final class PaletteEditorLayout {
     private static int compactFooterRows(int screenWidth) {
         int rows = 1;
         int x = OUTER_MARGIN;
-        for (int buttonWidth : FOOTER_BUTTON_WIDTHS) {
+        for (int preferredWidth : FOOTER_BUTTON_WIDTHS) {
+            int buttonWidth = Math.min(preferredWidth, 46);
             if (x + buttonWidth > screenWidth - OUTER_MARGIN) {
                 rows++;
                 x = OUTER_MARGIN;

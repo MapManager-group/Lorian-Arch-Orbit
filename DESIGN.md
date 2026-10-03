@@ -1,0 +1,51 @@
+---
+version: alpha
+colors:
+  primary: "#7fd4ff"
+  text: "#ffffff"
+  muted: "#bbbbbb"
+  warning: "#ffc14d"
+  panel: "#202020"
+typography:
+  sans:
+    fontFamily: "Minecraft default font"
+omitted:
+  - section: rounded
+    reason: "Native Minecraft widgets own their shape."
+  - section: spacing
+    reason: "Logical GUI geometry is owned by the Java layout classes."
+  - section: components
+    reason: "Minecraft Button, CycleButton and EditBox own control appearance."
+---
+
+## Overview
+
+A building workbench for creative-mode Minecraft builders. Actual block icons and a horizontal gradient are the signature; controls remain familiar Minecraft widgets. Avoid web-style cards, decorative animation and font substitutions.
+
+## Colors
+
+Existing editor colors remain the runtime source of truth. The documented colors map to editor text and feedback; the new gradient screen uses the same values. Color chips show target colors alongside actual block results, never substitute for labels.
+
+## Typography
+
+Use the game font and translatable Components in Chinese and English. Upstream palette names are localized for known presets. User group names remain user content. Long names are truncated with full tooltips.
+
+## Layout
+
+Editor geometry belongs to PaletteEditorLayout. Gradient geometry belongs to HueGradientLayout. Actions use 20-unit native controls and 4-unit gaps. Keep status and actions outside scroll regions. The preview header contains a default-on Hide repeats toggle alongside pagination. It affects rendering and hit testing only; generated samples remain intact for application. At 320×180 logical GUI units, use a compact node editor and independently paged block preview. Wider screens show a full strip of result blocks.
+
+## Elevation & Depth
+
+Use restrained flat panels and native hover/focus states. No extra shadows or animated backdrops.
+
+## Shapes
+
+Preserve native button shapes and square block/color cells.
+
+## Components
+
+Canonical control owners: Minecraft Button (actions), CycleButton (bounded choices), EditBox (hex colors and counts). Screen owns navigation, focus and Escape. PaletteEditorScreen owns draft mutations, undo and save. The four-button footer contains Generate, target selector, Apply and Back. Targets are temporary wheel, inventory, new group and replace group. Permanent group changes return to an undoable editor draft. Inventory and temporary wheel applications stay in the workbench with feedback; Restore items and Refresh share the header status row. The standalone key entry returns directly to the game on Escape. Temporary palette and rollback data live only in memory, and never write files directly. Download states come from HueBlocksRepository and occupy a stable status line. Missing upstream data never triggers local texture color estimation.
+
+## Do's and Don'ts
+
+Keep native keyboard focus and narration. Use visible previous/next controls for bounded content; scrolling is an additional shortcut. Preserve values through resize, background refresh and returning to the editor. Do not regenerate results until the user requests it. Do not overwrite custom wheel overrides when upstream data changes.

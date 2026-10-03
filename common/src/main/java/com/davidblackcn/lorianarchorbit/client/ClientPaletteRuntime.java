@@ -19,6 +19,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -29,9 +30,12 @@ public final class ClientPaletteRuntime {
     private static final String OWNER = "palette_wheel";
     private static KeyMapping openWheel;
     private static KeyMapping openEditor;
+    private static KeyMapping openGradient;
     private static GestureRegistration gestureRegistration;
     private static WheelLease lease;
     private static RadialMenuSnapshot<PaletteEntry> radial;
+    private static PaletteLayerGestureState.Layer activeLayer;
+    private static String lastBinding;
     private static final PaletteLayerGestureState LAYER_GESTURE = new PaletteLayerGestureState();
     private static final ScrollAccumulator SCROLL = new ScrollAccumulator();
 
@@ -44,12 +48,14 @@ public final class ClientPaletteRuntime {
         }
         openWheel = new KeyMapping("key.lorian_arch_orbit.palette_wheel", InputConstants.KEY_R, category);
         openEditor = new KeyMapping("key.lorian_arch_orbit.palette_editor", InputConstants.KEY_P, category);
+        openGradient = new KeyMapping("key.lorian_arch_orbit.gradient_editor", InputConstants.UNKNOWN.getValue(), category);
         KeyMappingRegistry.register(openWheel);
         KeyMappingRegistry.register(openEditor);
+        KeyMappingRegistry.register(openGradient);
         gestureRegistration = ClientInteractionRuntime.inputs().register(
                 OWNER,
                 new PressTiming(180, 250),
-                openWheel::saveString,
+                ClientPaletteRuntime::bindingToken,
                 openWheel::isDown,
                 ClientPaletteRuntime::enabled,
                 ClientPaletteRuntime::onGesture
@@ -57,9 +63,15 @@ public final class ClientPaletteRuntime {
     }
 
     public static void tick(Minecraft minecraft) {
+        CreativeInventoryHelper.syncPlayer(minecraft);
         while (openEditor != null && openEditor.consumeClick()) {
             if (minecraft.gui.screen() == null) {
                 minecraft.setScreenAndShow(new PaletteEditorScreen(null));
+            }
+        }
+        while (openGradient != null && openGradient.consumeClick()) {
+            if (minecraft.gui.screen() == null) {
+                minecraft.setScreenAndShow(new HueGradientScreen(null, null));
             }
         }
     }
@@ -77,19 +89,23 @@ public final class ClientPaletteRuntime {
             return false;
         }
         ItemStack held = minecraft.player.getInventory().getSelectedItem();
+        if (!CreativeInventoryHelper.temporaryPalette().isEmpty()) return true;
         if (held.isEmpty()) {
             return false;
         }
-        return resolve(minecraft, Layer.PRIMARY, held).isPresent()
-                || resolve(minecraft, Layer.SECONDARY, held).isPresent();
+        return resolve(minecraft, PaletteLayerGestureState.Layer.PRIMARY, held).isPresent()
+                || resolve(minecraft, PaletteLayerGestureState.Layer.SECONDARY, held).isPresent();
     }
 
     public static synchronized void configsChanged() {
-        close(false);
+        resetGesture();
     }
 
     public static synchronized void closeRuntime() {
         close(false);
+        LAYER_GESTURE.reset();
+        lastBinding = null;
+        CreativeInventoryHelper.clearSession();
         if (gestureRegistration != null) {
             gestureRegistration.close();
             gestureRegistration = null;
@@ -97,29 +113,40 @@ public final class ClientPaletteRuntime {
     }
 
     private static boolean enabled() {
-        return ClientConfigRuntime.configManager().client().featureEnabled(OWNER);
+        boolean enabled = ClientConfigRuntime.configManager().client().featureEnabled(OWNER);
+        if (!enabled) resetGesture();
+        return enabled;
+    }
+
+    private static String bindingToken() {
+        String binding = openWheel.saveString();
+        if (!binding.equals(lastBinding)) resetGesture();
+        lastBinding = binding;
+        return binding;
+    }
+
+    public static synchronized void resetGesture() {
+        LAYER_GESTURE.reset();
+        close(false);
     }
 
     private static synchronized void onGesture(InputGestureEvent event) {
-        LAYER_GESTURE.accept(event.gesture()).ifPresent(layer -> {
+        LAYER_GESTURE.accept(event).ifPresent(layer -> {
             close(false);
-            open(
-                    layer == PaletteLayerGestureState.Layer.PRIMARY ? Layer.PRIMARY : Layer.SECONDARY,
-                    event.timestampMillis()
-            );
+            open(layer, event.timestampMillis());
         });
         if (event.gesture() == InputGesture.RELEASED || event.gesture() == InputGesture.CANCELLED) {
             close(true);
         }
     }
 
-    private static void open(Layer layer, long nowMillis) {
+    private static void open(PaletteLayerGestureState.Layer layer, long nowMillis) {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.gameMode == null || !minecraft.player.isCreative()) {
             return;
         }
         ItemStack held = minecraft.player.getInventory().getSelectedItem();
-        if (held.isEmpty()) {
+        if (held.isEmpty() && layer != PaletteLayerGestureState.Layer.TEMPORARY) {
             return;
         }
         ResolvedPalette resolved = resolve(minecraft, layer, held).orElse(null);
@@ -135,6 +162,7 @@ public final class ClientPaletteRuntime {
             return;
         }
         lease = claimed;
+        activeLayer = layer;
         radial = new RadialMenuSnapshot<>(entries, selectedIndex);
         ClientInteractionRuntime.hud().showRadial(
                 OWNER, hudSnapshot(radial), animationMode(), nowMillis
@@ -142,8 +170,23 @@ public final class ClientPaletteRuntime {
         showSelectedName();
     }
 
-    private static Optional<ResolvedPalette> resolve(Minecraft minecraft, Layer layer, ItemStack held) {
-        WheelConfigSnapshot config = layer == Layer.PRIMARY
+    private static Optional<ResolvedPalette> resolve(Minecraft minecraft, PaletteLayerGestureState.Layer layer, ItemStack held) {
+        if (layer == PaletteLayerGestureState.Layer.TEMPORARY) {
+            List<PaletteEntry> entries = new ArrayList<>();
+            int selectedIndex = -1;
+            for (String item : CreativeInventoryHelper.temporaryPalette()) {
+                PaletteMember member = new PaletteMember(item);
+                var stack = ClientPaletteItemCodec.resolve(minecraft, member);
+                if (stack.isPresent()) {
+                    if (!held.isEmpty() && selectedIndex < 0 && ItemStack.isSameItemSameComponents(held, stack.get())) {
+                        selectedIndex = entries.size();
+                    }
+                    entries.add(new PaletteEntry(member, stack.get()));
+                }
+            }
+            return entries.isEmpty() ? Optional.empty() : Optional.of(new ResolvedPalette(entries, Math.max(0, selectedIndex)));
+        }
+        WheelConfigSnapshot config = layer == PaletteLayerGestureState.Layer.PRIMARY
                 ? ClientConfigRuntime.configManager().primaryWheel()
                 : ClientConfigRuntime.configManager().secondaryWheel();
         var match = PaletteLookup.find(
@@ -198,9 +241,13 @@ public final class ClientPaletteRuntime {
             ClientInteractionRuntime.hud().rotateRadial(
                     OWNER, hudSnapshot(radial), selectionSteps, ClientInteractionRuntime.nowMillis()
             );
-            radial.selected().ifPresent(entry -> CreativeInventoryHelper.replaceSelectedSlot(
-                    Minecraft.getInstance(), entry.stack
-            ));
+            radial.selected().ifPresent(entry -> {
+                if (activeLayer == PaletteLayerGestureState.Layer.TEMPORARY) {
+                    CreativeInventoryHelper.replaceSelectedSlotWithBackup(Minecraft.getInstance(), entry.stack);
+                } else {
+                    CreativeInventoryHelper.replaceSelectedSlot(Minecraft.getInstance(), entry.stack);
+                }
+            });
             showSelectedName();
         }
         return true;
@@ -210,9 +257,11 @@ public final class ClientPaletteRuntime {
         if (radial == null) {
             return;
         }
-        radial.selected().ifPresent(selected ->
-                ClientInteractionRuntime.hud().showNumeric(OWNER, selected.stack.getHoverName())
-        );
+        radial.selected().ifPresent(selected -> ClientInteractionRuntime.hud().showNumeric(OWNER,
+                activeLayer == PaletteLayerGestureState.Layer.TEMPORARY
+                        ? Component.translatable("hueblocks.lorian_arch_orbit.temporary_selection", selected.stack.getHoverName(),
+                                radial.selectedIndex() + 1, radial.entries().size())
+                        : selected.stack.getHoverName()));
     }
 
     private static synchronized void close(boolean animate) {
@@ -222,6 +271,7 @@ public final class ClientPaletteRuntime {
             previous.close();
         }
         radial = null;
+        activeLayer = null;
         SCROLL.reset();
         ClientInteractionRuntime.hud().hideNumeric(OWNER);
         if (animate) {
@@ -234,6 +284,7 @@ public final class ClientPaletteRuntime {
     private static synchronized void revoked() {
         lease = null;
         radial = null;
+        activeLayer = null;
         SCROLL.reset();
         ClientInteractionRuntime.hud().hideRadial(OWNER);
         ClientInteractionRuntime.hud().hideNumeric(OWNER);
@@ -253,8 +304,6 @@ public final class ClientPaletteRuntime {
             case OFF -> RadialAnimationMode.OFF;
         };
     }
-
-    private enum Layer { PRIMARY, SECONDARY }
 
     private record PaletteEntry(PaletteMember member, ItemStack stack) {
         private PaletteEntry {

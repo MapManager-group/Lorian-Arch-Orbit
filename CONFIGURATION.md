@@ -9,6 +9,7 @@
 - `lorian_arch_orbit-wheel-primary.json`：一级色轮自定义覆盖。
 - `lorian_arch_orbit-wheel-secondary.json`：二级色轮自定义覆盖。
 - `palette-shares/`：色轮分享 JSON 的导入导出目录。
+- `hueblocks/<游戏版本>.json`：自动下载的方块颜色／调色板联合缓存，包含 HTTP ETag。请勿将其当作色轮覆盖配置编辑。
 
 首次启动会自动创建文件。外部编辑采用约 250 ms 防抖热重载，也可执行客户端命令 `/lorian_arch_orbit reload`。编辑器使用原子写入；迁移旧 schema 前会生成同目录 `.bak` 备份。
 
@@ -54,3 +55,19 @@
 - 交互距离始终为 5：确认服务端也安装本 Mod 与 Architectury API，并在 `server.json` 开启功能；同时检查模式、权限和协议提示。
 - 按键无反应：在“控制”中搜索 `Lorian’s Arch Orbit` 并检查冲突。整合包常见冲突见集成说明。
 - 模型或透明显示异常：先关闭资源包、Sodium/Embeddium 与光影定位组合；连接材质修复开关会触发资源重载，不要连续快速切换。
+
+## 渐变配色数据
+
+每次客户端启动后后台读取 HueBlocks 的版本索引，并选择与游戏完全一致的版本，随后使用 HTTP 条件请求检查方块颜色和调色板更新。首次使用必须成功下载；之后网络异常时继续使用有效缓存。下载不占用游戏主线程，两份数据都通过校验后才原子替换缓存。界面中的“刷新数据”可手动重试。
+
+实际数据来自该仓库的 GitHub Pages 发布内容，而不是仓库内的示例文件：
+
+- `https://1280px.github.io/hueblocks/blocksets/_blocksets.json`
+- `https://1280px.github.io/hueblocks/blocksets/<版本目录>/_blockdata.json`
+- `https://1280px.github.io/hueblocks/blocksets/<版本目录>/_palettes.json`
+
+未被上游收录或不能映射到可选取方块的纹理不参与生成；不会使用资源包或本地材质估算颜色。当前版本没有对应数据时，界面会提示，不自动套用其他版本。内置色系优化随 Mod 资源一起发布，运行时的数据更新不会重新排列已有色轮或覆盖用户配置。
+
+## 临时色轮与物品回滚
+
+“打开渐变配色”快捷键默认未绑定，请在 Minecraft 按键设置中指定。临时色轮复用色轮键（默认 `R`）：三连按，第三次按住；无需新增配置文件。临时色轮仅存于内存，重启游戏重置。物品备份同样只存在于当前玩家的内存会话中；不会写入一级／二级色轮 JSON 或 HueBlocks 缓存。
