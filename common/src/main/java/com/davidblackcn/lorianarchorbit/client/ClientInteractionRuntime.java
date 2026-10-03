@@ -101,6 +101,7 @@ public final class ClientInteractionRuntime {
     }
 
     public static synchronized void clearTransientState() {
+        ClientPaletteRuntime.resetGesture();
         clearDevelopmentPreview();
         WHEEL.clear();
         HUD.clear();
@@ -119,6 +120,7 @@ public final class ClientInteractionRuntime {
                 && minecraft.gui.screen() == null;
         Object world = minecraft.level;
         if (!focused || world != lastWorld) {
+            ClientPaletteRuntime.resetGesture();
             WHEEL.clear();
             HUD.clear();
             PREVIEW_SCROLL.reset();

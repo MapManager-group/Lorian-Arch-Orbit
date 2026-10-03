@@ -1,3 +1,4 @@
+- ✨ feat(palette): add new gradient color options and temporary color wheel feature
 - ✨ feat(compat): add optional Radial 3.1.x integration for Minecraft 26.2
 - ✨ feat(input): arbitrate a shared R key from current palette eligibility while preserving independently bound keys
 - ✨ feat(radial): add the localized Pick Item slot mode with component-aware item parsing

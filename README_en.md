@@ -50,6 +50,14 @@ Except for **interaction reach modification**, all features are client-side.
 ![](./docs/image/6.png)
 
 
+## Block gradients
+
+Open the palette editor with `P`, then choose **Gradient**. Add color or block stops, set each segment length (2–128 samples including endpoints), choose RGB or OkLAB, and filter by facing, upstream palette or the current wheel group. Generate a preview preserving every sample, including repeats. Choose Inventory, Temporary wheel, New group or Replace group, then Apply. The result remains an undoable editor draft until you save.
+
+The direct gradient shortcut is unbound by default; assign it in Controls. In creative mode, Inventory fills the hotbar first, then the main inventory (up to 36 results). Restore items rolls back overwritten slots, preserving original counts and components. Triple-tap the wheel key (default `R`), hold the third press, scroll to immediately replace the held block, then release to close the temporary wheel. The temporary wheel resets when the game restarts; inventory backups expire when the player instance changes.
+
+Matching HueBlocks data is checked in the background on every launch and cached locally. Use Refresh to retry; valid cached data remains available offline. Only the eight built-in color groups were reordered; their original members, other presets and custom overrides are preserved. See [gradient details](docs/HUEBLOCKS.md).
+
 ## Dependencies
 
 ### Fabric
@@ -84,8 +92,11 @@ Except for **interaction reach modification**, all features are client-side.
 
 - [LotTweaks](https://github.com/aruma256/LotTweaks): behavioral reference for the color wheel, smart pick, and interaction reach.
 - [Visible Barriers](https://github.com/AmyMialeeMods/visiblebarriers): behavioral reference for invisible-block display.
+- [HueBlocks](https://github.com/1280px/hueblocks)：Gradient color matching feature reference.
 - The lovely Jiu Hu (酒狐): contributed this project's icon.
 
 ## License
 
 [MIT License](LICENSE).
+
+Gradient functionality and downloaded block color/palette data are based on [HueBlocks](https://github.com/1280px/hueblocks).

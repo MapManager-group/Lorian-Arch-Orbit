@@ -100,9 +100,11 @@ public final class PaletteEditorScreen extends Screen {
     protected void init() {
         refreshCreativeTabs();
         PaletteEditorLayout layout = layout();
+        String previousSearch = search == null ? "" : search.getValue();
         search = new EditBox(font, layout.browserLeft(), 28, layout.browserWidth(), 20,
                 Component.translatable("palette_editor.lorian_arch_orbit.search"));
         search.setHint(Component.translatable("palette_editor.lorian_arch_orbit.search"));
+        search.setValue(previousSearch);
         search.setResponder(value -> itemScrollRow = 0);
         addRenderableWidget(search);
 
@@ -123,29 +125,6 @@ public final class PaletteEditorScreen extends Screen {
     }
 
     private void addFooterButtons(PaletteEditorLayout layout) {
-        if (!layout.compactFooter()) {
-            int x = layout.groupLeft();
-            addButton(x, layout.footerTop(), 74, text("layer"), button -> switchLayer());
-            x += 78;
-            addButton(x, layout.footerTop(), 54, text("new"), button -> createGroup());
-            x += 58;
-            addButton(x, layout.footerTop(), 54, text("copy"), button -> copyGroup());
-            x += 58;
-            addButton(x, layout.footerTop(), 54, text("delete"), button -> deleteGroup());
-            x += 58;
-            addButton(x, layout.footerTop(), 64, text("defaults"), button -> restoreDefaults());
-            x += 68;
-            addButton(x, layout.footerTop(), 54, text("undo"), button -> undo());
-            x += 58;
-            addButton(x, layout.footerTop(), 54, text("share"), button -> openShareScreen());
-            x += 58;
-            addButton(x, layout.footerTop(), 54, text("import"), button -> openImportScreen());
-            addButton(width - PaletteEditorLayout.OUTER_MARGIN - 156, layout.footerTop(), 74,
-                    text("save"), button -> save());
-            addButton(width - PaletteEditorLayout.OUTER_MARGIN - 78, layout.footerTop(), 78,
-                    text("cancel"), button -> onClose());
-            return;
-        }
         FooterCursor cursor = new FooterCursor(PaletteEditorLayout.OUTER_MARGIN, layout.footerTop());
         cursor = addFlowButton(cursor, 74, text("layer"), button -> switchLayer());
         cursor = addFlowButton(cursor, 54, text("new"), button -> createGroup());
@@ -155,18 +134,23 @@ public final class PaletteEditorScreen extends Screen {
         cursor = addFlowButton(cursor, 54, text("undo"), button -> undo());
         cursor = addFlowButton(cursor, 54, text("share"), button -> openShareScreen());
         cursor = addFlowButton(cursor, 54, text("import"), button -> openImportScreen());
+        cursor = addFlowButton(cursor, 64, HueGradientScreen.text("entry"),
+                button -> minecraft.setScreenAndShow(new HueGradientScreen(this, selected())));
         cursor = addFlowButton(cursor, 74, text("save"), button -> save());
         addFlowButton(cursor, 78, text("cancel"), button -> onClose());
     }
 
     private FooterCursor addFlowButton(FooterCursor cursor, int buttonWidth, Component label, Button.OnPress press) {
+        buttonWidth = layout().compactFooter() ? Math.min(buttonWidth, 46) : buttonWidth;
         int x = cursor.x();
         int y = cursor.y();
         if (x + buttonWidth > width - PaletteEditorLayout.OUTER_MARGIN) {
             x = PaletteEditorLayout.OUTER_MARGIN;
             y += 24;
         }
-        addButton(x, y, buttonWidth, label, press);
+        Button action = Button.builder(label, press).bounds(x, y, buttonWidth, 20).build();
+        action.setTooltip(net.minecraft.client.gui.components.Tooltip.create(label));
+        addRenderableWidget(action);
         return new FooterCursor(x + buttonWidth + 4, y);
     }
 
@@ -890,6 +874,27 @@ public final class PaletteEditorScreen extends Screen {
 
     private void rememberEditor() {
         undo.push(new EditorSnapshot(primary.groups(), secondary.groups()));
+    }
+
+    void applyGradient(List<String> items, boolean create, int duplicatesRemoved) {
+        if (items.size() < 2) return;
+        if (create || selected() == null) {
+            createGroup();
+            PaletteGroup target = selected();
+            // createGroup already captured the pre-apply snapshot; the whole application is one undo.
+            draft().replaceGroup(selectedGroup, new PaletteGroup(target.id(),
+                    HueGradientScreen.text("group_name").getString(), items.getFirst(),
+                    items.stream().map(PaletteMember::new).toList()));
+        } else {
+            PaletteGroup target = selected();
+            replaceSelected(new PaletteGroup(target.id(), target.displayName(), target.iconItemId(),
+                    items.stream().map(PaletteMember::new).toList()));
+        }
+        memberScrollRow = 0;
+        previewSelection = 0;
+        resetPreviewAnimation();
+        syncSelection();
+        status = HueGradientScreen.text("applied", items.size(), duplicatesRemoved);
     }
 
     private void openShareScreen() {
