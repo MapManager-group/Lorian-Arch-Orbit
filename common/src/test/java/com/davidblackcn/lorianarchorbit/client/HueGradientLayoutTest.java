@@ -12,7 +12,7 @@ class HueGradientLayoutTest {
             assertTrue(layout.columns() > 0 && layout.rows() > 0);
             assertTrue(layout.previewTop() + layout.rows() * HueGradientLayout.CELL <= layout.footerTop());
             PaletteEditorLayout editor = PaletteEditorLayout.calculate(size[0], size[1]);
-            assertTrue(94 + editor.memberRows() * 18 <= editor.footerTop() - 14,
+            assertTrue(editor.memberTop() + editor.memberRows() * 18 <= editor.footerTop() - 14,
                     "Member rows should not overlap the status line at " + size[0]);
         }
     }

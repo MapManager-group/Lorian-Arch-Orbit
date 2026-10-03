@@ -12,7 +12,7 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 /** Native buttons give every selectable block keyboard focus and narration as well as pointer access. */
-final class HueBlockPickerScreen extends Screen {
+final class HueBlockPickerScreen extends AdaptivePaletteScreen {
     private final Screen parent;
     private final List<HueGradient.Candidate> source;
     private final Consumer<HueGradient.Candidate> picked;
@@ -30,7 +30,13 @@ final class HueBlockPickerScreen extends Screen {
     }
 
     @Override
-    protected void init() {
+    protected void onViewportChanged(PaletteViewport previous, PaletteViewport next) {
+        int anchor = page * Math.max(1, (previous.height() - 88) / 24) * 2;
+        page = anchor / (Math.max(1, (next.height() - 88) / 24) * 2);
+    }
+
+    @Override
+    protected void initContent() {
         resultButtons.clear();
         int panel = Math.min(680, width - 24);
         int left = (width - panel) / 2;
@@ -82,8 +88,8 @@ final class HueBlockPickerScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderContent(graphics, mouseX, mouseY, partialTick);
         graphics.centeredText(font, title, width / 2, 8, 0xFFFFFFFF);
         int panel = Math.min(680, width - 24);
         int left = (width - panel) / 2;
@@ -97,7 +103,7 @@ final class HueBlockPickerScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double x, double y, double ax, double ay) {
+    protected boolean mouseScrolledContent(double x, double y, double ax, double ay) {
         changePage((ay != 0 ? ay : ax) < 0 ? 1 : -1);
         return true;
     }

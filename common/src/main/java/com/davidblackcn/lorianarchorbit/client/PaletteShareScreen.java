@@ -9,7 +9,6 @@ import com.davidblackcn.lorianarchorbit.palette.share.PaletteShareLayer;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
@@ -20,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-final class PaletteShareScreen extends Screen {
+final class PaletteShareScreen extends AdaptivePaletteScreen {
     private static final int ROW_HEIGHT = 20;
     private final PaletteEditorScreen parent;
     private final List<PaletteShareEntry> entries;
@@ -49,9 +48,11 @@ final class PaletteShareScreen extends Screen {
     }
 
     @Override
-    protected void init() {
-        int panelWidth = Math.min(520, width - 40);
-        int left = (width - panelWidth) / 2;
+    protected void initContent() {
+        PaletteDialogLayout layout = layout();
+        int panelWidth = layout.width();
+        int left = layout.left();
+        String previousName = shareName == null ? null : shareName.getValue();
         shareName = new EditBox(font, left, 32, panelWidth, 20,
                 Component.translatable("palette_share.lorian_arch_orbit.name"));
         shareName.setMaxLength(80);
@@ -59,31 +60,33 @@ final class PaletteShareScreen extends Screen {
         String defaultName = selected.size() == 1 && initial != null
                 ? initial.group().displayName()
                 : Component.translatable("palette_share.lorian_arch_orbit.default_name").getString();
-        shareName.setValue(defaultName);
+        shareName.setValue(previousName == null ? defaultName : previousName);
         addRenderableWidget(shareName);
 
-        int bottom = height - 28;
-        addButton(left, bottom, 70, text("all"), button -> selectAll());
-        addButton(left + 74, bottom, 70, text("none"), button -> selected.clear());
-        addButton(left + 152, bottom, 104, text("copy_code"), button -> copyCode());
-        addButton(left + 260, bottom, 104, text("export_file"), button -> exportFile());
-        addButton(left + panelWidth - 80, bottom, 80, text("back"), button -> onClose());
+        addAction(0, text("all"), button -> selectAll());
+        addAction(1, text("none"), button -> selected.clear());
+        addAction(2, text("copy_code"), button -> copyCode());
+        addAction(3, text("export_file"), button -> exportFile());
+        addAction(4, text("back"), button -> onClose());
         if (entries.isEmpty()) {
             status = text("empty");
         }
     }
 
-    private void addButton(int x, int y, int width, Component label, Button.OnPress press) {
-        addRenderableWidget(Button.builder(label, press).bounds(x, y, width, 20).build());
+    private void addAction(int index, Component label, Button.OnPress press) {
+        var action = layout().actions().get(index);
+        Button button = Button.builder(label, press).bounds(action.x(), action.y(), action.width(), 20).build();
+        button.setTooltip(net.minecraft.client.gui.components.Tooltip.create(label));
+        addRenderableWidget(button);
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderContent(graphics, mouseX, mouseY, partialTick);
         graphics.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
         int panelWidth = Math.min(520, width - 40);
         int left = (width - panelWidth) / 2;
-        graphics.text(font, text("instructions"), left, 58, 0xFFBBBBBB);
+        boundedText(graphics, text("instructions"), left, 58, panelWidth, 0xFFBBBBBB, mouseX, mouseY);
         int rows = visibleRows();
         scroll = Math.max(0, Math.min(scroll, maxScroll()));
         for (int row = 0; row < rows && scroll + row < entries.size(); row++) {
@@ -99,18 +102,19 @@ final class PaletteShareScreen extends Screen {
                 graphics.centeredText(font, "✓", left + 9, y + 4, 0xFFFFFFFF);
             }
             String layer = entry.layer() == PaletteShareLayer.PRIMARY ? "P" : "S";
-            graphics.text(font, "[" + layer + "] " + entry.group().displayName(), left + 21, y + 5, 0xFFFFFFFF);
+            boundedText(graphics, Component.literal("[" + layer + "] " + entry.group().displayName()),
+                    left + 21, y + 5, panelWidth - 55, 0xFFFFFFFF, mouseX, mouseY);
             graphics.text(font, Component.literal(Integer.toString(entry.group().members().size())),
                     left + panelWidth - 28, y + 5, 0xFFBBBBBB);
         }
         graphics.text(font, Component.translatable("palette_share.lorian_arch_orbit.selected", selected.size()),
-                left, height - 48, 0xFFFFC14D);
-        graphics.text(font, status, left + 150, height - 48, 0xFFFFC14D);
+                left, layout().footerTop() - 26, 0xFFFFC14D);
+        boundedText(graphics, status, left, layout().footerTop() - 14, panelWidth, 0xFFFFC14D, mouseX, mouseY);
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (super.mouseClicked(event, doubleClick)) {
+    protected boolean mouseClickedContent(MouseButtonEvent event, boolean doubleClick) {
+        if (super.mouseClickedContent(event, doubleClick)) {
             return true;
         }
         if (event.button() != 0) {
@@ -131,7 +135,7 @@ final class PaletteShareScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
+    protected boolean mouseScrolledContent(double mouseX, double mouseY, double amountX, double amountY) {
         double amount = amountY != 0.0 ? amountY : amountX;
         scroll = Math.max(0, Math.min(maxScroll(), scroll + (amount < 0 ? 1 : -1)));
         return true;
@@ -185,7 +189,11 @@ final class PaletteShareScreen extends Screen {
     }
 
     private int visibleRows() {
-        return Math.max(1, (height - 154) / ROW_HEIGHT);
+        return layout().rows(78, ROW_HEIGHT);
+    }
+
+    private PaletteDialogLayout layout() {
+        return PaletteDialogLayout.calculate(width, height, 520, 70, 70, 104, 104, 80);
     }
 
     private int maxScroll() {

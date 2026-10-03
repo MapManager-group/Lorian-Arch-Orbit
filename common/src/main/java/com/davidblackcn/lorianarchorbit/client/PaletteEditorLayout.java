@@ -32,6 +32,7 @@ final class PaletteEditorLayout {
     private final int footerTop;
     private final int contentBottom;
     private final boolean compactFooter;
+    private final boolean compact;
 
     private PaletteEditorLayout(
             int groupLeft,
@@ -45,7 +46,8 @@ final class PaletteEditorLayout {
             int gridColumns,
             int footerTop,
             int contentBottom,
-            boolean compactFooter
+            boolean compactFooter,
+            boolean compact
     ) {
         this.groupLeft = groupLeft;
         this.groupWidth = groupWidth;
@@ -59,16 +61,30 @@ final class PaletteEditorLayout {
         this.footerTop = footerTop;
         this.contentBottom = contentBottom;
         this.compactFooter = compactFooter;
+        this.compact = compact;
     }
 
     static PaletteEditorLayout calculate(int screenWidth, int screenHeight) {
+        return calculate(screenWidth, screenHeight, false);
+    }
+
+    static PaletteEditorLayout calculate(int screenWidth, int screenHeight, boolean previewOnly) {
         if (screenWidth < 320 || screenHeight < 180) {
             throw new IllegalArgumentException("palette editor requires at least a 320x180 logical GUI");
         }
         boolean compactFooter = screenWidth < NORMAL_FOOTER_WIDTH;
-        int footerRows = compactFooter ? compactFooterRows(screenWidth) : 1;
+        boolean compact = screenWidth < 600 || screenHeight < 270;
+        int footerRows = compact && previewOnly ? 1 : compactFooter ? compactFooterRows(screenWidth) : 1;
         int footerTop = screenHeight - 6 - footerRows * 20 - (footerRows - 1) * 4;
         int contentBottom = footerTop - 20;
+
+        if (compact) {
+            int columns = Math.max(1, (screenWidth - OUTER_MARGIN * 2 - 8) / GRID_CELL);
+            return new PaletteEditorLayout(OUTER_MARGIN, screenWidth - OUTER_MARGIN * 2 - 8,
+                    OUTER_MARGIN, columns * GRID_CELL + 8, OUTER_MARGIN, screenWidth - OUTER_MARGIN * 2,
+                    OUTER_MARGIN, screenWidth - OUTER_MARGIN * 2, columns, footerTop, contentBottom,
+                    compactFooter, true);
+        }
 
         int groupLeft = OUTER_MARGIN;
         int groupWidth = clamp(screenWidth / 5, MIN_GROUP_WIDTH, MAX_GROUP_WIDTH);
@@ -96,7 +112,7 @@ final class PaletteEditorLayout {
         int previewLeft = browserLeft + browserWidth + COLUMN_GAP;
         return new PaletteEditorLayout(
                 groupLeft, groupWidth, browserLeft, browserWidth, previewLeft, previewWidth,
-                memberLeft, memberWidth, gridColumns, footerTop, contentBottom, compactFooter
+                memberLeft, memberWidth, gridColumns, footerTop, contentBottom, compactFooter, false
         );
     }
 
@@ -130,11 +146,15 @@ final class PaletteEditorLayout {
     int footerTop() { return footerTop; }
     int contentBottom() { return contentBottom; }
     boolean compactFooter() { return compactFooter; }
+    boolean compact() { return compact; }
+    int groupTop() { return compact ? 52 : 50; }
+    int memberTop() { return compact ? 78 : 94; }
+    int previewTop() { return compact ? 52 : 28; }
 
     int browserRight() { return browserLeft + browserWidth; }
     int memberRight() { return memberLeft + memberWidth; }
     int visibleTabs() { return Math.max(1, (browserWidth - 40) / 20); }
     int gridRows() { return Math.max(1, (contentBottom - GRID_TOP) / GRID_CELL); }
-    int groupRows() { return Math.max(1, (contentBottom - 50) / 18); }
-    int memberRows() { return Math.max(1, (contentBottom - 94) / 18); }
+    int groupRows() { return Math.max(1, (contentBottom - groupTop()) / 18); }
+    int memberRows() { return Math.max(1, (contentBottom - memberTop()) / 18); }
 }

@@ -58,3 +58,5 @@
 - 🧪 test(connected-textures): add production chest-render counters, one-shot logs, and forced sealed-model diagnostics
 - 🐛 fix(connected-textures): render double-chest connection caps with Vanilla face UVs and opposite-half sprites
 - 🧹 chore(connected-textures): remove temporary production chest diagnostics after in-game validation
+- 🐛 fix(ui): adapt palette wheels and workbench screens to window sizes and GUI scales
+- 🐛 fix(editor): keep item browsing safe before joining a world on Minecraft 26.2

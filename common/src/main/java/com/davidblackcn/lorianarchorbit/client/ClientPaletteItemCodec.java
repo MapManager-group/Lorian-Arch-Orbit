@@ -22,6 +22,7 @@ final class ClientPaletteItemCodec {
     }
 
     static Optional<ItemStack> resolve(Minecraft minecraft, PaletteMember member) {
+        if (minecraft.level == null) return Optional.empty();
         Identifier id = Identifier.tryParse(member.itemId());
         if (id == null) {
             return Optional.empty();

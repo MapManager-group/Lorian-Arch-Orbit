@@ -8,7 +8,6 @@ import com.davidblackcn.lorianarchorbit.palette.share.PaletteShareException;
 import com.davidblackcn.lorianarchorbit.palette.share.PaletteShareFiles;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -19,7 +18,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-final class PaletteImportScreen extends Screen {
+final class PaletteImportScreen extends AdaptivePaletteScreen {
     private static final int ROW_HEIGHT = 24;
     private final PaletteEditorScreen parent;
     private final Path configDirectory;
@@ -30,6 +29,7 @@ final class PaletteImportScreen extends Screen {
     private int selected = -1;
     private int scroll;
     private Component status = Component.empty();
+    private boolean sourcesLoaded;
 
     PaletteImportScreen(PaletteEditorScreen parent, Path configDirectory) {
         super(Component.translatable("palette_import.lorian_arch_orbit.title"));
@@ -38,32 +38,34 @@ final class PaletteImportScreen extends Screen {
     }
 
     @Override
-    protected void init() {
-        int panelWidth = Math.min(560, width - 40);
-        int left = (width - panelWidth) / 2;
-        int bottom = height - 28;
-        addButton(left, bottom, 82, text("refresh"), button -> refreshSources());
-        policyButton = addButton(left + 86, bottom, 150, policyLabel(), button -> cyclePolicy());
-        addButton(left + panelWidth - 170, bottom, 82, text("confirm"), button -> confirmImport());
-        addButton(left + panelWidth - 84, bottom, 84, text("cancel"), button -> onClose());
-        refreshSources();
+    protected void initContent() {
+        addAction(0, text("refresh"), button -> refreshSources());
+        policyButton = addAction(1, policyLabel(), button -> cyclePolicy());
+        addAction(2, text("confirm"), button -> confirmImport());
+        addAction(3, text("cancel"), button -> onClose());
+        if (!sourcesLoaded) {
+            refreshSources();
+            sourcesLoaded = true;
+        }
     }
 
-    private Button addButton(int x, int y, int width, Component label, Button.OnPress press) {
-        Button button = Button.builder(label, press).bounds(x, y, width, 20).build();
+    private Button addAction(int index, Component label, Button.OnPress press) {
+        var action = layout().actions().get(index);
+        Button button = Button.builder(label, press).bounds(action.x(), action.y(), action.width(), 20).build();
+        button.setTooltip(net.minecraft.client.gui.components.Tooltip.create(label));
         addRenderableWidget(button);
         return button;
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderContent(graphics, mouseX, mouseY, partialTick);
         graphics.centeredText(font, title, width / 2, 10, 0xFFFFFFFF);
         int panelWidth = Math.min(560, width - 40);
         int left = (width - panelWidth) / 2;
-        graphics.text(font, text("instructions"), left, 32, 0xFFBBBBBB);
-        graphics.text(font, Component.literal(PaletteShareFiles.shareDirectory(configDirectory).toString()),
-                left, 48, 0xFF888888);
+        boundedText(graphics, text("instructions"), left, 32, panelWidth, 0xFFBBBBBB, mouseX, mouseY);
+        boundedText(graphics, Component.literal(PaletteShareFiles.shareDirectory(configDirectory).toString()),
+                left, 48, panelWidth, 0xFF888888, mouseX, mouseY);
         int rows = visibleRows();
         scroll = Math.max(0, Math.min(scroll, maxScroll()));
         for (int row = 0; row < rows && scroll + row < sources.size(); row++) {
@@ -74,24 +76,27 @@ final class PaletteImportScreen extends Screen {
             boolean hovered = inside(mouseX, mouseY, left, y, panelWidth, 21);
             graphics.fill(left, y, left + panelWidth, y + 21,
                     active ? 0xAA3275A8 : hovered ? 0xAA4D6A7D : 0x88202020);
-            graphics.text(font, source.label(), left + 5, y + 4, 0xFFFFFFFF);
-            graphics.text(font, Component.translatable(
+            int labelWidth = panelWidth / 2;
+            boundedText(graphics, Component.literal(source.label()), left + 5, y + 4, labelWidth - 10,
+                    0xFFFFFFFF, mouseX, mouseY);
+            boundedText(graphics, Component.translatable(
                     "palette_import.lorian_arch_orbit.summary",
                     source.bundle().entries().size(), source.members(), source.missing()
-            ), left + 190, y + 4, source.missing() > 0 ? 0xFFFFC14D : 0xFFBBBBBB);
+            ), left + labelWidth, y + 4, panelWidth - labelWidth - 4,
+                    source.missing() > 0 ? 0xFFFFC14D : 0xFFBBBBBB, mouseX, mouseY);
         }
         if (selected >= 0 && selected < sources.size()) {
             ImportSource source = sources.get(selected);
-            graphics.text(font, Component.translatable(
+            boundedText(graphics, Component.translatable(
                     "palette_import.lorian_arch_orbit.preview", source.bundle().name()
-            ), left, height - 50, 0xFFFFFFFF);
+            ), left, layout().footerTop() - 26, panelWidth, 0xFFFFFFFF, mouseX, mouseY);
         }
-        graphics.text(font, status, left + 260, height - 50, 0xFFFFC14D);
+        boundedText(graphics, status, left, layout().footerTop() - 14, panelWidth, 0xFFFFC14D, mouseX, mouseY);
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (super.mouseClicked(event, doubleClick)) {
+    protected boolean mouseClickedContent(MouseButtonEvent event, boolean doubleClick) {
+        if (super.mouseClickedContent(event, doubleClick)) {
             return true;
         }
         if (event.button() != 0) {
@@ -110,7 +115,7 @@ final class PaletteImportScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
+    protected boolean mouseScrolledContent(double mouseX, double mouseY, double amountX, double amountY) {
         double amount = amountY != 0.0 ? amountY : amountX;
         scroll = Math.max(0, Math.min(maxScroll(), scroll + (amount < 0 ? 1 : -1)));
         return true;
@@ -176,6 +181,7 @@ final class PaletteImportScreen extends Screen {
             case SKIP -> PaletteImportConflictPolicy.KEEP_BOTH;
         };
         policyButton.setMessage(policyLabel());
+        policyButton.setTooltip(net.minecraft.client.gui.components.Tooltip.create(policyLabel()));
     }
 
     private Component policyLabel() {
@@ -193,7 +199,11 @@ final class PaletteImportScreen extends Screen {
     }
 
     private int visibleRows() {
-        return Math.max(1, (height - 146) / ROW_HEIGHT);
+        return layout().rows(70, ROW_HEIGHT);
+    }
+
+    private PaletteDialogLayout layout() {
+        return PaletteDialogLayout.calculate(width, height, 560, 82, 150, 82, 84);
     }
 
     private int maxScroll() {

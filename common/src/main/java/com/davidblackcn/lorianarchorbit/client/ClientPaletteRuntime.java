@@ -164,7 +164,7 @@ public final class ClientPaletteRuntime {
         lease = claimed;
         activeLayer = layer;
         radial = new RadialMenuSnapshot<>(entries, selectedIndex);
-        ClientInteractionRuntime.hud().showRadial(
+        ClientInteractionRuntime.hud().showPaletteRadial(
                 OWNER, hudSnapshot(radial), animationMode(), nowMillis
         );
         showSelectedName();

@@ -32,6 +32,10 @@ Use the game font and translatable Components in Chinese and English. Upstream p
 
 ## Layout
 
+Palette screens share a centered 768×408 reference canvas. PaletteViewport derives its scale from framebuffer dimensions, independently of the vanilla GUI scale, and keeps at least 1.5 pixels per logical unit when space permits. Smaller windows reduce the canvas to a minimum layout of 320×180; below that physical size the entire minimum layout scales to fit. Extra width or height remains background. AdaptivePaletteScreen owns the rendering/input boundary, including drag deltas, clipping, tooltips and IME overlays. Only the palette screens and opted-in palette HUD use this transform.
+
+Below 600 logical units wide or 270 high, the palette editor exposes Groups, Items, Members and Preview as tabs. Preview uses a single Back to editing action so its content remains usable at minimum height. Import and share actions wrap above reserved status lines. Resizing preserves draft values, selections and list anchors, and cancels active dragging. Palette rings keep readable icons and window the visible entries when crowded; scrolling still traverses the complete ordered list, including duplicate entries.
+
 Editor geometry belongs to PaletteEditorLayout. Gradient geometry belongs to HueGradientLayout. Actions use 20-unit native controls and 4-unit gaps. Keep status and actions outside scroll regions. The preview header contains a default-on Hide repeats toggle alongside pagination. It affects rendering and hit testing only; generated samples remain intact for application. At 320×180 logical GUI units, use a compact node editor and independently paged block preview. Wider screens show a full strip of result blocks.
 
 ## Elevation & Depth

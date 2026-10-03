@@ -10,7 +10,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /** Independent gradient workbench with draft, temporary wheel and reversible inventory targets. */
-final class HueGradientScreen extends Screen {
+final class HueGradientScreen extends AdaptivePaletteScreen {
     private static final List<String> FACES = List.of("all", "sides", "top", "bottom", "north", "south", "east", "west");
     private final PaletteEditorScreen parent;
     private final PaletteGroup group;
@@ -62,8 +61,15 @@ final class HueGradientScreen extends Screen {
     }
 
     @Override
-    protected void init() {
+    protected void onViewportChanged(PaletteViewport previous, PaletteViewport next) {
+        int anchor = page * HueGradientLayout.calculate(previous.width(), previous.height()).pageSize();
+        page = anchor / HueGradientLayout.calculate(next.width(), next.height()).pageSize();
+    }
+
+    @Override
+    protected void initContent() {
         HueGradientLayout layout = layout();
+        page = Math.min(page, maxPage());
         int left = layout.left();
         int panel = layout.width();
         restoreButton = button(left + panel - 112, 22, 64, text("restore_inventory"), b -> {
@@ -339,17 +345,15 @@ final class HueGradientScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderContent(graphics, mouseX, mouseY, partialTick);
         HueGradientLayout layout = layout();
         graphics.centeredText(font, title, width / 2, 8, 0xFFFFFFFF);
         Component status = !message.getString().isEmpty() ? message
                 : HueBlocksRuntime.repository().data() != null && filteredCandidates().isEmpty() ? text("no_candidates") : dataStatus();
         if (!validNodes()) status = text("invalid_inputs");
-        graphics.text(font, font.plainSubstrByWidth(status.getString(), layout.width() - 116), layout.left(), 27, 0xFFFFC14D);
-        if (mouseY >= 22 && mouseY < 42 && mouseX >= layout.left() && mouseX < layout.left() + layout.width() - 116) {
-            graphics.setTooltipForNextFrame(font, status, mouseX, mouseY);
-        }
+        if (minecraft.level == null) status = Component.translatable("palette_editor.lorian_arch_orbit.world_required");
+        boundedText(graphics, status, layout.left(), 27, layout.width() - 116, 0xFFFFC14D, mouseX, mouseY);
         graphics.centeredText(font, (selectedNode + 1) + " / " + nodes.size(), layout.left() + 56, 48, 0xFFFFFFFF);
         graphics.text(font, text("color_label"), layout.left(), 72, 0xFFBBBBBB);
         graphics.text(font, text("steps_label"), layout.left() + 112, 72, 0xFFBBBBBB);
@@ -357,10 +361,7 @@ final class HueGradientScreen extends Screen {
         graphics.fill(layout.left() + 30, 84, layout.left() + 106, 86, 0xFF000000 | rgb);
         Component label = text(results.isEmpty() ? "preview" : dirty ? "preview_stale" : "preview_count",
                 previewResults.size(), results.size(), page + 1, maxPage() + 1);
-        graphics.text(font, font.plainSubstrByWidth(label.getString(), layout.width() - 160), layout.left(), 117, 0xFFBBBBBB);
-        if (mouseY >= 114 && mouseY < 130 && mouseX >= layout.left() && mouseX < layout.left() + layout.width() - 160) {
-            graphics.setTooltipForNextFrame(font, label, mouseX, mouseY);
-        }
+        boundedText(graphics, label, layout.left(), 117, layout.width() - 160, 0xFFBBBBBB, mouseX, mouseY);
         page = Math.min(page, maxPage());
         for (int slot = 0; slot < layout.pageSize() && page * layout.pageSize() + slot < previewResults.size(); slot++) {
             var candidate = previewResults.get(page * layout.pageSize() + slot);
@@ -370,8 +371,8 @@ final class HueGradientScreen extends Screen {
             graphics.item(HueBlocksRuntime.stack(candidate), x + 3, y + 2);
             graphics.fill(x + 2, y + 20, x + 20, y + 22, 0xFF000000 | candidate.block().rgb());
             if (mouseX >= x && mouseX < x + 22 && mouseY >= y && mouseY < y + 22) {
-                graphics.setTooltipForNextFrame(font, text("block_hint", HueBlocksRuntime.stack(candidate).getHoverName(),
-                        candidate.itemId(), candidate.block().texture()), mouseX, mouseY);
+                graphics.setTooltipForNextFrame(font, font.split(text("block_hint", HueBlocksRuntime.stack(candidate).getHoverName(),
+                        candidate.itemId(), candidate.block().texture()), width - 24), mouseX, mouseY);
             }
         }
         if (results.isEmpty()) graphics.text(font, text("preview_empty"), layout.left() + 4, layout.previewTop() + 6, 0xFFBBBBBB);
@@ -393,8 +394,8 @@ final class HueGradientScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (super.mouseClicked(event, doubleClick)) return true;
+    protected boolean mouseClickedContent(MouseButtonEvent event, boolean doubleClick) {
+        if (super.mouseClickedContent(event, doubleClick)) return true;
         HueGradientLayout layout = layout();
         int x = (int) event.x() - layout.left();
         int y = (int) event.y() - layout.previewTop();
@@ -407,12 +408,12 @@ final class HueGradientScreen extends Screen {
     }
 
     @Override
-    public boolean mouseScrolled(double x, double y, double ax, double ay) {
+    protected boolean mouseScrolledContent(double x, double y, double ax, double ay) {
         if (y >= layout().previewTop() && y < layout().footerTop()) {
             changePage((ay != 0 ? ay : ax) < 0 ? 1 : -1);
             return true;
         }
-        return super.mouseScrolled(x, y, ax, ay);
+        return super.mouseScrolledContent(x, y, ax, ay);
     }
 
     private void changePage(int delta) { page = Math.max(0, Math.min(maxPage(), page + delta)); updateAvailability(); }

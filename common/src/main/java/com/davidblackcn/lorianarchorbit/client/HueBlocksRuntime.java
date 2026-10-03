@@ -35,6 +35,7 @@ final class HueBlocksRuntime {
     }
 
     static List<HueGradient.Candidate> candidates() {
+        if (net.minecraft.client.Minecraft.getInstance().level == null) return List.of();
         HueBlocksData data = repository().data();
         if (data == null) return List.of();
         if (data == mappedData) return candidates;

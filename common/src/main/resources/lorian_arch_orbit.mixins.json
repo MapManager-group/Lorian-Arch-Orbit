@@ -4,6 +4,8 @@
   "compatibilityLevel": "JAVA_25",
   "minVersion": "0.8",
   "client": [
+    "client.PaletteScreenMixin",
+    "client.PaletteGraphicsMixin",
     "client.MinecraftPickMixin",
     "client.BlockStateRenderShapeMixin",
     "client.ClientLevelBreakingEffectMixin",

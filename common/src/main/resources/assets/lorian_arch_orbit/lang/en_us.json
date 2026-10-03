@@ -1,4 +1,10 @@
 {
+  "palette_editor.lorian_arch_orbit.world_required": "Join a world to browse items and preview blocks.",
+  "palette_editor.lorian_arch_orbit.items": "Items",
+  "palette_editor.lorian_arch_orbit.preview_tab": "Preview",
+  "palette_editor.lorian_arch_orbit.members": "Members",
+  "palette_editor.lorian_arch_orbit.back_to_edit": "Back to editing",
+  "palette_editor.lorian_arch_orbit.wheel_overflow": "%s / %s · Scroll to browse",
   "key.category.lorian_arch_orbit.main": "Lorian’s Arch Orbit",
   "key.lorian_arch_orbit.open_config": "Open configuration",
   "key.lorian_arch_orbit.palette_wheel": "Hold to open palette wheel",

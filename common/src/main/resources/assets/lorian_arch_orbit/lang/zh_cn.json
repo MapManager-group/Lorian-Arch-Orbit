@@ -1,4 +1,10 @@
 {
+  "palette_editor.lorian_arch_orbit.world_required": "进入世界后可浏览物品和预览方块。",
+  "palette_editor.lorian_arch_orbit.items": "物品",
+  "palette_editor.lorian_arch_orbit.preview_tab": "预览",
+  "palette_editor.lorian_arch_orbit.members": "成员",
+  "palette_editor.lorian_arch_orbit.back_to_edit": "返回编辑",
+  "palette_editor.lorian_arch_orbit.wheel_overflow": "%s / %s · 滚轮切换",
   "key.category.lorian_arch_orbit.main": "Lorian’s Arch Orbit",
   "key.lorian_arch_orbit.open_config": "打开配置界面",
   "key.lorian_arch_orbit.palette_wheel": "按住打开色轮",

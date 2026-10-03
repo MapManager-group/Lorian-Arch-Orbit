@@ -7,6 +7,8 @@ import com.davidblackcn.lorianarchorbit.interaction.RadialAnimationMode;
 import com.davidblackcn.lorianarchorbit.interaction.RadialAnimationState;
 import com.davidblackcn.lorianarchorbit.interaction.RadialGeometry;
 import com.davidblackcn.lorianarchorbit.interaction.RadialMenuSnapshot;
+import com.davidblackcn.lorianarchorbit.interaction.RadialMenuWindow;
+import com.davidblackcn.lorianarchorbit.interaction.PaletteRadialLayout;
 import com.davidblackcn.lorianarchorbit.interaction.RadialRotationState;
 import com.davidblackcn.lorianarchorbit.interaction.ScrollAccumulator;
 import com.davidblackcn.lorianarchorbit.palette.PaletteGroup;
@@ -42,7 +44,7 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
-public final class PaletteEditorScreen extends Screen {
+public final class PaletteEditorScreen extends AdaptivePaletteScreen {
     private static final int GRID_CELL = PaletteEditorLayout.GRID_CELL;
     private static final int GRID_TOP = PaletteEditorLayout.GRID_TOP;
     private static final int TAB_SIZE = 20;
@@ -86,6 +88,15 @@ public final class PaletteEditorScreen extends Screen {
     private EditBox groupName;
     private boolean syncingName;
     private Component status = Component.empty();
+    private Pane pane = Pane.GROUPS;
+    private int previousGridColumns;
+    private int previewVisibleCount;
+    private String nameGroupId;
+    private Layer nameLayer;
+
+    private enum Pane { GROUPS, ITEMS, MEMBERS, PREVIEW }
+
+    private boolean shows(Pane target) { return !layout().compact() || pane == target; }
 
     public PaletteEditorScreen(Screen parent) {
         super(Component.translatable("palette_editor.lorian_arch_orbit.title"));
@@ -97,27 +108,67 @@ public final class PaletteEditorScreen extends Screen {
     }
 
     @Override
-    protected void init() {
+    protected void initContent() {
+        clearDragFeedback();
+        browserScrollbarDragging = groupScrollbarDragging = memberScrollbarDragging = false;
         refreshCreativeTabs();
         PaletteEditorLayout layout = layout();
+        if (previousGridColumns > 0) itemScrollRow = itemScrollRow * previousGridColumns / layout.gridColumns();
+        previousGridColumns = layout.gridColumns();
+        if (layout.compact()) {
+            int tabWidth = (width - 24 - 12) / 4;
+            String[] labels = {"groups", "items", "members", "preview_tab"};
+            for (Pane target : Pane.values()) {
+                Button tab = Button.builder(text(labels[target.ordinal()]), button -> {
+                    pane = target;
+                    rebuildWidgets();
+                }).bounds(12 + target.ordinal() * (tabWidth + 4), 28, tabWidth, 20).build();
+                tab.active = pane != target;
+                addRenderableWidget(tab);
+            }
+        }
         String previousSearch = search == null ? "" : search.getValue();
-        search = new EditBox(font, layout.browserLeft(), 28, layout.browserWidth(), 20,
+        String previousName = groupName != null && nameLayer == layer && selected() != null
+                && selected().id().equals(nameGroupId) ? groupName.getValue() : null;
+        int searchWidth = layout.compact() ? (layout.browserWidth() - 4) / 2 : layout.browserWidth();
+        search = new EditBox(font, layout.browserLeft(), layout.compact() ? 52 : 28, searchWidth, 20,
                 Component.translatable("palette_editor.lorian_arch_orbit.search"));
         search.setHint(Component.translatable("palette_editor.lorian_arch_orbit.search"));
         search.setValue(previousSearch);
         search.setResponder(value -> itemScrollRow = 0);
-        addRenderableWidget(search);
+        if (shows(Pane.ITEMS)) addRenderableWidget(search);
+        if (layout.compact() && shows(Pane.ITEMS)) {
+            Button category = Button.builder(selectedCreativeTab == null ? text("items") : selectedCreativeTab.getDisplayName(), button -> {
+                if (!creativeTabs.isEmpty()) {
+                    selectedCreativeTab = creativeTabs.get(Math.floorMod(creativeTabs.indexOf(selectedCreativeTab) + 1, creativeTabs.size()));
+                    itemScrollRow = 0;
+                    rebuildWidgets();
+                }
+            }).bounds(layout.browserLeft() + searchWidth + 4, 52, layout.browserWidth() - searchWidth - 4, 20).build();
+            category.setTooltip(net.minecraft.client.gui.components.Tooltip.create(category.getMessage()));
+            addRenderableWidget(category);
+        }
 
-        groupName = new EditBox(font, layout.memberLeft(), 28, layout.memberWidth(), 20,
+        int nameWidth = layout.compact() ? layout.memberWidth() - 112 : layout.memberWidth();
+        groupName = new EditBox(font, layout.memberLeft(), layout.compact() ? 52 : 28, nameWidth, 20,
                 Component.translatable("palette_editor.lorian_arch_orbit.group_name"));
         groupName.setMaxLength(80);
         groupName.setResponder(this::renameSelectedGroup);
-        addRenderableWidget(groupName);
+        if (shows(Pane.MEMBERS)) addRenderableWidget(groupName);
 
-        addFooterButtons(layout);
-        addButton(layout.memberLeft(), 52, layout.memberWidth(), text("held_exact"), button -> addHeldExact());
-        resetPreviewAnimation();
+        if (layout.compact() && pane == Pane.PREVIEW) {
+            addButton(12, layout.footerTop(), 100, text("back_to_edit"), button -> { pane = Pane.MEMBERS; rebuildWidgets(); });
+        } else {
+            addFooterButtons(layout);
+        }
+        if (shows(Pane.MEMBERS)) addButton(layout.memberLeft() + (layout.compact() ? nameWidth + 4 : 0), 52,
+                layout.compact() ? 108 : layout.memberWidth(), text("held_exact"), button -> addHeldExact());
         syncSelection();
+        if (previousName != null) {
+            syncingName = true;
+            try { groupName.setValue(previousName); }
+            finally { syncingName = false; }
+        }
     }
 
     private void addButton(int x, int y, int width, Component label, Button.OnPress press) {
@@ -155,30 +206,33 @@ public final class PaletteEditorScreen extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderContent(graphics, mouseX, mouseY, partialTick);
         graphics.centeredText(font, title, width / 2, 8, 0xFFFFFFFF);
         graphics.text(font, text(layer == Layer.PRIMARY ? "layer.primary" : "layer.secondary"),
                 layout().groupLeft(), 10, 0xFF7FD4FF);
         PaletteEditorLayout layout = layout();
         updateScrollbarDragging(layout, mouseY);
-        drawGroups(graphics, layout, mouseX, mouseY);
-        drawCreativeBrowser(graphics, layout, mouseX, mouseY);
-        drawPreview(graphics, layout);
-        updateDragFeedback(layout, mouseX, mouseY);
-        drawMembers(graphics, layout, mouseX, mouseY);
-        graphics.text(font, status, layout.groupLeft(), layout.footerTop() - 14, 0xFFFFC14D);
+        if (shows(Pane.GROUPS)) drawGroups(graphics, layout, mouseX, mouseY);
+        if (shows(Pane.ITEMS)) drawCreativeBrowser(graphics, layout, mouseX, mouseY);
+        if (shows(Pane.PREVIEW)) drawPreview(graphics, layout, mouseX, mouseY);
+        if (shows(Pane.MEMBERS)) {
+            updateDragFeedback(layout, mouseX, mouseY);
+            drawMembers(graphics, layout, mouseX, mouseY);
+        }
+        boundedText(graphics, minecraft.level == null && status.getString().isEmpty() ? text("world_required") : status,
+                layout.groupLeft(), layout.footerTop() - 14, width - 24, 0xFFFFC14D, mouseX, mouseY);
     }
 
     private void drawGroups(GuiGraphicsExtractor graphics, PaletteEditorLayout layout, int mouseX, int mouseY) {
-        graphics.text(font, text("groups"), layout.groupLeft(), 32, 0xFFFFFFFF);
+        if (!layout.compact()) graphics.text(font, text("groups"), layout.groupLeft(), 32, 0xFFFFFFFF);
         List<PaletteGroup> groups = draft().groups();
         int rows = groupRows(layout);
         groupScroll = Math.max(0, Math.min(groupScroll, maxGroupScroll(layout)));
         int start = groupScroll;
         for (int row = 0; row < rows && start + row < groups.size(); row++) {
             int index = start + row;
-            int y = 50 + row * 18;
+            int y = layout.groupTop() + row * 18;
             int color = index == selectedGroup ? 0xAA3275A8 : 0x88202020;
             graphics.fill(layout.groupLeft(), y, layout.groupLeft() + layout.groupWidth(), y + 16, color);
             boolean builtin = builtinGroup(groups.get(index).id()) != null;
@@ -191,7 +245,8 @@ public final class PaletteEditorScreen extends Screen {
             graphics.text(font, name, nameLeft, y + 4, 0xFFFFFFFF);
             if (inside(mouseX, mouseY, layout.groupLeft(), y, layout.groupWidth(), 16)
                     && !name.equals(groups.get(index).displayName())) {
-                graphics.setTooltipForNextFrame(font, Component.literal(groups.get(index).displayName()), mouseX, mouseY);
+                graphics.setTooltipForNextFrame(font, font.split(Component.literal(groups.get(index).displayName()), width - 24),
+                        mouseX, mouseY);
             }
         }
         drawGroupScrollbar(graphics, layout, groups.size(), rows);
@@ -200,13 +255,13 @@ public final class PaletteEditorScreen extends Screen {
     private void drawGroupScrollbar(GuiGraphicsExtractor graphics, PaletteEditorLayout layout, int groupCount, int rows) {
         int trackLeft = layout.groupLeft() + layout.groupWidth() + 2;
         int trackHeight = rows * 18;
-        graphics.fill(trackLeft, 50, trackLeft + 6, 50 + trackHeight, 0x88303030);
+        graphics.fill(trackLeft, layout.groupTop(), trackLeft + 6, layout.groupTop() + trackHeight, 0x88303030);
         if (groupCount <= rows) {
-            graphics.fill(trackLeft, 50, trackLeft + 6, 50 + trackHeight, 0xFF777777);
+            graphics.fill(trackLeft, layout.groupTop(), trackLeft + 6, layout.groupTop() + trackHeight, 0xFF777777);
             return;
         }
         int thumbHeight = Math.max(12, trackHeight * rows / groupCount);
-        int thumbY = 50 + (trackHeight - thumbHeight) * groupScroll / (groupCount - rows);
+        int thumbY = layout.groupTop() + (trackHeight - thumbHeight) * groupScroll / (groupCount - rows);
         graphics.fill(trackLeft, thumbY, trackLeft + 6, thumbY + thumbHeight,
                 groupScrollbarDragging ? 0xFFFFFFFF : 0xFFAAAAAA);
     }
@@ -217,7 +272,7 @@ public final class PaletteEditorScreen extends Screen {
             int mouseX,
             int mouseY
     ) {
-        drawCreativeTabs(graphics, layout, mouseX, mouseY);
+        if (!layout.compact()) drawCreativeTabs(graphics, layout, mouseX, mouseY);
         List<ItemStack> items = filteredCreativeItems();
         int columns = layout.gridColumns();
         int rows = layout.gridRows();
@@ -314,39 +369,39 @@ public final class PaletteEditorScreen extends Screen {
                 browserScrollbarDragging ? 0xFFFFFFFF : 0xFFAAAAAA);
     }
 
-    private void drawPreview(GuiGraphicsExtractor graphics, PaletteEditorLayout layout) {
+    private void drawPreview(GuiGraphicsExtractor graphics, PaletteEditorLayout layout, int mouseX, int mouseY) {
         int left = layout.previewLeft();
-        int top = 28;
+        int top = layout.previewTop();
         int previewWidth = layout.previewWidth();
         int previewHeight = layout.contentBottom() - top;
-        if (previewWidth < 60 || previewHeight < 80) {
+        if (previewWidth < 60 || previewHeight < 48) {
             return;
         }
         graphics.fill(left, top, left + previewWidth, top + previewHeight, 0x33202020);
         graphics.outline(left, top, previewWidth, previewHeight, 0x66777777);
-        graphics.centeredText(font, text("preview"), left + previewWidth / 2, top + 6, 0xFFBBBBBB);
+        previewText(graphics, text("preview"), left, previewWidth, top + 6, 0xFFBBBBBB, mouseX, mouseY);
         PaletteGroup group = selected();
         if (group == null || group.members().isEmpty()) {
-            graphics.centeredText(font, text("preview_empty"), left + previewWidth / 2,
-                    top + previewHeight / 2, 0xFF999999);
+            previewText(graphics, text("preview_empty"), left, previewWidth,
+                    top + previewHeight / 2, 0xFF999999, mouseX, mouseY);
             return;
         }
         List<ItemStack> stacks = group.members().stream()
                 .map(member -> ClientPaletteItemCodec.resolve(minecraft, member).orElse(ItemStack.EMPTY))
                 .toList();
         previewSelection = Math.floorMod(previewSelection, stacks.size());
-        RadialMenuSnapshot<ItemStack> snapshot = new RadialMenuSnapshot<>(stacks, previewSelection);
+        boolean singlePreview = previewHeight < 120;
+        PaletteRadialLayout ring = singlePreview ? PaletteRadialLayout.calculate(stacks.size(), 0)
+                : PaletteRadialLayout.preview(stacks.size(), previewWidth, previewHeight);
+        RadialMenuSnapshot<ItemStack> snapshot = RadialMenuWindow.from(stacks, previewSelection, Math.max(1, ring.visibleCount()));
         int centerX = left + previewWidth / 2;
-        int centerY = top + previewHeight / 2;
-        int maximumRadius = Math.max(0, Math.min(previewWidth / 2 - RadialWheelVisuals.ITEM_HALF_SIZE - 6,
-                previewHeight / 2 - RadialWheelVisuals.ITEM_HALF_SIZE - 18));
-        int preferredRadius = RadialWheelVisuals.MINIMUM_RADIUS
-                + (int) Math.round(Math.max(0, stacks.size() - 1) * 1.8);
-        int radius = Math.min(maximumRadius, preferredRadius);
+        int centerY = singlePreview ? top + 28 : top + previewHeight / 2;
+        int radius = ring.radius();
         long now = System.currentTimeMillis();
-        if (previewRotation == null) {
+        if (previewRotation == null || previewVisibleCount != ring.visibleCount()) {
             previewRotation = RadialRotationState.idle(now, PREVIEW_ROTATION_MILLIS);
         }
+        previewVisibleCount = ring.visibleCount();
         var slots = RadialGeometry.slots(snapshot, new HudPoint(centerX, centerY), radius,
                 new RadialAnimationState(RadialAnimationMode.OFF, now, 1), now,
                 previewRotation.offsetRadians(now));
@@ -360,10 +415,21 @@ public final class PaletteEditorScreen extends Screen {
         int labelWidth = Math.min(font.width(label), Math.max(0, previewWidth - 12));
         String labelText = elideMiddle(label.getString(), labelWidth);
         int textWidth = font.width(labelText);
-        int labelY = centerY + 12;
+        int labelY = centerY + (singlePreview ? 16 : 12);
         graphics.fill(centerX - textWidth / 2 - 3, labelY - 2,
                 centerX + (textWidth + 1) / 2 + 3, labelY + font.lineHeight + 2, 0x90000000);
         graphics.centeredText(font, labelText, centerX, labelY, 0xFFFFFFFF);
+        if (ring.visibleCount() < stacks.size()) {
+            Component overflow = text("wheel_overflow", previewSelection + 1, stacks.size());
+            previewText(graphics, overflow, left, previewWidth, top + previewHeight - 10,
+                    0xFFBBBBBB, mouseX, mouseY);
+        }
+    }
+
+    private void previewText(GuiGraphicsExtractor graphics, Component text, int left, int previewWidth,
+                             int y, int color, int mouseX, int mouseY) {
+        int textWidth = Math.min(font.width(text), previewWidth - 12);
+        boundedText(graphics, text, left + (previewWidth - textWidth) / 2, y, textWidth, color, mouseX, mouseY);
     }
 
     private void drawMembers(
@@ -375,11 +441,12 @@ public final class PaletteEditorScreen extends Screen {
         int left = layout.memberLeft();
         PaletteGroup group = selected();
         int count = group == null ? 0 : group.members().size();
-        graphics.text(font, text("members_count", count), left, 78, 0xFFFFFFFF);
+        if (!layout.compact()) boundedText(graphics, text("members_count", count), left, 78,
+                layout.memberWidth(), 0xFFFFFFFF, mouseX, mouseY);
         if (group == null) {
             return;
         }
-        int top = 94;
+        int top = layout.memberTop();
         int rows = memberRows(layout);
         memberScrollRow = Math.max(0, Math.min(memberScrollRow, maxMemberScroll(group.members().size(), rows)));
         int start = memberScrollRow;
@@ -423,7 +490,7 @@ public final class PaletteEditorScreen extends Screen {
             int memberCount,
             int rows
     ) {
-        int top = 94;
+        int top = layout.memberTop();
         int trackLeft = layout.memberRight() - MEMBER_SCROLLBAR_WIDTH;
         int trackHeight = rows * 18;
         graphics.fill(trackLeft, top, layout.memberRight(), top + trackHeight, 0x88303030);
@@ -474,30 +541,31 @@ public final class PaletteEditorScreen extends Screen {
             if (member.matchMode() == PaletteMatchMode.EXACT_COMPONENTS) {
                 tooltip.add(text("exact_components").copy().withStyle(ChatFormatting.GOLD));
             }
-            graphics.setComponentTooltipForNextFrame(font, tooltip, mouseX, mouseY);
+            graphics.setTooltipForNextFrame(font, tooltip.stream()
+                    .flatMap(line -> font.split(line, width - 24).stream()).toList(), mouseX, mouseY);
         }
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (super.mouseClicked(event, doubleClick)) {
+    protected boolean mouseClickedContent(MouseButtonEvent event, boolean doubleClick) {
+        if (super.mouseClickedContent(event, doubleClick)) {
             return true;
         }
         int mouseX = (int) event.x();
         int mouseY = (int) event.y();
         PaletteEditorLayout layout = layout();
-        if (event.button() == 0 && startGroupScrollbarDrag(layout, mouseX, mouseY)) {
+        if (shows(Pane.GROUPS) && event.button() == 0 && startGroupScrollbarDrag(layout, mouseX, mouseY)) {
             return true;
         }
-        if (event.button() == 0 && startBrowserScrollbarDrag(layout, mouseX, mouseY)) {
+        if (shows(Pane.ITEMS) && event.button() == 0 && startBrowserScrollbarDrag(layout, mouseX, mouseY)) {
             return true;
         }
-        if (event.button() == 0 && startMemberScrollbarDrag(layout, mouseX, mouseY)) {
+        if (shows(Pane.MEMBERS) && event.button() == 0 && startMemberScrollbarDrag(layout, mouseX, mouseY)) {
             return true;
         }
-        if (event.button() == 0 && inside(mouseX, mouseY, layout.groupLeft(), 50,
+        if (shows(Pane.GROUPS) && event.button() == 0 && inside(mouseX, mouseY, layout.groupLeft(), layout.groupTop(),
                 layout.groupWidth(), groupRows(layout) * 18)) {
-            int index = groupScroll + (mouseY - 50) / 18;
+            int index = groupScroll + (mouseY - layout.groupTop()) / 18;
             if (index < draft().groups().size()) {
                 selectedGroup = index;
                 memberScrollRow = 0;
@@ -507,10 +575,10 @@ public final class PaletteEditorScreen extends Screen {
                 return true;
             }
         }
-        if (event.button() == 0 && clickCreativeTab(layout, mouseX, mouseY)) {
+        if (shows(Pane.ITEMS) && !layout.compact() && event.button() == 0 && clickCreativeTab(layout, mouseX, mouseY)) {
             return true;
         }
-        int gridIndex = gridIndex(layout, mouseX, mouseY);
+        int gridIndex = shows(Pane.ITEMS) ? gridIndex(layout, mouseX, mouseY) : -1;
         if (event.button() == 0 && gridIndex >= 0) {
             List<ItemStack> items = filteredCreativeItems();
             int itemIndex = itemScrollRow * layout.gridColumns() + gridIndex;
@@ -519,7 +587,7 @@ public final class PaletteEditorScreen extends Screen {
                 return true;
             }
         }
-        int member = memberIndex(layout, mouseX, mouseY);
+        int member = shows(Pane.MEMBERS) ? memberIndex(layout, mouseX, mouseY) : -1;
         if (member >= 0) {
             if (event.button() == 1) {
                 removeMember(member);
@@ -528,7 +596,7 @@ public final class PaletteEditorScreen extends Screen {
                 dragTarget = member;
                 previousDragTarget = member;
                 dragMouseY = mouseY;
-                draggedVisualY = 94 + (member - memberScrollRow) * 18;
+                draggedVisualY = layout.memberTop() + (member - memberScrollRow) * 18;
                 dragTransitionStartedAt = System.currentTimeMillis();
             }
             return true;
@@ -537,7 +605,7 @@ public final class PaletteEditorScreen extends Screen {
     }
 
     @Override
-    public boolean mouseReleased(MouseButtonEvent event) {
+    protected boolean mouseReleasedContent(MouseButtonEvent event) {
         if (browserScrollbarDragging || groupScrollbarDragging || memberScrollbarDragging) {
             browserScrollbarDragging = false;
             groupScrollbarDragging = false;
@@ -552,26 +620,27 @@ public final class PaletteEditorScreen extends Screen {
             clearDragFeedback();
             return true;
         }
-        return super.mouseReleased(event);
+        return super.mouseReleasedContent(event);
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amountX, double amountY) {
+    protected boolean mouseScrolledContent(double mouseX, double mouseY, double amountX, double amountY) {
         PaletteEditorLayout layout = layout();
         double amount = amountY != 0.0 ? amountY : amountX;
-        if (mouseX < layout.groupLeft() + layout.groupWidth()) {
+        if (shows(Pane.GROUPS) && inside((int) mouseX, (int) mouseY, layout.groupLeft(), layout.groupTop(),
+                layout.groupWidth() + 8, groupRows(layout) * 18)) {
             groupScroll = Math.max(0, Math.min(maxGroupScroll(layout), groupScroll + (amount < 0 ? 1 : -1)));
             return true;
         }
-        if (inside((int) mouseX, (int) mouseY, layout.browserLeft(), 52,
+        if (shows(Pane.ITEMS) && inside((int) mouseX, (int) mouseY, layout.browserLeft(), 52,
                 layout.browserWidth(), layout.contentBottom() - 52)) {
             List<ItemStack> items = filteredCreativeItems();
             int max = maxItemScroll(items.size(), layout.gridColumns(), layout.gridRows());
             itemScrollRow = Math.max(0, Math.min(max, itemScrollRow + (amount < 0 ? 1 : -1)));
             return true;
         }
-        if (inside((int) mouseX, (int) mouseY, layout.previewLeft(), 28,
-                layout.previewWidth(), layout.contentBottom() - 28)) {
+        if (shows(Pane.PREVIEW) && inside((int) mouseX, (int) mouseY, layout.previewLeft(), layout.previewTop(),
+                layout.previewWidth(), layout.contentBottom() - layout.previewTop())) {
             PaletteGroup group = selected();
             if (group != null && !group.members().isEmpty()) {
                 int steps = previewScroll.add(amount);
@@ -583,13 +652,13 @@ public final class PaletteEditorScreen extends Screen {
                         previewRotation = RadialRotationState.idle(now, PREVIEW_ROTATION_MILLIS);
                     }
                     previewRotation = previewRotation.retarget(
-                            selectionSteps, group.members().size(), now, PREVIEW_ROTATION_MILLIS
+                            selectionSteps, Math.max(1, previewVisibleCount), now, PREVIEW_ROTATION_MILLIS
                     );
                 }
             }
             return true;
         }
-        if (inside((int) mouseX, (int) mouseY, layout.memberLeft(), 94,
+        if (shows(Pane.MEMBERS) && inside((int) mouseX, (int) mouseY, layout.memberLeft(), layout.memberTop(),
                 layout.memberWidth(), memberRows(layout) * 18)) {
             PaletteGroup selected = selected();
             if (selected != null) {
@@ -598,7 +667,7 @@ public final class PaletteEditorScreen extends Screen {
                 return true;
             }
         }
-        return super.mouseScrolled(mouseX, mouseY, amountX, amountY);
+        return super.mouseScrolledContent(mouseX, mouseY, amountX, amountY);
     }
 
     @Override
@@ -667,6 +736,8 @@ public final class PaletteEditorScreen extends Screen {
     }
 
     private List<ItemStack> filteredCreativeItems() {
+        // Since 26.2, item components are bound by the world's registry lifecycle.
+        if (minecraft.level == null) return List.of();
         String query = search == null ? "" : search.getValue().strip().toLowerCase(Locale.ROOT);
         List<ItemStack> source;
         if (!query.isBlank()) {
@@ -961,6 +1032,8 @@ public final class PaletteEditorScreen extends Screen {
         syncingName = true;
         if (groupName != null) {
             PaletteGroup selected = selected();
+            nameGroupId = selected == null ? null : selected.id();
+            nameLayer = layer;
             groupName.setValue(selected == null ? "" : selected.displayName());
             groupName.setEditable(selected != null);
         }
@@ -1001,7 +1074,7 @@ public final class PaletteEditorScreen extends Screen {
     }
 
     private int memberIndex(PaletteEditorLayout layout, int mouseX, int mouseY) {
-        int top = 94;
+        int top = layout.memberTop();
         if (!inside(mouseX, mouseY, layout.memberLeft(), top, layout.memberWidth(), memberRows(layout) * 18)) return -1;
         int index = memberScrollRow + (mouseY - top) / 18;
         PaletteGroup group = selected();
@@ -1018,7 +1091,7 @@ public final class PaletteEditorScreen extends Screen {
             return;
         }
         int rows = memberRows(layout);
-        int top = 94;
+        int top = layout.memberTop();
         int bottom = top + rows * 18;
         int scrollDirection = mouseY < top + 9 ? -1 : mouseY >= bottom - 9 ? 1 : 0;
         long now = System.currentTimeMillis();
@@ -1083,7 +1156,7 @@ public final class PaletteEditorScreen extends Screen {
 
     private boolean startGroupScrollbarDrag(PaletteEditorLayout layout, int mouseX, int mouseY) {
         int rows = groupRows(layout);
-        if (!inside(mouseX, mouseY, layout.groupLeft() + layout.groupWidth() + 2, 50, 6, rows * 18)) {
+        if (!inside(mouseX, mouseY, layout.groupLeft() + layout.groupWidth() + 2, layout.groupTop(), 6, rows * 18)) {
             return false;
         }
         if (maxGroupScroll(layout) <= 0) {
@@ -1098,7 +1171,7 @@ public final class PaletteEditorScreen extends Screen {
     private boolean startMemberScrollbarDrag(PaletteEditorLayout layout, int mouseX, int mouseY) {
         int rows = memberRows(layout);
         int trackLeft = layout.memberRight() - MEMBER_SCROLLBAR_WIDTH;
-        if (!inside(mouseX, mouseY, trackLeft, 94, MEMBER_SCROLLBAR_WIDTH, rows * 18)) {
+        if (!inside(mouseX, mouseY, trackLeft, layout.memberTop(), MEMBER_SCROLLBAR_WIDTH, rows * 18)) {
             return false;
         }
         PaletteGroup group = selected();
@@ -1138,7 +1211,7 @@ public final class PaletteEditorScreen extends Screen {
         int count = Math.max(1, draft().groups().size());
         int trackHeight = rows * 18;
         int thumbHeight = Math.max(12, trackHeight * rows / count);
-        groupScroll = scrollbarValue(mouseY, 50, trackHeight, thumbHeight, maxGroupScroll(layout));
+        groupScroll = scrollbarValue(mouseY, layout.groupTop(), trackHeight, thumbHeight, maxGroupScroll(layout));
     }
 
     private void updateMemberScrollbar(PaletteEditorLayout layout, int mouseY) {
@@ -1151,7 +1224,7 @@ public final class PaletteEditorScreen extends Screen {
         int count = Math.max(1, group.members().size());
         int trackHeight = rows * 18;
         int thumbHeight = Math.max(12, trackHeight * rows / count);
-        memberScrollRow = scrollbarValue(mouseY, 94, trackHeight, thumbHeight, maxMemberScroll(count, rows));
+        memberScrollRow = scrollbarValue(mouseY, layout.memberTop(), trackHeight, thumbHeight, maxMemberScroll(count, rows));
     }
 
     private static int scrollbarValue(int mouseY, int top, int trackHeight, int thumbHeight, int maximum) {
@@ -1202,7 +1275,7 @@ public final class PaletteEditorScreen extends Screen {
     }
 
     private PaletteEditorLayout layout() {
-        return PaletteEditorLayout.calculate(width, height);
+        return PaletteEditorLayout.calculate(width, height, pane == Pane.PREVIEW);
     }
 
     private String elideMiddle(String value, int maximumWidth) {

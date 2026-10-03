@@ -6,6 +6,8 @@ import com.davidblackcn.lorianarchorbit.interaction.RadialAnimationMode;
 import com.davidblackcn.lorianarchorbit.interaction.RadialAnimationState;
 import com.davidblackcn.lorianarchorbit.interaction.RadialGeometry;
 import com.davidblackcn.lorianarchorbit.interaction.RadialMenuSnapshot;
+import com.davidblackcn.lorianarchorbit.interaction.RadialMenuWindow;
+import com.davidblackcn.lorianarchorbit.interaction.PaletteRadialLayout;
 import com.davidblackcn.lorianarchorbit.interaction.RadialRotationState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -44,6 +46,16 @@ public final class ClientHudOverlayManager {
             RadialAnimationMode animation,
             long nowMillis
     ) {
+        showRadial(ownerId, snapshot, animation, nowMillis, false);
+    }
+
+    public synchronized void showPaletteRadial(String ownerId, RadialMenuSnapshot<RadialHudEntry> snapshot,
+                                               RadialAnimationMode animation, long nowMillis) {
+        showRadial(ownerId, snapshot, animation, nowMillis, true);
+    }
+
+    private void showRadial(String ownerId, RadialMenuSnapshot<RadialHudEntry> snapshot,
+                            RadialAnimationMode animation, long nowMillis, boolean adaptive) {
         requireOwner(ownerId);
         Objects.requireNonNull(snapshot, "snapshot");
         if (snapshot.entries().isEmpty()) {
@@ -52,7 +64,8 @@ public final class ClientHudOverlayManager {
         }
         RadialAnimationState state = new RadialAnimationState(animation, nowMillis, ANIMATION_MILLIS);
         radial = new RadialOverlay(
-                ownerId, snapshot, state, RadialRotationState.idle(nowMillis, ROTATION_MILLIS), -1L
+                ownerId, snapshot, state, RadialRotationState.idle(nowMillis, ROTATION_MILLIS), -1L,
+                adaptive, adaptive ? paletteLayout(snapshot).visibleCount() : snapshot.entries().size()
         );
     }
 
@@ -60,7 +73,7 @@ public final class ClientHudOverlayManager {
         if (radial != null && radial.ownerId.equals(ownerId)) {
             radial = new RadialOverlay(
                     ownerId, Objects.requireNonNull(snapshot, "snapshot"), radial.animation,
-                    radial.rotation, radial.closingStartedAtMillis
+                    radial.rotation, radial.closingStartedAtMillis, radial.adaptive, radial.visibleCount
             );
         }
     }
@@ -73,16 +86,18 @@ public final class ClientHudOverlayManager {
     ) {
         if (radial != null && radial.ownerId.equals(ownerId)) {
             Objects.requireNonNull(snapshot, "snapshot");
-            int entryCount = snapshot.entries().size();
+            int entryCount = radial.adaptive ? paletteLayout(snapshot).visibleCount() : snapshot.entries().size();
             if (entryCount <= 0 || selectionSteps == 0) {
                 updateRadial(ownerId, snapshot);
                 return;
             }
-            RadialRotationState rotation = radial.rotation.retarget(
+            RadialRotationState previous = !radial.adaptive || entryCount == radial.visibleCount ? radial.rotation
+                    : RadialRotationState.idle(nowMillis, ROTATION_MILLIS);
+            RadialRotationState rotation = previous.retarget(
                     selectionSteps, entryCount, nowMillis, ROTATION_MILLIS
             );
             radial = new RadialOverlay(
-                    ownerId, snapshot, radial.animation, rotation, radial.closingStartedAtMillis
+                    ownerId, snapshot, radial.animation, rotation, radial.closingStartedAtMillis, radial.adaptive, entryCount
             );
         }
     }
@@ -96,7 +111,8 @@ public final class ClientHudOverlayManager {
     public synchronized void closeRadial(String ownerId, long nowMillis) {
         if (radial != null && radial.ownerId.equals(ownerId) && radial.closingStartedAtMillis < 0) {
             radial = new RadialOverlay(
-                    radial.ownerId, radial.snapshot, radial.animation, radial.rotation, nowMillis
+                    radial.ownerId, radial.snapshot, radial.animation, radial.rotation, nowMillis,
+                    radial.adaptive, radial.visibleCount
             );
         }
     }
@@ -115,14 +131,54 @@ public final class ClientHudOverlayManager {
             return;
         }
         if (radial != null) {
-            renderRadial(graphics, minecraft, radial, nowMillis);
+            if (radial.adaptive) {
+                int visible = paletteLayout(radial.snapshot).visibleCount();
+                if (visible != radial.visibleCount) {
+                    radial = new RadialOverlay(radial.ownerId, radial.snapshot, radial.animation,
+                            RadialRotationState.idle(nowMillis, ROTATION_MILLIS), radial.closingStartedAtMillis, true, visible);
+                }
+                try (var ignored = PaletteRenderContext.open(graphics, paletteViewport())) {
+                    renderRadial(graphics, minecraft, radial, nowMillis);
+                    if (numeric != null && numeric.ownerId.equals(radial.ownerId)) {
+                        renderPaletteName(graphics, minecraft, numeric, radial);
+                    }
+                }
+            } else {
+                renderRadial(graphics, minecraft, radial, nowMillis);
+            }
             if (radial.closingStartedAtMillis >= 0
                     && nowMillis - radial.closingStartedAtMillis >= ANIMATION_MILLIS) {
                 radial = null;
             }
         }
-        if (numeric != null) {
+        if (numeric != null && (radial == null || !radial.adaptive || !numeric.ownerId.equals(radial.ownerId))) {
             renderNumeric(graphics, minecraft, numeric);
+        }
+    }
+
+    private static PaletteViewport paletteViewport() {
+        var window = Minecraft.getInstance().getWindow();
+        return PaletteViewport.calculate(Math.max(1, window.getWidth()), Math.max(1, window.getHeight()), window.getGuiScale());
+    }
+
+    private static PaletteRadialLayout paletteLayout(RadialMenuSnapshot<?> snapshot) {
+        PaletteViewport viewport = paletteViewport();
+        return PaletteRadialLayout.hud(snapshot.entries().size(), viewport.width(), viewport.height(), 1 / viewport.scale());
+    }
+
+    private static void renderPaletteName(GuiGraphicsExtractor graphics, Minecraft minecraft,
+                                          NumericOverlay numeric, RadialOverlay radial) {
+        int maximum = graphics.guiWidth() - 24;
+        String label = numeric.text.getString();
+        if (minecraft.font.width(label) > maximum) {
+            label = minecraft.font.plainSubstrByWidth(label, maximum - minecraft.font.width("…")) + "…";
+        }
+        renderNumeric(graphics, minecraft, new NumericOverlay(numeric.ownerId, Component.literal(label), false, true));
+        if (radial.snapshot.entries().size() > radial.visibleCount) {
+            Component hint = Component.translatable("palette_editor.lorian_arch_orbit.wheel_overflow",
+                    radial.snapshot.selectedIndex() + 1, radial.snapshot.entries().size());
+            graphics.centeredText(minecraft.font, hint, graphics.guiWidth() / 2,
+                    graphics.guiHeight() / 2 + 26, 0xFFBBBBBB);
         }
     }
 
@@ -155,13 +211,19 @@ public final class ClientHudOverlayManager {
                 overlay.snapshot.entries().size(),
                 RadialWheelVisuals.MINIMUM_RADIUS, RadialWheelVisuals.ITEM_HALF_SIZE, HudLayout.DEFAULT_MARGIN
         );
+        RadialMenuSnapshot<RadialHudEntry> snapshot = overlay.snapshot;
+        if (overlay.adaptive) {
+            PaletteRadialLayout layout = paletteLayout(snapshot);
+            radius = layout.radius();
+            snapshot = RadialMenuWindow.from(snapshot.entries(), snapshot.selectedIndex(), Math.max(1, layout.visibleCount()));
+        }
         HudPoint center = HudLayout.crosshairRadialCenter(
                 graphics.guiWidth(), graphics.guiHeight(), HudLayout.DEFAULT_MARGIN
         );
         double closeProgress = overlay.closingStartedAtMillis < 0 ? 1.0
                 : Math.max(0.0, 1.0 - (double) (nowMillis - overlay.closingStartedAtMillis) / ANIMATION_MILLIS);
         var slots = RadialGeometry.slots(
-                overlay.snapshot, center, radius, overlay.animation, nowMillis,
+                snapshot, center, radius, overlay.animation, nowMillis,
                 overlay.rotation.offsetRadians(nowMillis)
         );
         for (var slot : slots) {
@@ -197,7 +259,9 @@ public final class ClientHudOverlayManager {
             RadialMenuSnapshot<RadialHudEntry> snapshot,
             RadialAnimationState animation,
             RadialRotationState rotation,
-            long closingStartedAtMillis
+            long closingStartedAtMillis,
+            boolean adaptive,
+            int visibleCount
     ) {
     }
 }

@@ -29,17 +29,36 @@ public final class PaletteEditorLayoutTest {
         assertTrue(layout.groupRows() >= 1);
         assertTrue(layout.gridRows() >= 1);
         assertTrue(layout.memberRows() >= 1);
-        assertColumnBounds(layout);
+        assertTrue(layout.compact());
+        assertTrue(layout.memberTop() + layout.memberRows() * 18 <= layout.contentBottom());
     }
 
     @Test
-    void narrowEditorsHideOnlyTheOptionalPreview() {
+    void narrowEditorsExposeEachPaneWithSafeContentBounds() {
         PaletteEditorLayout layout = PaletteEditorLayout.calculate(320, 180);
 
-        assertEquals(0, layout.previewWidth());
+        assertTrue(layout.compact());
+        assertEquals(296, layout.previewWidth());
         assertTrue(layout.browserWidth() >= 88);
         assertTrue(layout.memberWidth() >= 108);
-        assertColumnBounds(layout);
+        assertTrue(layout.memberTop() + layout.memberRows() * 18 <= layout.contentBottom());
+        assertTrue(PaletteEditorLayout.GRID_TOP + layout.gridRows() * 20 <= layout.contentBottom());
+        var preview = PaletteEditorLayout.calculate(320, 180, true);
+        assertTrue(preview.contentBottom() - preview.previewTop() >= 80);
+    }
+
+    @Test
+    void compactBreakpointAndAllMinimumHeightPanesAreSafe() {
+        for (int width : new int[]{320, 427, 512, 569, 599, 600, 768}) {
+            for (int height : new int[]{180, 240, 269, 270, 320, 408}) {
+                var layout = PaletteEditorLayout.calculate(width, height);
+                assertEquals(width < 600 || height < 270, layout.compact());
+                assertTrue(layout.memberTop() + layout.memberRows() * 18 <= layout.contentBottom());
+                assertTrue(layout.groupTop() + layout.groupRows() * 18 <= layout.contentBottom());
+                assertTrue(PaletteEditorLayout.GRID_TOP + layout.gridRows() * 20 <= layout.contentBottom());
+                assertTrue(layout.memberRight() <= width - 12);
+            }
+        }
     }
 
     private static void assertColumnBounds(PaletteEditorLayout layout) {
