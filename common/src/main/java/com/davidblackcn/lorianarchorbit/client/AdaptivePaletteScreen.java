@@ -99,8 +99,11 @@ public abstract class AdaptivePaletteScreen extends Screen {
 
     @Override
     public final boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        return viewport.containsMouse(event.x(), event.y()) && mouseClickedContent(localEvent(event), doubleClick);
+        return viewport.containsMouse(event.x(), event.y())
+                ? mouseClickedContent(localEvent(event), doubleClick) : mouseClickedOutsideCanvas();
     }
+
+    protected boolean mouseClickedOutsideCanvas() { return false; }
 
     protected boolean mouseClickedContent(MouseButtonEvent event, boolean doubleClick) {
         return super.mouseClicked(event, doubleClick);

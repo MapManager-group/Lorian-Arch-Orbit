@@ -20,11 +20,11 @@ public final class PaletteEditorLayoutTest {
     }
 
     @Test
-    void compactEditorsWrapControlsBeforeTheyCanOverlap() {
+    void compactEditorsKeepTheFourFooterActionsInOneRow() {
         PaletteEditorLayout layout = PaletteEditorLayout.calculate(512, 288);
 
-        assertTrue(layout.compactFooter());
-        assertTrue(layout.footerTop() < 262);
+        assertFalse(layout.compactFooter());
+        assertEquals(262, layout.footerTop());
         assertTrue(layout.contentBottom() < layout.footerTop());
         assertTrue(layout.groupRows() >= 1);
         assertTrue(layout.gridRows() >= 1);

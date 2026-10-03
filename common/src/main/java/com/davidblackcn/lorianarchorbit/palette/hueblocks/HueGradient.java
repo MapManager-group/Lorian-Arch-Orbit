@@ -19,33 +19,52 @@ public final class HueGradient {
         }
     }
 
-    public static List<Candidate> generate(List<Stop> stops, List<Candidate> candidates, boolean oklab) {
-        if (stops.size() < 2 || stops.size() > MAX_STOPS) throw new IllegalArgumentException("Use 2–16 stops");
-        if (candidates.isEmpty()) return List.of();
-        List<Candidate> result = new ArrayList<>();
+    public record Target(double red, double green, double blue, HueColor lab, Candidate pinned) {
+        public int rgb() { return (int) Math.round(red) << 16 | (int) Math.round(green) << 8 | (int) Math.round(blue); }
+        public int displayRgb(boolean oklab) { return oklab ? lab.toRgb() : rgb(); }
+    }
+
+    public static List<Target> targets(List<Stop> stops) {
+        if (stops.size() < 2 || stops.size() > MAX_STOPS) throw new IllegalArgumentException("Use 2-16 stops");
+        List<Target> targets = new ArrayList<>();
         for (int segment = 0; segment < stops.size() - 1; segment++) {
-            Stop from = stops.get(segment);
-            Stop to = stops.get(segment + 1);
-            HueColor fromLab = HueColor.fromRgb(from.rgb());
-            HueColor toLab = HueColor.fromRgb(to.rgb());
+            Stop from = stops.get(segment), to = stops.get(segment + 1);
+            HueColor fromLab = HueColor.fromRgb(from.rgb()), toLab = HueColor.fromRgb(to.rgb());
             for (int step = segment == 0 ? 0 : 1; step < from.steps(); step++) {
                 double t = step / (double) (from.steps() - 1);
-                HueColor target = fromLab.mix(toLab, t);
-                Candidate nearest = null;
-                double score = Double.POSITIVE_INFINITY;
-                for (Candidate candidate : candidates) {
-                    double distance = oklab ? target.distanceSquared(candidate.block().lab())
-                            : rgbDistance(from.rgb(), to.rgb(), candidate.block().rgb(), t);
-                    if (distance < score) {
-                        score = distance;
-                        nearest = candidate;
-                    }
-                }
-                // Keep selected block endpoints when they satisfy the same filters as candidates.
-                Candidate pin = step == 0 ? from.pinned() : step == from.steps() - 1 ? to.pinned() : null;
-                if (pin != null && candidates.contains(pin)) nearest = pin;
-                result.add(nearest);
+                targets.add(new Target(channel(from.rgb(), to.rgb(), 16, t), channel(from.rgb(), to.rgb(), 8, t),
+                        channel(from.rgb(), to.rgb(), 0, t), fromLab.mix(toLab, t),
+                        step == 0 ? from.pinned() : step == from.steps() - 1 ? to.pinned() : null));
             }
+        }
+        return List.copyOf(targets);
+    }
+    private static double channel(int from, int to, int shift, double t) {
+        return ((from >> shift) & 255) + (((to >> shift) & 255) - ((from >> shift) & 255)) * t;
+    }
+    public static double distance(Target target, Candidate candidate, boolean oklab) {
+        int rgb = candidate.block().rgb();
+        return oklab ? target.lab().distanceSquared(candidate.block().lab())
+                : Math.abs(target.red() - ((rgb >> 16) & 255)) + Math.abs(target.green() - ((rgb >> 8) & 255))
+                + Math.abs(target.blue() - (rgb & 255));
+    }
+    public static List<Candidate> alternatives(Target target, List<Candidate> candidates, boolean oklab) {
+        return candidates.stream().sorted(java.util.Comparator.comparingDouble((Candidate c) -> distance(target, c, oklab))
+                .thenComparing(Candidate::itemId).thenComparing(c -> c.block().texture())).toList();
+    }
+    public static List<Candidate> generate(List<Stop> stops, List<Candidate> candidates, boolean oklab) {
+        List<Target> targets = targets(stops);
+        if (candidates.isEmpty()) return List.of();
+        List<Candidate> result = new ArrayList<>();
+        for (Target target : targets) {
+            Candidate nearest = null;
+            double score = Double.POSITIVE_INFINITY;
+            for (Candidate candidate : candidates) {
+                double distance = distance(target, candidate, oklab);
+                if (distance < score) { score = distance; nearest = candidate; }
+            }
+            if (target.pinned() != null && candidates.contains(target.pinned())) nearest = target.pinned();
+            result.add(nearest);
         }
         return List.copyOf(result);
     }
@@ -60,13 +79,4 @@ public final class HueGradient {
         return List.copyOf(visible);
     }
 
-    private static double rgbDistance(int from, int to, int candidate, double t) {
-        double score = 0;
-        for (int shift : new int[]{16, 8, 0}) {
-            double start = (from >> shift) & 255;
-            double end = (to >> shift) & 255;
-            score += Math.abs(start + (end - start) * t - ((candidate >> shift) & 255));
-        }
-        return score;
-    }
 }

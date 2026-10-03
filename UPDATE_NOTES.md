@@ -65,3 +65,12 @@
 - 🐛 fix(palette): decouple target arrow motion from wheel rotation and use a muted green triangle
 - 💄 style(palette): redraw the target marker as a dark green notched arrowhead with beveled pixel edges
 - ✨ feat(palette): add selectable Pointer and Shift indicators with Shift as the default
+- ✨ feat(editor): unify editor navigation and retain wheel drafts and gradient work across pages
+- 💄 style(editor): organize wheel actions into menus and arrange gradient settings and results with compact tabs
+- ✨ feat(gradient): add node overview, position-based replacement and locking, and matched-texture tiling previews
+- 💄 style(editor): use compact flat dropdown lists and illustrated translucent home cards with an expandable grid layout
+- 🐛 fix(editor): align dropdowns with their headers and separate pointer and keyboard highlights from current values
+- 💄 style(editor): halve home card dimensions and remove the exit button while retaining Escape confirmation
+- 💄 style(editor): simplify page selection and unify the gradient block picker with the wheel editor item grid
+- 🐛 fix(editor): exit directly with Escape and apply valid gradient counts as they are entered
+- 💄 style(editor): align footer actions, hide unnecessary node arrows, and replace block picker pages with a scrollbar

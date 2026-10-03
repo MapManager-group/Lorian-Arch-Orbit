@@ -29,6 +29,20 @@ public record HueColor(double l, double a, double b) {
         return new HueColor(l + (other.l - l) * t, a + (other.a - a) * t, b + (other.b - b) * t);
     }
 
+    /** Display conversion: inverse of the two matrices in fromRgb, followed by sRGB encoding. */
+    public int toRgb() {
+        double x = Math.pow(.9999999984505201 * l + .3963377921737678 * a + .21580375806075877 * b, 3);
+        double y = Math.pow(1.0000000088817607 * l - .10556134232365634 * a - .0638541747717059 * b, 3);
+        double z = Math.pow(1.0000000546724108 * l - .08948418209496575 * a - 1.2914855378640917 * b, 3);
+        return encoded(4.076741661347994 * x - 3.3077115904081937 * y + .23096992872942781 * z) << 16
+                | encoded(-1.2684380040921763 * x + 2.609757400663372 * y - .34131939631021957 * z) << 8
+                | encoded(-.004196086541837074 * x - .7034186144594495 * y + 1.7076147009309446 * z);
+    }
+    private static int encoded(double linear) {
+        double value = Math.clamp(linear, 0, 1);
+        return (int) Math.round(255 * (value <= .0031308 ? 12.92 * value : 1.055 * Math.pow(value, 1 / 2.4) - .055));
+    }
+
     public double distanceSquared(HueColor other) {
         return Math.pow(l - other.l, 2) + Math.pow(a - other.a, 2) + Math.pow(b - other.b, 2);
     }

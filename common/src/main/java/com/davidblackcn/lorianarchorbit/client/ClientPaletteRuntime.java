@@ -30,7 +30,6 @@ public final class ClientPaletteRuntime {
     private static final String OWNER = "palette_wheel";
     private static KeyMapping openWheel;
     private static KeyMapping openEditor;
-    private static KeyMapping openGradient;
     private static GestureRegistration gestureRegistration;
     private static WheelLease lease;
     private static RadialMenuSnapshot<PaletteEntry> radial;
@@ -48,10 +47,8 @@ public final class ClientPaletteRuntime {
         }
         openWheel = new KeyMapping("key.lorian_arch_orbit.palette_wheel", InputConstants.KEY_R, category);
         openEditor = new KeyMapping("key.lorian_arch_orbit.palette_editor", InputConstants.KEY_P, category);
-        openGradient = new KeyMapping("key.lorian_arch_orbit.gradient_editor", InputConstants.UNKNOWN.getValue(), category);
         KeyMappingRegistry.register(openWheel);
         KeyMappingRegistry.register(openEditor);
-        KeyMappingRegistry.register(openGradient);
         gestureRegistration = ClientInteractionRuntime.inputs().register(
                 OWNER,
                 new PressTiming(180, 250),
@@ -66,12 +63,7 @@ public final class ClientPaletteRuntime {
         CreativeInventoryHelper.syncPlayer(minecraft);
         while (openEditor != null && openEditor.consumeClick()) {
             if (minecraft.gui.screen() == null) {
-                minecraft.setScreenAndShow(new PaletteEditorScreen(null));
-            }
-        }
-        while (openGradient != null && openGradient.consumeClick()) {
-            if (minecraft.gui.screen() == null) {
-                minecraft.setScreenAndShow(new HueGradientScreen(null, null));
+                minecraft.setScreenAndShow(EditorSession.open(null));
             }
         }
     }

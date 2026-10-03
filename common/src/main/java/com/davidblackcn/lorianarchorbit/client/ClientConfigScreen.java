@@ -101,7 +101,7 @@ public final class ClientConfigScreen {
                 .text(text("palette_wheel.editor.button"))
                 .description(description("palette_wheel.editor"))
                 .action((screen, option) -> net.minecraft.client.Minecraft.getInstance()
-                        .setScreenAndShow(new PaletteEditorScreen(screen)))
+                        .setScreenAndShow(EditorSession.open(screen)))
                 .build());
         addEnum(behavior, resettable, "smart_pick.mode", SmartPickMode.CONTEXT,
                 SmartPickMode.class, draft::smartPickMode, draft::setSmartPickMode);

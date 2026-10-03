@@ -26,7 +26,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,14 +36,13 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
-public final class PaletteEditorScreen extends AdaptivePaletteScreen {
+public final class PaletteEditorScreen extends WorkbenchScreen {
     private static final int GRID_CELL = PaletteEditorLayout.GRID_CELL;
     private static final int GRID_TOP = PaletteEditorLayout.GRID_TOP;
     private static final int TAB_SIZE = 20;
@@ -55,18 +53,18 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
     private static final int PREVIEW_ROTATION_MILLIS = 140;
     private static final long CLICK_FEEDBACK_MILLIS = 180;
     private static final long DRAG_TRANSITION_MILLIS = 120;
-    private final Screen parent;
     private final PaletteWheelDraft primary;
     private final PaletteWheelDraft secondary;
     private final com.davidblackcn.lorianarchorbit.config.WheelConfigSnapshot primaryBase;
     private final com.davidblackcn.lorianarchorbit.config.WheelConfigSnapshot secondaryBase;
     private final ScrollAccumulator previewScroll = new ScrollAccumulator();
-    private final Deque<EditorSnapshot> undo = new ArrayDeque<>();
+    private final Deque<com.davidblackcn.lorianarchorbit.palette.WheelEditorState.Snapshot> undo;
     private List<CreativeModeTab> creativeTabs = List.of();
     private CreativeModeTab selectedCreativeTab;
     private Layer layer = Layer.PRIMARY;
     private int selectedGroup = -1;
     private int groupScroll;
+    private boolean revealOnInit;
     private int tabStart;
     private int itemScrollRow;
     private int memberScrollRow;
@@ -98,17 +96,28 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
 
     private boolean shows(Pane target) { return !layout().compact() || pane == target; }
 
-    public PaletteEditorScreen(Screen parent) {
-        super(Component.translatable("palette_editor.lorian_arch_orbit.title"));
-        this.parent = parent;
-        this.primaryBase = ClientConfigRuntime.configManager().primaryWheel();
-        this.secondaryBase = ClientConfigRuntime.configManager().secondaryWheel();
-        this.primary = new PaletteWheelDraft(primaryBase);
-        this.secondary = new PaletteWheelDraft(secondaryBase);
+    PaletteEditorScreen(EditorSession session) {
+        super(session, "wheel", Component.translatable("palette_editor.lorian_arch_orbit.title"));
+        this.primaryBase = session.wheelState.primaryBase;
+        this.secondaryBase = session.wheelState.secondaryBase;
+        this.primary = session.wheelState.primary;
+        this.secondary = session.wheelState.secondary;
+        this.undo = session.wheelState.undo;
+    }
+
+    boolean hasUnsavedChanges() { return session.wheelState.dirty(); }
+    com.davidblackcn.lorianarchorbit.palette.WheelEditorState.GroupRef selectedRef() {
+        return selected() == null ? null : new com.davidblackcn.lorianarchorbit.palette.WheelEditorState.GroupRef(
+                layer == Layer.PRIMARY, selected().id());
+    }
+    void selectRef(com.davidblackcn.lorianarchorbit.palette.WheelEditorState.GroupRef ref) {
+        if (session.wheelState.resolve(ref) == null) return;
+        layer = ref.primary() ? Layer.PRIMARY : Layer.SECONDARY;
+        for (int i = 0; i < draft().groups().size(); i++) if (draft().groups().get(i).id().equals(ref.id())) selectedGroup = i;
     }
 
     @Override
-    protected void initContent() {
+    protected void initWorkbench() {
         clearDragFeedback();
         browserScrollbarDragging = groupScrollbarDragging = memberScrollbarDragging = false;
         refreshCreativeTabs();
@@ -156,14 +165,26 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
         groupName.setResponder(this::renameSelectedGroup);
         if (shows(Pane.MEMBERS)) addRenderableWidget(groupName);
 
-        if (layout.compact() && pane == Pane.PREVIEW) {
-            addButton(12, layout.footerTop(), 100, text("back_to_edit"), button -> { pane = Pane.MEMBERS; rebuildWidgets(); });
-        } else {
-            addFooterButtons(layout);
+        addFooterButtons(layout);
+        dropdown(12, 4, 102, text(layer == Layer.PRIMARY ? "layer.primary" : "layer.secondary"), () -> menu(12, 26, List.of(
+                new MenuEntry(text("layer.primary"), () -> { if (layer != Layer.PRIMARY) switchLayer(); rebuildWidgets(); }),
+                new MenuEntry(text("layer.secondary"), () -> { if (layer != Layer.SECONDARY) switchLayer(); rebuildWidgets(); }))));
+        if (shows(Pane.GROUPS)) {
+            int top = layout.compact() ? 52 : 28;
+            int right = layout.groupLeft() + layout.groupWidth();
+            action(right - 88, top, 36, text("new"), this::createGroup);
+            dropdown(right - 48, top, 48, EditorSession.text("group_menu"), () -> menu(right - 180, top + 22, List.of(
+                    new MenuEntry(text("copy"), this::copyGroup, selected() != null),
+                    new MenuEntry(EditorSession.text("delete_named", selected() == null ? "" : selected().displayName()),
+                            this::deleteGroup, selected() != null))));
         }
         if (shows(Pane.MEMBERS)) addButton(layout.memberLeft() + (layout.compact() ? nameWidth + 4 : 0), 52,
                 layout.compact() ? 108 : layout.memberWidth(), text("held_exact"), button -> addHeldExact());
         syncSelection();
+        if (revealOnInit) {
+            revealOnInit = false;
+            revealSelectedGroup();
+        }
         if (previousName != null) {
             syncingName = true;
             try { groupName.setValue(previousName); }
@@ -176,41 +197,20 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
     }
 
     private void addFooterButtons(PaletteEditorLayout layout) {
-        FooterCursor cursor = new FooterCursor(PaletteEditorLayout.OUTER_MARGIN, layout.footerTop());
-        cursor = addFlowButton(cursor, 74, text("layer"), button -> switchLayer());
-        cursor = addFlowButton(cursor, 54, text("new"), button -> createGroup());
-        cursor = addFlowButton(cursor, 54, text("copy"), button -> copyGroup());
-        cursor = addFlowButton(cursor, 54, text("delete"), button -> deleteGroup());
-        cursor = addFlowButton(cursor, 64, text("defaults"), button -> restoreDefaults());
-        cursor = addFlowButton(cursor, 54, text("undo"), button -> undo());
-        cursor = addFlowButton(cursor, 54, text("share"), button -> openShareScreen());
-        cursor = addFlowButton(cursor, 54, text("import"), button -> openImportScreen());
-        cursor = addFlowButton(cursor, 64, HueGradientScreen.text("entry"),
-                button -> minecraft.setScreenAndShow(new HueGradientScreen(this, selected())));
-        cursor = addFlowButton(cursor, 74, text("save"), button -> save());
-        addFlowButton(cursor, 78, text("cancel"), button -> onClose());
-    }
-
-    private FooterCursor addFlowButton(FooterCursor cursor, int buttonWidth, Component label, Button.OnPress press) {
-        buttonWidth = layout().compactFooter() ? Math.min(buttonWidth, 46) : buttonWidth;
-        int x = cursor.x();
-        int y = cursor.y();
-        if (x + buttonWidth > width - PaletteEditorLayout.OUTER_MARGIN) {
-            x = PaletteEditorLayout.OUTER_MARGIN;
-            y += 24;
-        }
-        Button action = Button.builder(label, press).bounds(x, y, buttonWidth, 20).build();
-        action.setTooltip(net.minecraft.client.gui.components.Tooltip.create(label));
-        addRenderableWidget(action);
-        return new FooterCursor(x + buttonWidth + 4, y);
+        int y = layout.footerTop();
+        dropdown(12, y, 60, EditorSession.text("file_menu"), () -> menu(12, y - 68, List.of(
+                new MenuEntry(text("share"), this::openShareScreen),
+                new MenuEntry(text("import"), this::openImportScreen),
+                new MenuEntry(EditorSession.text("restore_all"), () -> confirm(EditorSession.text("restore_all_hint"),
+                        text("defaults"), this::restoreDefaults)))));
+        action(76, y, 52, text("undo"), this::undo);
+        action(width - 144, y, 64, EditorSession.text("back"), session::home);
+        action(width - 76, y, 64, text("save"), this::save);
     }
 
     @Override
-    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.renderContent(graphics, mouseX, mouseY, partialTick);
-        graphics.centeredText(font, title, width / 2, 8, 0xFFFFFFFF);
-        graphics.text(font, text(layer == Layer.PRIMARY ? "layer.primary" : "layer.secondary"),
-                layout().groupLeft(), 10, 0xFF7FD4FF);
+    protected void renderWorkbench(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        if (width >= 600) graphics.centeredText(font, title, width / 2, 8, 0xFFFFFFFF);
         PaletteEditorLayout layout = layout();
         updateScrollbarDragging(layout, mouseY);
         if (shows(Pane.GROUPS)) drawGroups(graphics, layout, mouseX, mouseY);
@@ -220,12 +220,13 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
             updateDragFeedback(layout, mouseX, mouseY);
             drawMembers(graphics, layout, mouseX, mouseY);
         }
-        boundedText(graphics, minecraft.level == null && status.getString().isEmpty() ? text("world_required") : status,
+        boundedText(graphics, minecraft.level == null ? text("world_required") : hasUnsavedChanges()
+                ? EditorSession.text("unsaved_status").copy().append(" · ").append(status) : status,
                 layout.groupLeft(), layout.footerTop() - 14, width - 24, 0xFFFFC14D, mouseX, mouseY);
     }
 
     private void drawGroups(GuiGraphicsExtractor graphics, PaletteEditorLayout layout, int mouseX, int mouseY) {
-        if (!layout.compact()) graphics.text(font, text("groups"), layout.groupLeft(), 32, 0xFFFFFFFF);
+        graphics.text(font, text("groups"), layout.groupLeft(), layout.compact() ? 58 : 34, 0xFFFFFFFF);
         List<PaletteGroup> groups = draft().groups();
         int rows = groupRows(layout);
         groupScroll = Math.max(0, Math.min(groupScroll, maxGroupScroll(layout)));
@@ -553,8 +554,8 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
     }
 
     @Override
-    protected boolean mouseClickedContent(MouseButtonEvent event, boolean doubleClick) {
-        if (super.mouseClickedContent(event, doubleClick)) {
+    protected boolean clickWorkbench(MouseButtonEvent event, boolean doubleClick) {
+        if (super.clickWorkbench(event, doubleClick)) {
             return true;
         }
         int mouseX = (int) event.x();
@@ -630,7 +631,7 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
     }
 
     @Override
-    protected boolean mouseScrolledContent(double mouseX, double mouseY, double amountX, double amountY) {
+    protected boolean scrollWorkbench(double mouseX, double mouseY, double amountX, double amountY) {
         PaletteEditorLayout layout = layout();
         double amount = amountY != 0.0 ? amountY : amountX;
         if (shows(Pane.GROUPS) && inside((int) mouseX, (int) mouseY, layout.groupLeft(), layout.groupTop(),
@@ -673,12 +674,12 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
                 return true;
             }
         }
-        return super.mouseScrolledContent(mouseX, mouseY, amountX, amountY);
+        return super.scrollWorkbench(mouseX, mouseY, amountX, amountY);
     }
 
     @Override
     public void onClose() {
-        minecraft.setScreenAndShow(parent);
+        super.onClose();
     }
 
     private void refreshCreativeTabs() {
@@ -847,7 +848,7 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
 
     private void undo() {
         if (!undo.isEmpty()) {
-            EditorSnapshot snapshot = undo.pop();
+            var snapshot = undo.pop();
             primary.restoreWithoutUndo(snapshot.primary());
             secondary.restoreWithoutUndo(snapshot.secondary());
             selectedGroup = Math.min(selectedGroup, draft().groups().size() - 1);
@@ -870,6 +871,7 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
                 .savePrimaryWheel(primaryCodec.fromGroups(primaryBase, primary.groups()));
         ConfigLoadResult secondaryResult = ClientConfigRuntime.configManager()
                 .saveSecondaryWheel(secondaryCodec.fromGroups(secondaryBase, secondary.groups()));
+        session.wheelState.saved(primaryResult.successful(), secondaryResult.successful());
         status = primaryResult.successful() && secondaryResult.successful() ? text("saved") : text("save_failed");
     }
 
@@ -950,7 +952,7 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
     }
 
     private void rememberEditor() {
-        undo.push(new EditorSnapshot(primary.groups(), secondary.groups()));
+        undo.push(new com.davidblackcn.lorianarchorbit.palette.WheelEditorState.Snapshot(primary.groups(), secondary.groups()));
     }
 
     void applyGradient(List<String> items, boolean create, int duplicatesRemoved) {
@@ -1242,6 +1244,11 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
     }
 
     private void revealSelectedGroup() {
+        // A gradient can create a group before this cached page has ever been opened.
+        if (width < 320 || height < 180) {
+            revealOnInit = true;
+            return;
+        }
         if (selectedGroup < 0) {
             groupScroll = 0;
             return;
@@ -1305,13 +1312,4 @@ public final class PaletteEditorScreen extends AdaptivePaletteScreen {
 
     private enum Layer { PRIMARY, SECONDARY }
 
-    private record FooterCursor(int x, int y) {
-    }
-
-    private record EditorSnapshot(List<PaletteGroup> primary, List<PaletteGroup> secondary) {
-        private EditorSnapshot {
-            primary = List.copyOf(primary);
-            secondary = List.copyOf(secondary);
-        }
-    }
 }

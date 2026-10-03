@@ -1,436 +1,489 @@
 package com.davidblackcn.lorianarchorbit.client;
 
-import com.davidblackcn.lorianarchorbit.palette.PaletteGroup;
 import com.davidblackcn.lorianarchorbit.palette.PaletteMember;
-import com.davidblackcn.lorianarchorbit.palette.TemporaryPaletteSession;
+import com.davidblackcn.lorianarchorbit.palette.WheelEditorState.GroupRef;
+import com.davidblackcn.lorianarchorbit.palette.hueblocks.GradientWorkbench;
 import com.davidblackcn.lorianarchorbit.palette.hueblocks.HueBlocksData;
 import com.davidblackcn.lorianarchorbit.palette.hueblocks.HueGradient;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Independent gradient workbench with draft, temporary wheel and reversible inventory targets. */
-final class HueGradientScreen extends AdaptivePaletteScreen {
+/** Settings, positional editing and texture inspection share one memory-only model. */
+final class HueGradientScreen extends WorkbenchScreen {
     private static final List<String> FACES = List.of("all", "sides", "top", "bottom", "north", "south", "east", "west");
-    private final PaletteEditorScreen parent;
-    private final PaletteGroup group;
-    private final List<Node> nodes = new ArrayList<>();
-    private int selectedNode;
-    private boolean oklab = true;
-    private String face = "all";
-    private int palette = -1;
-    private List<HueGradient.Candidate> results = List.of();
-    private List<HueGradient.Candidate> previewResults = List.of();
+    final GradientWorkbench model;
+    private boolean resultTab, textures, vertical, editing;
     private boolean hideConsecutive = true;
-    private int page;
-    private boolean dirty = true;
+    private int cell = 24, textureOffset, crossOffset, settingsScroll, nodeStart, page;
     private Component message = Component.empty();
     private HueBlocksData widgetData;
-    private CycleButton<Integer> paletteButton;
-    private Button generateButton;
-    private ApplyTarget applyTarget = ApplyTarget.TEMPORARY;
-    private Button applyButton;
-    private Button restoreButton;
-    private Button pickButton;
-    private Button heldButton;
-    private Button refreshButton;
-    private Button previousPage;
-    private Button nextPage;
+    private List<HueGradient.Candidate> previousCandidates = List.of();
+    private ApplyTarget target = ApplyTarget.TEMPORARY;
+    private Button applyButton, generateButton, restoreButton, refreshButton;
+    private final List<Button> nodeButtons = new ArrayList<>();
+    private int nodeButtonStart;
 
-    HueGradientScreen(PaletteEditorScreen parent, PaletteGroup group) {
-        super(text("title"));
-        this.parent = parent;
-        this.group = group;
-        nodes.add(new Node("E0C9A2", "8"));
-        nodes.add(new Node("4B5E73", "8"));
+    HueGradientScreen(EditorSession session) {
+        super(session, "gradient", text("title")); model = session.gradientState;
+        model.sourceGroup = session.wheel().selectedRef(); model.targetGroup = model.sourceGroup;
         HueBlocksRuntime.initialize();
     }
-
-    static Component text(String key, Object... args) {
-        return Component.translatable("hueblocks.lorian_arch_orbit." + key, args);
-    }
-
-    @Override
-    protected void onViewportChanged(PaletteViewport previous, PaletteViewport next) {
+    static Component text(String key, Object... args) { return Component.translatable("hueblocks.lorian_arch_orbit." + key, args); }
+    static Component work(String key, Object... args) { return EditorSession.text(key, args); }
+    boolean hasUnappliedChanges() { return model.unapplied(); }
+    private HueGradientLayout layout() { return HueGradientLayout.calculate(width, height); }
+    private boolean settingsVisible() { return !layout().compact() || !resultTab; }
+    private boolean resultsVisible() { return !layout().compact() || resultTab; }
+    @Override protected void onViewportChanged(PaletteViewport previous, PaletteViewport next) {
         int anchor = page * HueGradientLayout.calculate(previous.width(), previous.height()).pageSize();
         page = anchor / HueGradientLayout.calculate(next.width(), next.height()).pageSize();
     }
-
-    @Override
-    protected void initContent() {
-        HueGradientLayout layout = layout();
-        page = Math.min(page, maxPage());
-        int left = layout.left();
-        int panel = layout.width();
-        restoreButton = button(left + panel - 112, 22, 64, text("restore_inventory"), b -> {
+    @Override protected void initWorkbench() {
+        var l = layout(); nodeButtons.clear(); generateButton = null;
+        settingsScroll = Math.clamp(settingsScroll, 0, l.settingsScrollMax()); page = Math.min(page, maxPage());
+        if (l.compact()) {
+            action(l.left(), 28, 84, work("settings"), () -> { resultTab = false; rebuildWidgets(); }).active = resultTab;
+            action(l.left() + 88, 28, 84, work("results"), () -> { resultTab = true; rebuildWidgets(); }).active = !resultTab;
+        }
+        refreshButton = action(l.left() + l.width() - 66, l.compact() ? 50 : 28, 66, text("refresh"),
+                () -> HueBlocksRuntime.repository().refresh());
+        if (settingsVisible()) initSettings();
+        if (resultsVisible()) initResults();
+        action(l.backLeft(), l.footerTop(), 64, text("back"), session::home);
+        restoreButton = action(l.left(), l.footerTop(), 64, text("restore_inventory"), () -> {
             if (CreativeInventoryHelper.restore(minecraft)) message = text("inventory_restored");
-            updateAvailability();
         });
         restoreButton.setTooltip(Tooltip.create(text("restore_inventory_hint")));
-        refreshButton = button(left + panel - 44, 22, 44, text("refresh"), b -> HueBlocksRuntime.repository().refresh());
-        button(left, 42, 24, Component.literal("<"), b -> selectNode(-1))
-                .setTooltip(Tooltip.create(text("previous_node")));
-        button(left + 84, 42, 24, Component.literal(">"), b -> selectNode(1))
-                .setTooltip(Tooltip.create(text("next_node")));
-        button(left + 112, 42, 48, text("add_node"), b -> {
-            if (nodes.size() >= HueGradient.MAX_STOPS) return;
-            nodes.add(selectedNode + 1, new Node(nodes.get(selectedNode).hex, nodes.get(selectedNode).steps));
-            selectedNode++;
-            invalidate();
-            rebuildWidgets();
-        }).active = nodes.size() < HueGradient.MAX_STOPS;
-        button(left + 164, 42, 48, text("remove_node"), b -> {
-            if (nodes.size() <= 2) return;
-            nodes.remove(selectedNode);
-            selectedNode = Math.min(selectedNode, nodes.size() - 1);
-            invalidate();
-            rebuildWidgets();
-        }).active = nodes.size() > 2;
-        button(left + 216, 42, Math.min(80, panel - 216), text("reverse"), b -> reverse());
-
-        Node node = nodes.get(selectedNode);
-        EditBox color = new EditBox(font, left + 28, 66, 80, 20, text("color"));
-        color.setMaxLength(7);
-        color.setHint(Component.literal("#RRGGBB"));
-        color.setTooltip(Tooltip.create(text("color_hint")));
-        color.setValue(node.hex);
-        color.setResponder(value -> { node.hex = value; node.pinned = null; invalidate(); });
-        addRenderableWidget(color);
-        EditBox steps = new EditBox(font, left + 132, 66, 40, 20, text("steps"));
-        steps.setMaxLength(3);
-        steps.setValue(selectedNode == nodes.size() - 1 ? "—" : node.steps);
-        steps.setTooltip(Tooltip.create(text("steps_hint")));
-        steps.setResponder(value -> { node.steps = value; invalidate(); });
-        steps.active = selectedNode < nodes.size() - 1;
-        addRenderableWidget(steps);
-        int pickWidth = (panel - 180 - 4) / 2;
-        heldButton = button(left + 176, 66, pickWidth, text("held_block"), b -> useHeld());
-        pickButton = button(left + 180 + pickWidth, 66, panel - 180 - pickWidth, text("pick_block"), b -> {
-            List<HueGradient.Candidate> available = filteredCandidates();
-            minecraft.setScreenAndShow(new HueBlockPickerScreen(this, available, candidate -> setBlock(candidate)));
+        dropdown(l.targetLeft(), l.footerTop(), l.targetWidth(), text(target.key), () -> {
+            List<MenuEntry> choices = new ArrayList<>();
+            for (ApplyTarget option : ApplyTarget.values()) choices.add(new MenuEntry(text(option.key), () -> {
+                target = option; rebuildWidgets(); if (option == ApplyTarget.REPLACE) chooseGroup(false);
+            }));
+            menu(l.left() + l.width() - 224, l.footerTop() - 90, choices);
         });
-
-        int colorWidth = 74;
-        int faceWidth = 76;
-        addRenderableWidget(CycleButton.booleanBuilder(Component.literal("OkLAB"), Component.literal("RGB"), oklab)
-                .displayOnlyValue().withTooltip(v -> Tooltip.create(text("color_space_hint")))
-                .create(left, 90, colorWidth, 20, text("color_space"), (b, value) -> { oklab = value; invalidate(); }));
-        addRenderableWidget(CycleButton.builder(value -> text("face." + value), face).withValues(FACES)
-                .displayOnlyValue().withTooltip(v -> Tooltip.create(text("face_hint")))
-                .create(left + colorWidth + 4, 90, faceWidth, 20, text("facing"), (b, value) -> { face = value; invalidate(); }));
-        widgetData = HueBlocksRuntime.repository().data();
-        rebuildPaletteButton();
-
-        addRenderableWidget(CycleButton.booleanBuilder(text("hide_repeats_on"), text("hide_repeats_off"), hideConsecutive)
-                .displayOnlyValue().withTooltip(value -> Tooltip.create(text("hide_repeats_hint")))
-                .create(left + panel - 156, 114, 100, 16, text("hide_repeats"), (b, value) -> {
-                    hideConsecutive = value;
-                    updatePreview();
-                    updateAvailability();
-                }));
-        previousPage = button(left + panel - 52, 114, 24, Component.literal("<"), b -> changePage(-1));
-        previousPage.setHeight(16);
-        previousPage.setTooltip(Tooltip.create(text("previous_page")));
-        nextPage = button(left + panel - 24, 114, 24, Component.literal(">"), b -> changePage(1));
-        nextPage.setHeight(16);
-        nextPage.setTooltip(Tooltip.create(text("next_page")));
-        int footerWidth = (panel - 12) / 4;
-        generateButton = button(left, layout.footerTop(), footerWidth, text("generate"), b -> generate());
-        addRenderableWidget(CycleButton.builder(target -> text(target.key), applyTarget).withValues(ApplyTarget.values())
-                .displayOnlyValue().withTooltip(target -> Tooltip.create(targetHint(target)))
-                .create(left + footerWidth + 4, layout.footerTop(), footerWidth, 20, text("apply_target"), (b, value) -> {
-                    applyTarget = value;
-                    updateAvailability();
-                }));
-        applyButton = button(left + 2 * (footerWidth + 4), layout.footerTop(), footerWidth, text("apply"), b -> apply());
-        button(left + 3 * (footerWidth + 4), layout.footerTop(), panel - 3 * (footerWidth + 4), text("back"), b -> onClose());
-        setInitialFocus(color);
-        updateAvailability();
+        applyButton = action(l.applyLeft(), l.footerTop(), 64, text("apply"), this::apply);
+        widgetData = HueBlocksRuntime.repository().data(); updateAvailability();
     }
-
-    private void rebuildPaletteButton() {
-        if (paletteButton != null) removeWidget(paletteButton);
-        List<Integer> values = new ArrayList<>(List.of(-1));
-        if (group != null) values.add(-2);
-        HueBlocksData data = HueBlocksRuntime.repository().data();
-        if (data != null) for (int i = 0; i < data.palettes().size(); i++) values.add(i);
-        if (!values.contains(palette)) palette = -1;
-        int x = layout().left() + 158;
-        paletteButton = addRenderableWidget(CycleButton.<Integer>builder(this::paletteLabel, (java.util.function.Supplier<Integer>) () -> palette).withValues(values)
-                .displayOnlyValue().withTooltip(value -> Tooltip.create(paletteLabel(value)))
-                .create(x, 90, layout().width() - 158, 20, text("palette"), (button, value) -> {
-                    palette = value;
-                    invalidate();
-                }));
+    private Button settingAction(int x, int offset, int w, Component label, Runnable callback) {
+        var l = layout(); int y = l.bodyTop() + offset - settingsScroll;
+        return y < l.bodyTop() || y + 20 > l.bodyBottom() ? null : action(x, y, w, label, callback);
     }
-
-    private Component paletteLabel(int index) {
-        if (index == -1) return text("palette.all");
-        if (index == -2) return text("palette.group");
-        HueBlocksData data = HueBlocksRuntime.repository().data();
-        if (data == null || index >= data.palettes().size()) return text("palette.all");
-        return switch (data.palettes().get(index).name()) {
+    private Button settingDropdown(int x, int offset, int w, Component label, Runnable callback) {
+        var l = layout(); int y = l.bodyTop() + offset - settingsScroll;
+        return y < l.bodyTop() || y + 20 > l.bodyBottom() ? null : dropdown(x, y, w, label, callback);
+    }
+    private void initSettings() {
+        var l = layout(); int x = l.left(), w = l.settingsWidth() - 16;
+        boolean overflow = HueGradientLayout.nodeOverflow(w, model.nodes.size());
+        int visibleNodes = HueGradientLayout.visibleNodes(w, model.nodes.size());
+        nodeStart = Math.clamp(nodeStart, 0, Math.max(0, model.nodes.size() - visibleNodes)); nodeButtonStart = nodeStart;
+        if (overflow) {
+            Button previous = settingAction(x, 16, 16, Component.literal("<"), () -> { nodeStart--; rebuildWidgets(); });
+            if (previous != null) previous.active = nodeStart > 0;
+        }
+        for (int i = 0; i < visibleNodes && nodeStart + i < model.nodes.size(); i++) {
+            int index = nodeStart + i;
+            Button b = settingAction(x + (overflow ? 20 : 0) + i * 28, 16, 26, Component.literal(Integer.toString(index + 1)), () -> {
+                model.selectedNode = index; rebuildWidgets();
+            });
+            if (b != null) { b.active = index != model.selectedNode; nodeButtons.add(b); }
+        }
+        if (overflow) {
+            Button next = settingAction(x + w - 16, 16, 16, Component.literal(">"), () -> { nodeStart++; rebuildWidgets(); });
+            if (next != null) next.active = nodeStart + visibleNodes < model.nodes.size();
+        }
+        int third = (w - 8) / 3;
+        settingAction(x, 42, third, text("add_node"), () -> {
+            if (model.nodes.size() == HueGradient.MAX_STOPS) return;
+            structural(() -> {
+                var n = model.nodes.get(model.selectedNode);
+                model.structural(() -> model.nodes.add(++model.selectedNode, new GradientWorkbench.Node(n.hex, n.steps)));
+                nodeStart = Math.max(0, model.selectedNode - visibleNodes + 1);
+            });
+        });
+        settingAction(x + third + 4, 42, third, text("remove_node"), () -> {
+            if (model.nodes.size() <= 2) return;
+            structural(() -> model.structural(() -> {
+                model.nodes.remove(model.selectedNode); model.selectedNode = Math.min(model.selectedNode, model.nodes.size() - 1);
+            }));
+        });
+        settingAction(x + 2 * (third + 4), 42, third, text("reverse"), () -> structural(model::reverse));
+        settingAction(x, 66, (w - 4) / 2, work("move_before"), () -> moveNode(-1));
+        settingAction(x + (w - 4) / 2 + 4, 66, (w - 4) / 2, work("move_after"), () -> moveNode(1));
+        var node = model.nodes.get(model.selectedNode);
+        int colorY = l.bodyTop() + 108 - settingsScroll;
+        if (colorY >= l.bodyTop() && colorY + 20 <= l.bodyBottom()) {
+            EditBox color = new EditBox(font, x, colorY, w, 20, text("color"));
+            color.setMaxLength(7); color.setValue(node.hex); color.setHint(Component.literal("#RRGGBB"));
+            color.setResponder(model::setColor); color.setTooltip(Tooltip.create(text("color_hint"))); addRenderableWidget(color);
+        }
+        settingAction(x, 132, (w - 4) / 2, text("held_block"), this::useHeld);
+        settingAction(x + (w - 4) / 2 + 4, 132, (w - 4) / 2, text("pick_block"), () ->
+                minecraft.setScreenAndShow(new HueBlockPickerScreen(this, candidates(), model::setBlock)));
+        if (model.selectedNode < model.nodes.size() - 1) {
+            int y = l.bodyTop() + 160 - settingsScroll;
+            if (y >= l.bodyTop() && y + 20 <= l.bodyBottom()) {
+                EditBox count = new EditBox(font, x + 38, y, w - 38, 20, text("steps"));
+                count.setMaxLength(3); count.setValue(node.editedSteps); count.setResponder(value -> editCount(node, count, value));
+                count.setTooltip(Tooltip.create(text("steps_hint"))); addRenderableWidget(count);
+            }
+        }
+        settingAction(x, 202, 72, Component.literal(model.oklab ? "OkLAB" : "RGB"), () -> {
+            model.oklab = !model.oklab; model.invalidate(); rebuildWidgets();
+        });
+        settingDropdown(x + 76, 202, w - 76, text("face." + model.face), () ->
+                menu(x, l.bodyTop() + 202 - settingsScroll, FACES.stream().map(face -> new MenuEntry(text("face." + face), () -> {
+                    model.face = face; model.invalidate(); rebuildWidgets();
+                })).toList()));
+        settingDropdown(x, 226, w, paletteLabel(), this::choosePalette);
+        settingDropdown(x, 250, w, groupLabel(model.sourceGroup), () -> chooseGroup(true));
+        generateButton = settingAction(x, 278, w, text("generate"), this::generate);
+        if (l.settingsScrollMax() > 0) {
+            action(x + l.settingsWidth() - 12, l.bodyTop(), 12, Component.literal("↑"), () -> scrollSettings(-24));
+            action(x + l.settingsWidth() - 12, l.bodyBottom() - 20, 12, Component.literal("↓"), () -> scrollSettings(24));
+        }
+    }
+    private void editCount(GradientWorkbench.Node node, EditBox input, String value) {
+        var result = model.editSteps(node, value, false);
+        if (result == GradientWorkbench.CountEdit.CONFIRM_LOCK_LOSS) {
+            // Restore the last committed count before opening the existing lock-loss confirmation.
+            input.setValue(node.steps);
+            confirm(work("clear_locks_hint"), work("clear_continue"), () -> {
+                model.editSteps(node, value, true);
+                page = textureOffset = crossOffset = 0; editing = false;
+                rebuildWidgets();
+            });
+        } else if (result == GradientWorkbench.CountEdit.CHANGED) {
+            page = textureOffset = crossOffset = 0; editing = false;
+        }
+    }
+    private void structural(Runnable change) {
+        Runnable apply = () -> {
+            change.run(); page = textureOffset = crossOffset = 0; editing = false;
+            nodeStart = Math.max(0, model.selectedNode - 2); rebuildWidgets();
+        };
+        if (model.hasLocks()) confirm(work("clear_locks_hint"), work("clear_continue"), apply); else apply.run();
+    }
+    private void moveNode(int delta) {
+        int next = model.selectedNode + delta;
+        if (next >= 0 && next < model.nodes.size()) structural(() -> model.structural(() -> {
+            Collections.swap(model.nodes, model.selectedNode, next); model.selectedNode = next;
+        }));
+    }
+    private void initResults() {
+        var l = layout();
+        dropdown(l.resultLeft(), l.bodyTop(), 84, work(textures ? "tile_view" : "sequence_view"), () -> menu(l.resultLeft(), l.bodyTop() + 22, List.of(
+                new MenuEntry(work("sequence_view"), () -> { textures = false; rebuildWidgets(); }),
+                new MenuEntry(work("tile_view"), () -> { textures = true; rebuildWidgets(); }))));
+        dropdown(l.resultLeft() + 88, l.bodyTop(), 80, work("view_options"), () -> {
+            List<MenuEntry> options = new ArrayList<>();
+            if (textures) {
+                options.add(new MenuEntry(work(vertical ? "vertical" : "horizontal"), () -> { vertical = !vertical; textureOffset = crossOffset = 0; }));
+                for (int size : new int[]{16, 24, 32}) options.add(new MenuEntry(work("tile_size", size), () -> { cell = size; textureOffset = crossOffset = 0; }));
+                options.add(new MenuEntry(work("cross_previous"), () -> crossOffset = Math.max(0, crossOffset - cell)));
+                options.add(new MenuEntry(work("cross_next"), () -> crossOffset += cell));
+            } else {
+                options.add(new MenuEntry(text(hideConsecutive ? "hide_repeats_on" : "hide_repeats_off"), () -> {
+                    hideConsecutive = !hideConsecutive; editing = false; page = 0;
+                }));
+                options.add(new MenuEntry(work(editing ? "stop_editing" : "edit_results"), () -> {
+                    editing = !editing;
+                    if (editing && !model.samples().isEmpty()) minecraft.setScreenAndShow(new GradientInspectorScreen(this,
+                            Math.min(model.samples().size() - 1, page * layout().pageSize())));
+                }));
+            }
+            options.add(new MenuEntry(work("unlock_all"), model::unlockAll, model.hasLocks()));
+            menu(l.resultLeft() + 88, l.bodyTop() + 22, options);
+        });
+        if (!textures) {
+            action(l.resultLeft() + l.resultWidth() - 52, l.bodyTop(), 24, Component.literal("<"), () -> changePage(-1));
+            action(l.resultLeft() + l.resultWidth() - 24, l.bodyTop(), 24, Component.literal(">"), () -> changePage(1));
+        }
+    }
+    private Component paletteLabel() {
+        if (model.palette.equals("all")) return text("palette.all");
+        if (model.palette.equals("group")) return text("palette.group");
+        return paletteName(model.palette);
+    }
+    private Component paletteName(String name) {
+        return switch (name) {
             case "Default (opaque only)" -> text("palette.opaque");
             case "Build-friendly blocks" -> text("palette.build");
             case "Grayscale blocks" -> text("palette.gray");
             case "Overworld natural blocks" -> text("palette.overworld");
             case "Nether + End blocks" -> text("palette.dimensions");
-            default -> Component.literal(data.palettes().get(index).name());
+            default -> Component.literal(name);
         };
     }
-
-    private Button button(int x, int y, int width, Component label, Button.OnPress press) {
-        return addRenderableWidget(Button.builder(label, press).bounds(x, y, width, 20).build());
+    private void choosePalette() {
+        List<MenuEntry> entries = new ArrayList<>();
+        entries.add(new MenuEntry(text("palette.all"), () -> setPalette("all")));
+        entries.add(new MenuEntry(text("palette.group"), () -> { setPalette("group"); chooseGroup(true); }));
+        var data = HueBlocksRuntime.repository().data();
+        if (data != null) for (var palette : data.palettes()) entries.add(new MenuEntry(paletteName(palette.name()), () -> setPalette(palette.name())));
+        menu(layout().left(), layout().bodyTop(), entries);
     }
-
-    @Override
-    public void tick() {
-        if (widgetData != HueBlocksRuntime.repository().data()) {
-            widgetData = HueBlocksRuntime.repository().data();
-            // Invalidate results, but preserve every node input and text-field focus while refreshing choices.
-            invalidate();
-            rebuildPaletteButton();
+    private void setPalette(String name) { model.palette = name; model.invalidate(); rebuildWidgets(); }
+    private Component groupLabel(GroupRef ref) {
+        var group = session.wheelState.resolve(ref);
+        return group == null ? work("choose_group") : Component.literal((ref.primary() ? "I · " : "II · ") + group.displayName());
+    }
+    private void chooseGroup(boolean source) {
+        List<MenuEntry> entries = new ArrayList<>();
+        for (boolean primary : new boolean[]{true, false}) for (var group : (primary ? session.wheelState.primary : session.wheelState.secondary).groups()) {
+            GroupRef ref = new GroupRef(primary, group.id());
+            entries.add(new MenuEntry(groupLabel(ref), () -> {
+                if (source) { model.sourceGroup = ref; model.palette = "group"; model.invalidate(); } else model.targetGroup = ref;
+                rebuildWidgets();
+            }));
         }
-        updateAvailability();
+        if (entries.isEmpty()) message = text("select_group"); else menu(width / 2 - 112, layout().bodyTop(), entries);
     }
-
+    List<HueGradient.Candidate> candidates() {
+        var data = HueBlocksRuntime.repository().data(); if (data == null) return List.of();
+        Set<String> textures = null, ids = null;
+        if (model.palette.equals("group")) {
+            var group = session.wheelState.resolve(model.sourceGroup); if (group == null) return List.of();
+            ids = group.members().stream().map(PaletteMember::itemId).collect(Collectors.toSet());
+        } else if (!model.palette.equals("all")) {
+            var palette = data.palettes().stream().filter(p -> p.name().equals(model.palette)).findFirst();
+            if (palette.isEmpty()) return List.of(); textures = palette.get().textures();
+        }
+        final Set<String> allowedTextures = textures, allowedIds = ids;
+        return HueBlocksRuntime.candidates().stream().filter(c -> c.block().faces(model.face)
+                && (allowedTextures == null || allowedTextures.contains(c.block().texture()))
+                && (allowedIds == null || allowedIds.contains(c.itemId()))).toList();
+    }
+    private void useHeld() {
+        if (minecraft.player == null) { message = text("held_missing"); return; }
+        String id = ClientPaletteItemCodec.itemId(minecraft.player.getInventory().getSelectedItem());
+        var candidate = candidates().stream().filter(c -> c.itemId().equals(id)).findFirst();
+        if (candidate.isPresent()) { model.setBlock(candidate.get()); rebuildWidgets(); } else message = text("held_missing");
+    }
+    private void generate() {
+        if (!model.valid() || model.pendingSteps()) { message = work("pending_count"); return; }
+        var available = candidates();
+        if (model.generate(available)) {
+            previousCandidates = available;
+            message = text("generated", model.samples().size()); page = 0; resultTab = true; rebuildWidgets();
+        } else message = work("lock_conflicts");
+    }
+    @Override public void tick() {
+        var current = HueBlocksRuntime.repository().data(); var available = candidates();
+        if (current != widgetData || !previousCandidates.equals(available)) {
+            if (!model.samples().isEmpty() && !model.stale()) model.invalidate(); widgetData = current;
+        }
+        previousCandidates = available; updateAvailability();
+    }
     private void updateAvailability() {
-        List<HueGradient.Candidate> candidates = filteredCandidates();
-        generateButton.active = validNodes() && !candidates.isEmpty();
-        boolean distinct = results.stream().map(HueGradient.Candidate::itemId).distinct().limit(2).count() >= 2;
-        applyButton.active = !dirty && !results.isEmpty() && switch (applyTarget) {
+        var available = candidates();
+        boolean ready = model.valid() && !model.pendingSteps() && !available.isEmpty() && model.conflicts(available).isEmpty();
+        if (generateButton != null) generateButton.active = ready;
+        boolean distinct = model.results().stream().map(HueGradient.Candidate::itemId).distinct().limit(2).count() >= 2;
+        applyButton.active = ready && !model.stale() && !model.samples().isEmpty() && switch (target) {
             case TEMPORARY -> true;
-            case INVENTORY -> CreativeInventoryHelper.canApply(minecraft) && results.size() <= TemporaryPaletteSession.INVENTORY_SIZE;
+            case INVENTORY -> CreativeInventoryHelper.canApply(minecraft) && model.samples().size() <= 36;
             case CREATE -> distinct;
-            case REPLACE -> distinct && group != null;
+            case REPLACE -> distinct && session.wheelState.resolve(model.targetGroup) != null;
         };
-        applyButton.setTooltip(Tooltip.create(dirty ? text("preview_stale") : targetHint(applyTarget)));
-        restoreButton.active = CreativeInventoryHelper.canRestore(minecraft);
-        pickButton.active = !candidates.isEmpty();
-        heldButton.active = minecraft.player != null && !candidates.isEmpty();
+        applyButton.setTooltip(Tooltip.create(targetHint())); restoreButton.active = CreativeInventoryHelper.canRestore(minecraft);
         refreshButton.active = !HueBlocksRuntime.repository().checking();
-        previousPage.active = page > 0;
-        nextPage.active = page < maxPage();
     }
-
-    private Component targetHint(ApplyTarget target) {
+    private Component targetHint() {
+        if (model.pendingSteps()) return work("pending_count");
+        if (!model.conflicts(candidates()).isEmpty()) return work("lock_conflicts");
+        if (model.stale()) return text("preview_stale");
         return switch (target) {
             case TEMPORARY -> text("temporary_hint");
             case INVENTORY -> !CreativeInventoryHelper.canApply(minecraft) ? text("creative_required")
-                    : results.size() > TemporaryPaletteSession.INVENTORY_SIZE ? text("inventory_too_many") : text("inventory_hint");
-            case CREATE -> !results.isEmpty() && results.stream().map(HueGradient.Candidate::itemId).distinct().limit(2).count() < 2
-                    ? text("too_few") : text("create_group");
-            case REPLACE -> group == null ? text("select_group") : text("replace_hint", group.displayName());
+                    : model.samples().size() > 36 ? text("inventory_too_many") : text("inventory_hint");
+            case CREATE -> text("create_group");
+            case REPLACE -> session.wheelState.resolve(model.targetGroup) == null ? text("select_group")
+                    : text("replace_hint", session.wheelState.resolve(model.targetGroup).displayName());
         };
     }
-
-    private List<HueGradient.Candidate> filteredCandidates() {
-        HueBlocksData data = HueBlocksRuntime.repository().data();
-        Set<String> textures = data != null && palette >= 0 && palette < data.palettes().size()
-                ? data.palettes().get(palette).textures() : null;
-        Set<String> groupItems = palette == -2 && group != null
-                ? group.members().stream().map(PaletteMember::itemId).collect(Collectors.toSet()) : null;
-        return HueBlocksRuntime.candidates().stream().filter(c -> c.block().faces(face)
-                && (textures == null || textures.contains(c.block().texture()))
-                && (groupItems == null || groupItems.contains(c.itemId()))).toList();
-    }
-
-    private void selectNode(int delta) {
-        selectedNode = Math.floorMod(selectedNode + delta, nodes.size());
-        rebuildWidgets();
-    }
-
-    private void reverse() {
-        List<String> lengths = nodes.subList(0, nodes.size() - 1).stream().map(n -> n.steps).toList();
-        Collections.reverse(nodes);
-        for (int i = 0; i < nodes.size() - 1; i++) nodes.get(i).steps = lengths.get(lengths.size() - 1 - i);
-        selectedNode = nodes.size() - 1 - selectedNode;
-        invalidate();
-        rebuildWidgets();
-    }
-
-    private void setBlock(HueGradient.Candidate candidate) {
-        Node node = nodes.get(selectedNode);
-        node.hex = String.format(Locale.ROOT, "%06X", candidate.block().rgb());
-        node.pinned = candidate;
-        invalidate();
-    }
-
-    private void useHeld() {
-        if (minecraft.player == null) return;
-        String id = ClientPaletteItemCodec.itemId(minecraft.player.getInventory().getSelectedItem());
-        var candidate = filteredCandidates().stream().filter(c -> c.itemId().equals(id)).findFirst();
-        if (candidate.isEmpty()) {
-            message = text("held_missing");
-        } else {
-            setBlock(candidate.get());
-            rebuildWidgets();
-        }
-    }
-
-    private boolean validNodes() {
-        try { stops(); return true; } catch (IllegalArgumentException exception) { return false; }
-    }
-
-    private List<HueGradient.Stop> stops() {
-        List<HueGradient.Stop> stops = new ArrayList<>();
-        for (int i = 0; i < nodes.size(); i++) {
-            Node node = nodes.get(i);
-            String hex = node.hex.startsWith("#") ? node.hex.substring(1) : node.hex;
-            if (!hex.matches("[0-9a-fA-F]{6}")) throw new IllegalArgumentException("Use #RRGGBB");
-            int steps = i == nodes.size() - 1 ? 2 : Integer.parseInt(node.steps);
-            stops.add(new HueGradient.Stop(Integer.parseInt(hex, 16), steps, node.pinned));
-        }
-        return List.copyOf(stops);
-    }
-
-    private void invalidate() {
-        dirty = true;
-        message = Component.empty();
-    }
-
-    private void generate() {
-        try {
-            results = HueGradient.generate(stops(), filteredCandidates(), oklab);
-            updatePreview();
-            dirty = false;
-            message = results.isEmpty() ? text("no_candidates")
-                    : text("generated", results.size());
-            updateAvailability();
-        } catch (IllegalArgumentException exception) {
-            message = text("invalid_inputs");
-        }
-    }
-
-    private void updatePreview() {
-        previewResults = HueGradient.preview(results, hideConsecutive);
-        page = 0;
-    }
-
     private void apply() {
-        if (dirty || results.isEmpty()) return;
-        if (applyTarget == ApplyTarget.TEMPORARY) {
-            CreativeInventoryHelper.setTemporaryPalette(results.stream().map(HueGradient.Candidate::itemId).toList());
-            message = text("temporary_applied", results.size());
-            updateAvailability();
-            return;
+        updateAvailability(); if (!applyButton.active) return;
+        var items = model.results().stream().map(HueGradient.Candidate::itemId).toList();
+        if (target == ApplyTarget.TEMPORARY) {
+            CreativeInventoryHelper.setTemporaryPalette(items); model.applied(); message = text("temporary_applied", items.size());
+        } else if (target == ApplyTarget.INVENTORY) {
+            if (CreativeInventoryHelper.applyGradient(minecraft, model.results().stream().map(HueBlocksRuntime::stack).toList())) {
+                model.applied(); message = text("inventory_applied", items.size());
+            }
+        } else {
+            var editor = session.wheel(); if (target == ApplyTarget.REPLACE) editor.selectRef(model.targetGroup);
+            var distinct = items.stream().distinct().toList(); editor.applyGradient(distinct, target == ApplyTarget.CREATE, items.size() - distinct.size());
+            model.applied(); session.show("wheel");
         }
-        if (applyTarget == ApplyTarget.INVENTORY) {
-            if (CreativeInventoryHelper.applyGradient(minecraft, results.stream().map(HueBlocksRuntime::stack).toList())) {
-                message = text("inventory_applied", results.size());
-            } else message = targetHint(applyTarget);
-            updateAvailability();
-            return;
-        }
-        boolean create = applyTarget == ApplyTarget.CREATE;
-        if (!create && group == null) return;
-        List<String> items = results.stream().map(HueGradient.Candidate::itemId).distinct().toList();
-        if (items.size() < 2) {
-            message = text("too_few");
-            return;
-        }
-        PaletteEditorScreen editor = parent == null ? new PaletteEditorScreen(null) : parent;
-        editor.applyGradient(items, create, results.size() - items.size());
-        minecraft.setScreenAndShow(editor);
     }
-
-    @Override
-    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        super.renderContent(graphics, mouseX, mouseY, partialTick);
-        HueGradientLayout layout = layout();
-        graphics.centeredText(font, title, width / 2, 8, 0xFFFFFFFF);
-        Component status = !message.getString().isEmpty() ? message
-                : HueBlocksRuntime.repository().data() != null && filteredCandidates().isEmpty() ? text("no_candidates") : dataStatus();
-        if (!validNodes()) status = text("invalid_inputs");
+    @Override protected void renderWorkbench(GuiGraphicsExtractor graphics, int mx, int my, float tick) {
+        var l = layout(); graphics.text(font, title, l.left(), 10, 0xFFFFFFFF);
+        Component status = !model.conflicts(candidates()).isEmpty() ? work("lock_conflicts")
+                : model.pendingSteps() ? work("pending_count") : !model.valid() ? text("invalid_inputs") : dataStatus();
         if (minecraft.level == null) status = Component.translatable("palette_editor.lorian_arch_orbit.world_required");
-        boundedText(graphics, status, layout.left(), 27, layout.width() - 116, 0xFFFFC14D, mouseX, mouseY);
-        graphics.centeredText(font, (selectedNode + 1) + " / " + nodes.size(), layout.left() + 56, 48, 0xFFFFFFFF);
-        graphics.text(font, text("color_label"), layout.left(), 72, 0xFFBBBBBB);
-        graphics.text(font, text("steps_label"), layout.left() + 112, 72, 0xFFBBBBBB);
-        int rgb = parsePreviewRgb(nodes.get(selectedNode).hex);
-        graphics.fill(layout.left() + 30, 84, layout.left() + 106, 86, 0xFF000000 | rgb);
-        Component label = text(results.isEmpty() ? "preview" : dirty ? "preview_stale" : "preview_count",
-                previewResults.size(), results.size(), page + 1, maxPage() + 1);
-        boundedText(graphics, label, layout.left(), 117, layout.width() - 160, 0xFFBBBBBB, mouseX, mouseY);
-        page = Math.min(page, maxPage());
-        for (int slot = 0; slot < layout.pageSize() && page * layout.pageSize() + slot < previewResults.size(); slot++) {
-            var candidate = previewResults.get(page * layout.pageSize() + slot);
-            int x = layout.left() + (slot % layout.columns()) * HueGradientLayout.CELL;
-            int y = layout.previewTop() + (slot / layout.columns()) * HueGradientLayout.CELL;
-            graphics.fill(x, y, x + 22, y + 22, 0x88202020);
-            graphics.item(HueBlocksRuntime.stack(candidate), x + 3, y + 2);
-            graphics.fill(x + 2, y + 20, x + 20, y + 22, 0xFF000000 | candidate.block().rgb());
-            if (mouseX >= x && mouseX < x + 22 && mouseY >= y && mouseY < y + 22) {
-                graphics.setTooltipForNextFrame(font, font.split(text("block_hint", HueBlocksRuntime.stack(candidate).getHoverName(),
-                        candidate.itemId(), candidate.block().texture()), width - 24), mouseX, mouseY);
+        boundedText(graphics, status, l.left(), l.compact() ? 56 : 34,
+                l.compact() ? l.width() - 72 : l.settingsWidth(), 0xFFFFC14D, mx, my);
+        if (!l.compact()) boundedText(graphics, model.samples().isEmpty() ? text("preview")
+                : work("result_count", model.samples().size(), model.results().stream().map(HueGradient.Candidate::itemId).distinct().count())
+                .copy().append(model.stale() ? " *" : ""), l.resultLeft(), 34, l.resultWidth() - 72, 0xFFBBBBBB, mx, my);
+        if (settingsVisible()) renderSettings(graphics, mx, my);
+        if (resultsVisible()) {
+            graphics.enableScissor(l.resultLeft(), l.previewTop(), l.resultLeft() + l.resultWidth(), l.bodyBottom());
+            try {
+                if (model.samples().isEmpty()) renderEmpty(graphics);
+                else if (textures) renderTiles(graphics, mx, my); else renderSequence(graphics, mx, my);
+            } finally { graphics.disableScissor(); }
+        }
+        Component feedback = message;
+        if (model.stale() && !model.samples().isEmpty()) feedback = text("preview_stale");
+        else if (feedback.getString().isEmpty() && !model.samples().isEmpty()) feedback = work("result_count", model.samples().size(),
+                model.results().stream().map(HueGradient.Candidate::itemId).distinct().count());
+        if (editing) feedback = work("editing_all").copy().append(" · ").append(feedback);
+        if (target == ApplyTarget.REPLACE) feedback = groupLabel(model.targetGroup).copy().append(" · ").append(feedback);
+        boundedText(graphics, feedback, l.left(), l.footerTop() - 14, l.width(), 0xFFBBBBBB, mx, my);
+    }
+    private void renderSettings(GuiGraphicsExtractor graphics, int mx, int my) {
+        var l = layout(); int x = l.left(), w = l.settingsWidth() - 16;
+        graphics.enableScissor(x, l.bodyTop(), x + w, l.bodyBottom());
+        try {
+            int y = l.bodyTop() - settingsScroll;
+            graphics.text(font, work("nodes", model.selectedNode + 1, model.nodes.size()), x, y + 2, 0xFFBBBBBB);
+            for (int i = 0; i < nodeButtons.size(); i++) {
+                var n = model.nodes.get(nodeButtonStart + i); var b = nodeButtons.get(i);
+                graphics.fill(b.getX() + 2, b.getY() + 17, b.getX() + b.getWidth() - 2, b.getY() + 19, 0xFF000000 | parseRgb(n.hex));
+                if (n.pinned != null) {
+                    graphics.item(HueBlocksRuntime.stack(n.pinned), b.getX() + 8, b.getY() + 1);
+                    graphics.text(font, Integer.toString(nodeButtonStart + i + 1), b.getX() + 2, b.getY() + 2, 0xFFFFFFFF);
+                }
+            }
+            graphics.text(font, text("color"), x, y + 96, 0xFFBBBBBB);
+            graphics.text(font, model.selectedNode < model.nodes.size() - 1 ? text("steps_label") : work("last_node"), x, y + 166, 0xFFBBBBBB);
+            boundedText(graphics, model.valid() ? work("expected", model.expectedCount()) : text("invalid_inputs"), x, y + 186, w, 0xFFBBBBBB, mx, my);
+        } finally { graphics.disableScissor(); }
+    }
+    private void renderEmpty(GuiGraphicsExtractor graphics) {
+        var l = layout(); int y = l.previewTop(), w = l.resultWidth();
+        var targets = model.valid() ? HueGradient.targets(model.stops()) : List.<HueGradient.Target>of();
+        for (int i = 0; i < w; i++) {
+            int color = targets.isEmpty() ? 0x555555 : targets.get(Math.min(targets.size() - 1, i * targets.size() / w)).displayRgb(model.oklab);
+            graphics.fill(l.resultLeft() + i, y, l.resultLeft() + i + 1, y + 12, 0xFF000000 | color);
+        }
+        graphics.text(font, work("empty_guidance"), l.resultLeft() + 4, y + 18, 0xFFBBBBBB);
+    }
+    private List<GradientWorkbench.Sample> visibleSamples() { return model.preview(hideConsecutive && !editing); }
+    private void renderSequence(GuiGraphicsExtractor graphics, int mx, int my) {
+        var l = layout(); var samples = visibleSamples(); page = Math.min(page, maxPage());
+        for (int slot = 0; slot < l.pageSize() && page * l.pageSize() + slot < samples.size(); slot++) {
+            var sample = samples.get(page * l.pageSize() + slot);
+            int x = l.resultLeft() + slot % l.columns() * 24, y = l.previewTop() + slot / l.columns() * 24;
+            graphics.fill(x, y, x + 22, y + 22, sample.locked() ? 0xAA365E43 : 0x88202020);
+            graphics.item(HueBlocksRuntime.stack(sample.candidate()), x + 3, y + 2);
+            graphics.fill(x + 2, y + 20, x + 20, y + 22, 0xFF000000 | sample.candidate().block().rgb());
+            if (sample.locked()) graphics.text(font, "*", x + 15, y, 0xFFFFC14D);
+            if (inside(mx, my, x, y, 22, 22)) sampleTooltip(graphics, sample, mx, my);
+        }
+    }
+    private TextureTilingLayout tiling() {
+        var l = layout(); int h = l.bodyBottom() - l.previewTop();
+        var tile = TextureTilingLayout.calculate(model.samples().size(), cell, vertical ? h : l.resultWidth(),
+                vertical ? l.resultWidth() : h, textureOffset, crossOffset);
+        textureOffset = tile.offset(); crossOffset = tile.crossOffset(); return tile;
+    }
+    private void renderTiles(GuiGraphicsExtractor graphics, int mx, int my) {
+        var l = layout(); var tile = tiling();
+        for (int i = tile.first(); i < tile.last(); i++) {
+            var sample = model.samples().get(i); String texture = sample.candidate().block().texture();
+            var sprite = graphics.getSprite(new SpriteId(TextureAtlas.LOCATION_BLOCKS,
+                    Identifier.withDefaultNamespace("block/" + texture.substring(0, texture.length() - 4))));
+            for (int cross = tile.firstCross(); cross < tile.lastCross(); cross++) {
+                int along = i * cell - tile.offset(), across = cross * cell - tile.crossOffset();
+                int x = l.resultLeft() + (vertical ? across : along), y = l.previewTop() + (vertical ? along : across);
+                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, cell, cell);
+                if (inside(mx, my, x, y, cell, cell)) {
+                    if (sprite.contents().name().equals(net.minecraft.client.renderer.texture.MissingTextureAtlasSprite.getLocation()))
+                        graphics.setTooltipForNextFrame(font, work("missing_texture"), mx, my);
+                    else sampleTooltip(graphics, sample, mx, my);
+                }
             }
         }
-        if (results.isEmpty()) graphics.text(font, text("preview_empty"), layout.left() + 4, layout.previewTop() + 6, 0xFFBBBBBB);
     }
-
+    private void sampleTooltip(GuiGraphicsExtractor graphics, GradientWorkbench.Sample sample, int x, int y) {
+        Component tooltip = text("block_hint", HueBlocksRuntime.stack(sample.candidate()).getHoverName(), sample.candidate().itemId(), sample.candidate().block().texture())
+                .copy().append("\n").append(work("sample_position", sample.index() + 1));
+        if (textures) tooltip = tooltip.copy().append("\n").append(work("texture_hint"));
+        graphics.setTooltipForNextFrame(font, font.split(tooltip, Math.min(320, width - 24)), x, y);
+    }
+    @Override protected boolean clickWorkbench(MouseButtonEvent event, boolean twice) {
+        if (super.clickWorkbench(event, twice)) return true;
+        var l = layout(); int x = (int)event.x(), y = (int)event.y();
+        if (event.button() != 0 || !resultsVisible() || !inside(x, y, l.resultLeft(), l.previewTop(), l.resultWidth(), l.bodyBottom() - l.previewTop())) return false;
+        int index;
+        if (textures) {
+            tiling(); int cross = (vertical ? x - l.resultLeft() : y - l.previewTop()) + crossOffset;
+            if (cross >= 4 * cell) return true;
+            index = ((vertical ? y - l.previewTop() : x - l.resultLeft()) + textureOffset) / cell;
+        } else {
+            int col = (x - l.resultLeft()) / 24, row = (y - l.previewTop()) / 24;
+            if (col >= l.columns() || row >= l.rows()) return true;
+            int offset = page * l.pageSize() + row * l.columns() + col;
+            var samples = visibleSamples(); if (offset >= samples.size()) return true; index = samples.get(offset).index();
+        }
+        if (index >= 0 && index < model.samples().size()) {
+            editing = true; page = index / l.pageSize(); minecraft.setScreenAndShow(new GradientInspectorScreen(this, index));
+        }
+        return true;
+    }
+    @Override protected boolean scrollWorkbench(double x, double y, double ax, double ay) {
+        var l = layout();
+        if (settingsVisible() && inside((int)x, (int)y, l.left(), l.bodyTop(), l.settingsWidth(), l.bodyBottom() - l.bodyTop())) {
+            if (y < l.bodyTop() + 38 - settingsScroll) { nodeStart += ay < 0 ? 1 : -1; rebuildWidgets(); }
+            else scrollSettings(ay < 0 ? 24 : -24); return true;
+        }
+        if (resultsVisible() && y >= l.previewTop() && y < l.bodyBottom()) {
+            if (textures) { textureOffset = Math.max(0, textureOffset + (ay < 0 ? cell : -cell)); crossOffset = Math.max(0, crossOffset + (int)(-ax * cell)); }
+            else changePage(ay < 0 ? 1 : -1); return true;
+        }
+        return super.scrollWorkbench(x, y, ax, ay);
+    }
+    @Override public boolean keyPressed(KeyEvent event) {
+        if (menuOpen()) return super.keyPressed(event);
+        if (settingsVisible() && (event.key() == 266 || event.key() == 267)) { scrollSettings(event.key() == 266 ? -48 : 48); return true; }
+        if (textures && resultsVisible() && !(getFocused() instanceof EditBox) && event.key() >= 262 && event.key() <= 265) {
+            int dx = event.key() == 262 ? cell : event.key() == 263 ? -cell : 0, dy = event.key() == 264 ? cell : event.key() == 265 ? -cell : 0;
+            textureOffset = Math.max(0, textureOffset + (vertical ? dy : dx)); crossOffset = Math.max(0, crossOffset + (vertical ? dx : dy)); return true;
+        }
+        return super.keyPressed(event);
+    }
+    private void scrollSettings(int amount) { settingsScroll = Math.clamp(settingsScroll + amount, 0, layout().settingsScrollMax()); rebuildWidgets(); }
+    private void changePage(int delta) { page = Math.clamp(page + delta, 0, maxPage()); }
+    private int maxPage() { return Math.max(0, (visibleSamples().size() - 1) / layout().pageSize()); }
+    private static boolean inside(int x, int y, int left, int top, int w, int h) { return x >= left && x < left + w && y >= top && y < top + h; }
+    private static int parseRgb(String value) { try { return Integer.parseInt(value.replace("#", ""), 16); } catch (NumberFormatException ex) { return 0; } }
     private Component dataStatus() {
         var repository = HueBlocksRuntime.repository();
         if (repository.checking()) return text(repository.data() == null ? "loading" : "checking_cached");
         return switch (repository.state()) {
-            case READY -> text("ready", repository.data().blocks().size());
-            case CACHED -> text("cached");
-            case UNSUPPORTED -> text("unsupported");
-            case FAILED, EMPTY -> text("download_failed");
+            case READY -> candidates().isEmpty() ? text("no_candidates") : text("ready", repository.data().blocks().size());
+            case CACHED -> text("cached"); case UNSUPPORTED -> text("unsupported"); default -> text("download_failed");
         };
     }
-
-    private static int parsePreviewRgb(String hex) {
-        try { return Integer.parseInt(hex.replace("#", ""), 16); } catch (NumberFormatException ignored) { return 0; }
-    }
-
-    @Override
-    protected boolean mouseClickedContent(MouseButtonEvent event, boolean doubleClick) {
-        if (super.mouseClickedContent(event, doubleClick)) return true;
-        HueGradientLayout layout = layout();
-        int x = (int) event.x() - layout.left();
-        int y = (int) event.y() - layout.previewTop();
-        if (event.button() == 0 && x >= 0 && x < layout.columns() * HueGradientLayout.CELL
-                && y >= 0 && y < layout.rows() * HueGradientLayout.CELL) {
-            int index = page * layout.pageSize() + (y / HueGradientLayout.CELL) * layout.columns() + x / HueGradientLayout.CELL;
-            if (index < previewResults.size()) { setBlock(previewResults.get(index)); rebuildWidgets(); return true; }
-        }
-        return false;
-    }
-
-    @Override
-    protected boolean mouseScrolledContent(double x, double y, double ax, double ay) {
-        if (y >= layout().previewTop() && y < layout().footerTop()) {
-            changePage((ay != 0 ? ay : ax) < 0 ? 1 : -1);
-            return true;
-        }
-        return super.mouseScrolledContent(x, y, ax, ay);
-    }
-
-    private void changePage(int delta) { page = Math.max(0, Math.min(maxPage(), page + delta)); updateAvailability(); }
-    private int maxPage() { return Math.max(0, (previewResults.size() - 1) / layout().pageSize()); }
-    private HueGradientLayout layout() { return HueGradientLayout.calculate(width, height); }
-    @Override public void onClose() { minecraft.setScreenAndShow(parent); }
-
     private enum ApplyTarget {
         TEMPORARY("temporary_wheel"), INVENTORY("inventory"), CREATE("create_group"), REPLACE("replace_group");
-        private final String key;
-        ApplyTarget(String key) { this.key = key; }
-    }
-
-    private static final class Node {
-        String hex;
-        String steps;
-        HueGradient.Candidate pinned;
-        Node(String hex, String steps) { this.hex = hex; this.steps = steps; }
+        final String key; ApplyTarget(String key) { this.key = key; }
     }
 }

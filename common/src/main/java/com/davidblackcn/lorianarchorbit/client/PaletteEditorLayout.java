@@ -16,9 +16,7 @@ final class PaletteEditorLayout {
     private static final int MAX_MEMBER_WIDTH = 280;
     private static final int MIN_BROWSER_WIDTH = GRID_CELL * 4 + 8;
     private static final int MIN_PREVIEW_WIDTH = 100;
-    private static final int NORMAL_FOOTER_WIDTH = 742;
     private static final int WIDE_GROUP_BROWSER_GAP = 20;
-    private static final int[] FOOTER_BUTTON_WIDTHS = {74, 54, 54, 54, 64, 54, 54, 54, 64, 74, 78};
 
     private final int groupLeft;
     private final int groupWidth;
@@ -72,9 +70,9 @@ final class PaletteEditorLayout {
         if (screenWidth < 320 || screenHeight < 180) {
             throw new IllegalArgumentException("palette editor requires at least a 320x180 logical GUI");
         }
-        boolean compactFooter = screenWidth < NORMAL_FOOTER_WIDTH;
+        boolean compactFooter = false;
         boolean compact = screenWidth < 600 || screenHeight < 270;
-        int footerRows = compact && previewOnly ? 1 : compactFooter ? compactFooterRows(screenWidth) : 1;
+        int footerRows = 1;
         int footerTop = screenHeight - 6 - footerRows * 20 - (footerRows - 1) * 4;
         int contentBottom = footerTop - 20;
 
@@ -116,20 +114,6 @@ final class PaletteEditorLayout {
         );
     }
 
-    private static int compactFooterRows(int screenWidth) {
-        int rows = 1;
-        int x = OUTER_MARGIN;
-        for (int preferredWidth : FOOTER_BUTTON_WIDTHS) {
-            int buttonWidth = Math.min(preferredWidth, 46);
-            if (x + buttonWidth > screenWidth - OUTER_MARGIN) {
-                rows++;
-                x = OUTER_MARGIN;
-            }
-            x += buttonWidth + 4;
-        }
-        return rows;
-    }
-
     private static int clamp(int value, int minimum, int maximum) {
         return Math.max(minimum, Math.min(maximum, value));
     }
@@ -147,7 +131,7 @@ final class PaletteEditorLayout {
     int contentBottom() { return contentBottom; }
     boolean compactFooter() { return compactFooter; }
     boolean compact() { return compact; }
-    int groupTop() { return compact ? 52 : 50; }
+    int groupTop() { return compact ? 76 : 50; }
     int memberTop() { return compact ? 78 : 94; }
     int previewTop() { return compact ? 52 : 28; }
 
