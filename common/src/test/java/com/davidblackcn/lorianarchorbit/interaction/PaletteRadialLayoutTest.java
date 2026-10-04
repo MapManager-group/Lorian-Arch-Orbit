@@ -43,7 +43,8 @@ class PaletteRadialLayoutTest {
             assertEquals(entries.get(Math.floorMod(selected, entries.size())), window.selected().orElseThrow());
             assertEquals(capacity, window.entries().size());
             for (int offset = 0; offset < capacity; offset++) {
-                assertEquals(entries.get(Math.floorMod(selected + offset, entries.size())), window.entries().get(offset));
+                assertEquals(entries.get(Math.floorMod(selected - capacity / 2 + offset, entries.size())),
+                        window.entries().get(offset));
             }
             var bottom = RadialGeometry.slots(window, new HudPoint(100, 100), 80,
                     new RadialAnimationState(RadialAnimationMode.OFF, 0, 1), 0).getFirst();

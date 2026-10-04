@@ -19,7 +19,8 @@ class PaletteTargetIndicatorTest {
                 assertEquals(entries.get(Math.floorMod(selected, entries.size())), target.value());
                 assertEquals(200 + directions[position.ordinal()][0] * 80, target.x());
                 assertEquals(150 + directions[position.ordinal()][1] * 80, target.y());
-                assertEquals(snapshot.entries(), slots.stream().map(RadialSlot::value).toList());
+                assertEquals(snapshot.orderedEntries().stream().map(RadialOrderedEntry::value).toList(),
+                        slots.stream().map(RadialSlot::value).toList());
             }
         }
     }

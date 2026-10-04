@@ -83,3 +83,4 @@
 - 💄 style(palette): smoothly emphasize target items and align temporary wheel labels with permanent wheels
 - 💄 style(palette): enlarge Vanilla indicators with crisp two-times pixel scaling
 - ✨ feat(palette): add configurable clockwise or counterclockwise scrolling for all palette wheels and editor previews, preserving the original direction by default
+- 🐛 fix(palette): center overflow windows on the selected item so adjacent previews match actual scrolling in both directions

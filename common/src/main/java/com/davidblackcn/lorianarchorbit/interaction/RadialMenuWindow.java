@@ -19,9 +19,13 @@ public final class RadialMenuWindow {
             return new RadialMenuSnapshot<>(entries, selected);
         }
         List<T> visible = new ArrayList<>(maximumVisible);
+        // Keep real predecessors and successors beside the target. A forward-only
+        // slice puts its unrelated last item next to the target when drawn as a ring.
+        // The omitted arc belongs opposite the target, not at the selection point.
+        int before = maximumVisible / 2;
         for (int offset = 0; offset < maximumVisible; offset++) {
-            visible.add(entries.get(Math.floorMod(selected + offset, entries.size())));
+            visible.add(entries.get(Math.floorMod(selected - before + offset, entries.size())));
         }
-        return new RadialMenuSnapshot<>(visible, 0);
+        return new RadialMenuSnapshot<>(visible, before);
     }
 }
