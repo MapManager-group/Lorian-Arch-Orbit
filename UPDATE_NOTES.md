@@ -75,3 +75,7 @@
 - 🐛 fix(editor): exit directly with Escape and apply valid gradient counts as they are entered
 - 💄 style(editor): align footer actions, hide unnecessary node arrows, and replace block picker pages with a scrollbar
 - 🐛 fix(gradient): resolve item-specific model faces and missing texture mappings while preserving distinct face candidates
+- ✨ feat(gradient): inspect and select face textures, customize candidate exclusions, and compare retained results
+- ✨ feat(gradient): export and import gradient parameters and candidate palettes through separate JSON files or the clipboard
+- 💄 style(gradient): show translucent color nodes in rows of eight with unobscured color bars
+- ✨ feat(gradient): select block faces and texture variants directly in the picker sidebar

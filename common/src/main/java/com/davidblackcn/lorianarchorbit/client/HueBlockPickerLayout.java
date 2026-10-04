@@ -6,14 +6,21 @@ record HueBlockPickerLayout(int left, int width, int columns, int rows, int prev
     static final int CELL = PaletteEditorLayout.GRID_CELL;
     static final int GRID_TOP = 72;
     static HueBlockPickerLayout calculate(int width, int height) {
+        return calculate(width, height, false);
+    }
+    static HueBlockPickerLayout calculate(int width, int height, boolean inlineFaces) {
         if (width < 320 || height < 180) throw new IllegalArgumentException("Picker requires a 320x180 canvas");
         int panel = Math.min(744, width - 24), left = (width - panel) / 2;
         boolean compact = width < 600 || height < 270;
-        int columns = Math.max(1, (panel - (compact ? 8 : 220)) / CELL);
+        int columns = Math.max(1, (panel - (compact ? inlineFaces ? 132 : 8 : 220)) / CELL);
         int previewLeft = left + columns * CELL + 12;
         return new HueBlockPickerLayout(left, panel, columns, Math.max(1, (height - 48 - GRID_TOP) / CELL),
-                previewLeft, compact ? 0 : left + panel - previewLeft, height - 26);
+                previewLeft, compact && !inlineFaces ? 0 : left + panel - previewLeft, height - 26);
     }
+    int faceTop() { return Math.max(70, gridBottom() - 68); }
+    int faceWidth() { return (previewWidth - 16) / 3; }
+    int faceX(int index) { return previewLeft + 4 + index % 3 * (faceWidth() + 4); }
+    int faceY(int index) { return faceTop() + index / 3 * 24; }
     int gridWidth() { return columns * CELL; }
     int gridBottom() { return GRID_TOP + rows * CELL; }
     int visibleSlots() { return columns * rows; }

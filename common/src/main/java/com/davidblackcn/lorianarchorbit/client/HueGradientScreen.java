@@ -26,16 +26,14 @@ import java.util.stream.Collectors;
 final class HueGradientScreen extends WorkbenchScreen {
     private static final List<String> FACES = List.of("all", "sides", "top", "bottom", "north", "south", "east", "west");
     final GradientWorkbench model;
-    private boolean resultTab, textures, vertical, editing;
+    private boolean resultTab, textures, vertical, editing, sequenceTextures = true;
     private boolean hideConsecutive = true;
-    private int cell = 24, textureOffset, crossOffset, settingsScroll, nodeStart, page;
+    private int cell = 24, textureOffset, crossOffset, settingsScroll, page;
     private Component message = Component.empty();
     private HueBlocksData widgetData;
     private List<HueGradient.Candidate> previousCandidates = List.of();
     private ApplyTarget target = ApplyTarget.TEMPORARY;
     private Button applyButton, generateButton, restoreButton, refreshButton;
-    private final List<Button> nodeButtons = new ArrayList<>();
-    private int nodeButtonStart;
 
     HueGradientScreen(EditorSession session) {
         super(session, "gradient", text("title")); model = session.gradientState;
@@ -53,14 +51,16 @@ final class HueGradientScreen extends WorkbenchScreen {
         page = anchor / HueGradientLayout.calculate(next.width(), next.height()).pageSize();
     }
     @Override protected void initWorkbench() {
-        var l = layout(); nodeButtons.clear(); generateButton = null;
-        settingsScroll = Math.clamp(settingsScroll, 0, l.settingsScrollMax()); page = Math.min(page, maxPage());
+        var l = layout(); generateButton = null;
+        settingsScroll = Math.clamp(settingsScroll, 0, l.settingsScrollMax(model.nodes.size())); page = Math.min(page, maxPage());
         if (l.compact()) {
             action(l.left(), 28, 84, work("settings"), () -> { resultTab = false; rebuildWidgets(); }).active = resultTab;
             action(l.left() + 88, 28, 84, work("results"), () -> { resultTab = true; rebuildWidgets(); }).active = !resultTab;
         }
         refreshButton = action(l.left() + l.width() - 66, l.compact() ? 50 : 28, 66, text("refresh"),
                 () -> HueBlocksRuntime.repository().refresh());
+        action(l.left() + l.width() - 148, l.compact() ? 50 : 28, 78, text("plans"),
+                () -> minecraft.setScreenAndShow(new GradientLibraryScreen(this)));
         if (settingsVisible()) initSettings();
         if (resultsVisible()) initResults();
         action(l.backLeft(), l.footerTop(), 64, text("back"), session::home);
@@ -79,32 +79,21 @@ final class HueGradientScreen extends WorkbenchScreen {
         widgetData = HueBlocksRuntime.repository().data(); updateAvailability();
     }
     private Button settingAction(int x, int offset, int w, Component label, Runnable callback) {
-        var l = layout(); int y = l.bodyTop() + offset - settingsScroll;
+        var l = layout(); int y = l.bodyTop() + offset + HueGradientLayout.nodeExtraHeight(model.nodes.size()) - settingsScroll;
         return y < l.bodyTop() || y + 20 > l.bodyBottom() ? null : action(x, y, w, label, callback);
     }
     private Button settingDropdown(int x, int offset, int w, Component label, Runnable callback) {
-        var l = layout(); int y = l.bodyTop() + offset - settingsScroll;
+        var l = layout(); int y = l.bodyTop() + offset + HueGradientLayout.nodeExtraHeight(model.nodes.size()) - settingsScroll;
         return y < l.bodyTop() || y + 20 > l.bodyBottom() ? null : dropdown(x, y, w, label, callback);
     }
     private void initSettings() {
         var l = layout(); int x = l.left(), w = l.settingsWidth() - 16;
-        boolean overflow = HueGradientLayout.nodeOverflow(w, model.nodes.size());
-        int visibleNodes = HueGradientLayout.visibleNodes(w, model.nodes.size());
-        nodeStart = Math.clamp(nodeStart, 0, Math.max(0, model.nodes.size() - visibleNodes)); nodeButtonStart = nodeStart;
-        if (overflow) {
-            Button previous = settingAction(x, 16, 16, Component.literal("<"), () -> { nodeStart--; rebuildWidgets(); });
-            if (previous != null) previous.active = nodeStart > 0;
-        }
-        for (int i = 0; i < visibleNodes && nodeStart + i < model.nodes.size(); i++) {
-            int index = nodeStart + i;
-            Button b = settingAction(x + (overflow ? 20 : 0) + i * 28, 16, 26, Component.literal(Integer.toString(index + 1)), () -> {
-                model.selectedNode = index; rebuildWidgets();
-            });
-            if (b != null) { b.active = index != model.selectedNode; nodeButtons.add(b); }
-        }
-        if (overflow) {
-            Button next = settingAction(x + w - 16, 16, 16, Component.literal(">"), () -> { nodeStart++; rebuildWidgets(); });
-            if (next != null) next.active = nodeStart + visibleNodes < model.nodes.size();
+        for (int index = 0; index < model.nodes.size(); index++) {
+            int selected = index;
+            int y = l.bodyTop() + HueGradientLayout.nodeY(index) - settingsScroll;
+            if (y >= l.bodyTop() && y + 24 <= l.bodyBottom()) addRenderableWidget(new GradientNodeButton(
+                    x + HueGradientLayout.nodeX(index), y, index, model.nodes.get(index), index == model.selectedNode,
+                    b -> { model.selectedNode = selected; rebuildWidgets(); }));
         }
         int third = (w - 8) / 3;
         settingAction(x, 42, third, text("add_node"), () -> {
@@ -112,7 +101,6 @@ final class HueGradientScreen extends WorkbenchScreen {
             structural(() -> {
                 var n = model.nodes.get(model.selectedNode);
                 model.structural(() -> model.nodes.add(++model.selectedNode, new GradientWorkbench.Node(n.hex, n.steps)));
-                nodeStart = Math.max(0, model.selectedNode - visibleNodes + 1);
             });
         });
         settingAction(x + third + 4, 42, third, text("remove_node"), () -> {
@@ -125,7 +113,7 @@ final class HueGradientScreen extends WorkbenchScreen {
         settingAction(x, 66, (w - 4) / 2, work("move_before"), () -> moveNode(-1));
         settingAction(x + (w - 4) / 2 + 4, 66, (w - 4) / 2, work("move_after"), () -> moveNode(1));
         var node = model.nodes.get(model.selectedNode);
-        int colorY = l.bodyTop() + 108 - settingsScroll;
+        int colorY = l.bodyTop() + 108 + HueGradientLayout.nodeExtraHeight(model.nodes.size()) - settingsScroll;
         if (colorY >= l.bodyTop() && colorY + 20 <= l.bodyBottom()) {
             EditBox color = new EditBox(font, x, colorY, w, 20, text("color"));
             color.setMaxLength(7); color.setValue(node.hex); color.setHint(Component.literal("#RRGGBB"));
@@ -135,7 +123,7 @@ final class HueGradientScreen extends WorkbenchScreen {
         settingAction(x + (w - 4) / 2 + 4, 132, (w - 4) / 2, text("pick_block"), () ->
                 minecraft.setScreenAndShow(new HueBlockPickerScreen(this, candidates(), model::setBlock)));
         if (model.selectedNode < model.nodes.size() - 1) {
-            int y = l.bodyTop() + 160 - settingsScroll;
+            int y = l.bodyTop() + 160 + HueGradientLayout.nodeExtraHeight(model.nodes.size()) - settingsScroll;
             if (y >= l.bodyTop() && y + 20 <= l.bodyBottom()) {
                 EditBox count = new EditBox(font, x + 38, y, w - 38, 20, text("steps"));
                 count.setMaxLength(3); count.setValue(node.editedSteps); count.setResponder(value -> editCount(node, count, value));
@@ -146,13 +134,13 @@ final class HueGradientScreen extends WorkbenchScreen {
             model.oklab = !model.oklab; model.invalidate(); rebuildWidgets();
         });
         settingDropdown(x + 76, 202, w - 76, text("face." + model.face), () ->
-                menu(x, l.bodyTop() + 202 - settingsScroll, FACES.stream().map(face -> new MenuEntry(text("face." + face), () -> {
+                menu(x, l.bodyTop() + 202 + HueGradientLayout.nodeExtraHeight(model.nodes.size()) - settingsScroll, FACES.stream().map(face -> new MenuEntry(text("face." + face), () -> {
                     model.face = face; model.invalidate(); rebuildWidgets();
                 })).toList()));
         settingDropdown(x, 226, w, paletteLabel(), this::choosePalette);
         settingDropdown(x, 250, w, groupLabel(model.sourceGroup), () -> chooseGroup(true));
         generateButton = settingAction(x, 278, w, text("generate"), this::generate);
-        if (l.settingsScrollMax() > 0) {
+        if (l.settingsScrollMax(model.nodes.size()) > 0) {
             action(x + l.settingsWidth() - 12, l.bodyTop(), 12, Component.literal("↑"), () -> scrollSettings(-24));
             action(x + l.settingsWidth() - 12, l.bodyBottom() - 20, 12, Component.literal("↓"), () -> scrollSettings(24));
         }
@@ -174,7 +162,7 @@ final class HueGradientScreen extends WorkbenchScreen {
     private void structural(Runnable change) {
         Runnable apply = () -> {
             change.run(); page = textureOffset = crossOffset = 0; editing = false;
-            nodeStart = Math.max(0, model.selectedNode - 2); rebuildWidgets();
+            rebuildWidgets();
         };
         if (model.hasLocks()) confirm(work("clear_locks_hint"), work("clear_continue"), apply); else apply.run();
     }
@@ -197,6 +185,7 @@ final class HueGradientScreen extends WorkbenchScreen {
                 options.add(new MenuEntry(work("cross_previous"), () -> crossOffset = Math.max(0, crossOffset - cell)));
                 options.add(new MenuEntry(work("cross_next"), () -> crossOffset += cell));
             } else {
+                options.add(new MenuEntry(text(sequenceTextures ? "show_items" : "show_textures"), () -> sequenceTextures = !sequenceTextures));
                 options.add(new MenuEntry(text(hideConsecutive ? "hide_repeats_on" : "hide_repeats_off"), () -> {
                     hideConsecutive = !hideConsecutive; editing = false; page = 0;
                 }));
@@ -207,6 +196,10 @@ final class HueGradientScreen extends WorkbenchScreen {
                 }));
             }
             options.add(new MenuEntry(work("unlock_all"), model::unlockAll, model.hasLocks()));
+            options.add(new MenuEntry(text("keep_comparison"), model::keepComparison, !model.samples().isEmpty()));
+            options.add(new MenuEntry(text("compare"), () -> minecraft.setScreenAndShow(new GradientComparisonScreen(this)),
+                    model.comparison() != null && !model.samples().isEmpty()));
+            options.add(new MenuEntry(text("clear_comparison"), model::clearComparison, model.comparison() != null));
             menu(l.resultLeft() + 88, l.bodyTop() + 22, options);
         });
         if (!textures) {
@@ -233,6 +226,8 @@ final class HueGradientScreen extends WorkbenchScreen {
         List<MenuEntry> entries = new ArrayList<>();
         entries.add(new MenuEntry(text("palette.all"), () -> setPalette("all")));
         entries.add(new MenuEntry(text("palette.group"), () -> { setPalette("group"); chooseGroup(true); }));
+        entries.add(new MenuEntry(text("custom_candidates", model.excluded.size()), () -> minecraft.setScreenAndShow(
+                new HueBlockPickerScreen(this, candidates(false), model))));
         var data = HueBlocksRuntime.repository().data();
         if (data != null) for (var palette : data.palettes()) entries.add(new MenuEntry(paletteName(palette.name()), () -> setPalette(palette.name())));
         menu(layout().left(), layout().bodyTop(), entries);
@@ -254,6 +249,9 @@ final class HueGradientScreen extends WorkbenchScreen {
         if (entries.isEmpty()) message = text("select_group"); else menu(width / 2 - 112, layout().bodyTop(), entries);
     }
     List<HueGradient.Candidate> candidates() {
+        return candidates(true);
+    }
+    private List<HueGradient.Candidate> candidates(boolean exclusions) {
         var data = HueBlocksRuntime.repository().data(); if (data == null) return List.of();
         Set<String> textures = null, ids = null;
         if (model.palette.equals("group")) {
@@ -264,7 +262,7 @@ final class HueGradientScreen extends WorkbenchScreen {
             if (palette.isEmpty()) return List.of(); textures = palette.get().textures();
         }
         final Set<String> allowedTextures = textures, allowedIds = ids;
-        return HueBlocksRuntime.candidates().stream().filter(c -> c.block().faces(model.face)
+        return HueBlocksRuntime.candidates().stream().filter(c -> c.faces(model.face) && (!exclusions || model.allows(c))
                 && (allowedTextures == null || allowedTextures.contains(c.block().texture()))
                 && (allowedIds == null || allowedIds.contains(c.itemId()))).toList();
     }
@@ -272,8 +270,10 @@ final class HueGradientScreen extends WorkbenchScreen {
         if (minecraft.player == null) { message = text("held_missing"); return; }
         String id = ClientPaletteItemCodec.itemId(minecraft.player.getInventory().getSelectedItem());
         var candidate = candidates().stream().filter(c -> c.itemId().equals(id)).findFirst();
-        if (candidate.isPresent()) { model.setBlock(candidate.get()); rebuildWidgets(); } else message = text("held_missing");
+        if (candidate.isPresent()) minecraft.setScreenAndShow(new HueFaceScreen(this, this, candidate.get(), candidates(), model::setBlock));
+        else message = text("held_missing");
     }
+    void parametersImported() { page = textureOffset = crossOffset = settingsScroll = 0; editing = false; }
     private void generate() {
         if (!model.valid() || model.pendingSteps()) { message = work("pending_count"); return; }
         var available = candidates();
@@ -337,10 +337,10 @@ final class HueGradientScreen extends WorkbenchScreen {
                 : model.pendingSteps() ? work("pending_count") : !model.valid() ? text("invalid_inputs") : dataStatus();
         if (minecraft.level == null) status = Component.translatable("palette_editor.lorian_arch_orbit.world_required");
         boundedText(graphics, status, l.left(), l.compact() ? 56 : 34,
-                l.compact() ? l.width() - 72 : l.settingsWidth(), 0xFFFFC14D, mx, my);
+                l.compact() ? l.width() - 154 : l.settingsWidth(), 0xFFFFC14D, mx, my);
         if (!l.compact()) boundedText(graphics, model.samples().isEmpty() ? text("preview")
                 : work("result_count", model.samples().size(), model.results().stream().map(HueGradient.Candidate::itemId).distinct().count())
-                .copy().append(model.stale() ? " *" : ""), l.resultLeft(), 34, l.resultWidth() - 72, 0xFFBBBBBB, mx, my);
+                .copy().append(model.stale() ? " *" : ""), l.resultLeft(), 34, l.resultWidth() - 154, 0xFFBBBBBB, mx, my);
         if (settingsVisible()) renderSettings(graphics, mx, my);
         if (resultsVisible()) {
             graphics.enableScissor(l.resultLeft(), l.previewTop(), l.resultLeft() + l.resultWidth(), l.bodyBottom());
@@ -363,14 +363,7 @@ final class HueGradientScreen extends WorkbenchScreen {
         try {
             int y = l.bodyTop() - settingsScroll;
             graphics.text(font, work("nodes", model.selectedNode + 1, model.nodes.size()), x, y + 2, 0xFFBBBBBB);
-            for (int i = 0; i < nodeButtons.size(); i++) {
-                var n = model.nodes.get(nodeButtonStart + i); var b = nodeButtons.get(i);
-                graphics.fill(b.getX() + 2, b.getY() + 17, b.getX() + b.getWidth() - 2, b.getY() + 19, 0xFF000000 | parseRgb(n.hex));
-                if (n.pinned != null) {
-                    graphics.item(HueBlocksRuntime.stack(n.pinned), b.getX() + 8, b.getY() + 1);
-                    graphics.text(font, Integer.toString(nodeButtonStart + i + 1), b.getX() + 2, b.getY() + 2, 0xFFFFFFFF);
-                }
-            }
+            y += HueGradientLayout.nodeExtraHeight(model.nodes.size());
             graphics.text(font, text("color"), x, y + 96, 0xFFBBBBBB);
             graphics.text(font, model.selectedNode < model.nodes.size() - 1 ? text("steps_label") : work("last_node"), x, y + 166, 0xFFBBBBBB);
             boundedText(graphics, model.valid() ? work("expected", model.expectedCount()) : text("invalid_inputs"), x, y + 186, w, 0xFFBBBBBB, mx, my);
@@ -392,7 +385,8 @@ final class HueGradientScreen extends WorkbenchScreen {
             var sample = samples.get(page * l.pageSize() + slot);
             int x = l.resultLeft() + slot % l.columns() * 24, y = l.previewTop() + slot / l.columns() * 24;
             graphics.fill(x, y, x + 22, y + 22, sample.locked() ? 0xAA365E43 : 0x88202020);
-            graphics.item(HueBlocksRuntime.stack(sample.candidate()), x + 3, y + 2);
+            if (sequenceTextures) HueTexture.draw(graphics, sample.candidate().block().texture(), x + 3, y + 2, 16);
+            else graphics.item(HueBlocksRuntime.stack(sample.candidate()), x + 3, y + 2);
             graphics.fill(x + 2, y + 20, x + 20, y + 22, 0xFF000000 | sample.candidate().block().rgb());
             if (sample.locked()) graphics.text(font, "*", x + 15, y, 0xFFFFC14D);
             if (inside(mx, my, x, y, 22, 22)) sampleTooltip(graphics, sample, mx, my);
@@ -451,8 +445,7 @@ final class HueGradientScreen extends WorkbenchScreen {
     @Override protected boolean scrollWorkbench(double x, double y, double ax, double ay) {
         var l = layout();
         if (settingsVisible() && inside((int)x, (int)y, l.left(), l.bodyTop(), l.settingsWidth(), l.bodyBottom() - l.bodyTop())) {
-            if (y < l.bodyTop() + 38 - settingsScroll) { nodeStart += ay < 0 ? 1 : -1; rebuildWidgets(); }
-            else scrollSettings(ay < 0 ? 24 : -24); return true;
+            scrollSettings(ay < 0 ? 24 : -24); return true;
         }
         if (resultsVisible() && y >= l.previewTop() && y < l.bodyBottom()) {
             if (textures) { textureOffset = Math.max(0, textureOffset + (ay < 0 ? cell : -cell)); crossOffset = Math.max(0, crossOffset + (int)(-ax * cell)); }
@@ -469,16 +462,17 @@ final class HueGradientScreen extends WorkbenchScreen {
         }
         return super.keyPressed(event);
     }
-    private void scrollSettings(int amount) { settingsScroll = Math.clamp(settingsScroll + amount, 0, layout().settingsScrollMax()); rebuildWidgets(); }
+    private void scrollSettings(int amount) { settingsScroll = Math.clamp(settingsScroll + amount, 0, layout().settingsScrollMax(model.nodes.size())); rebuildWidgets(); }
     private void changePage(int delta) { page = Math.clamp(page + delta, 0, maxPage()); }
     private int maxPage() { return Math.max(0, (visibleSamples().size() - 1) / layout().pageSize()); }
     private static boolean inside(int x, int y, int left, int top, int w, int h) { return x >= left && x < left + w && y >= top && y < top + h; }
-    private static int parseRgb(String value) { try { return Integer.parseInt(value.replace("#", ""), 16); } catch (NumberFormatException ex) { return 0; } }
     private Component dataStatus() {
         var repository = HueBlocksRuntime.repository();
         if (repository.checking()) return text(repository.data() == null ? "loading" : "checking_cached");
         return switch (repository.state()) {
-            case READY -> candidates().isEmpty() ? text("no_candidates") : text("ready", repository.data().blocks().size());
+            case READY -> candidates().isEmpty() ? text("no_candidates") : text("coverage", repository.data().blocks().size(),
+                    HueBlocksRuntime.candidates().stream().map(c -> c.block().texture()).distinct().count(),
+                    candidates().stream().map(HueGradient.Candidate::itemId).distinct().count(), candidates().size());
             case CACHED -> text("cached"); case UNSUPPORTED -> text("unsupported"); default -> text("download_failed");
         };
     }

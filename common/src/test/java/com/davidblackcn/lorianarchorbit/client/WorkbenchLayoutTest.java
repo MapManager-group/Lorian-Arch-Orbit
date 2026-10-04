@@ -77,14 +77,19 @@ class WorkbenchLayoutTest {
             assertEquals(l.left()+l.width(),l.applyLeft()+64);
         }
     }
-    @Test void nodeScrollArrowsOnlyAppearWhenNodesDoNotFit() {
-        for(int width:new int[]{208,280,400}) {
-            assertFalse(HueGradientLayout.nodeOverflow(width,2));
+    @Test void eightNodesFitEachRowAndAdditionalRowsKeepSettingsReachable() {
+        for(int width:new int[]{320,600,768}) for(int height:new int[]{180,270,408}) {
+            var l = HueGradientLayout.calculate(width,height);
             for(int count=2;count<=16;count++) {
-                boolean overflow=HueGradientLayout.nodeOverflow(width,count);
-                int visible=HueGradientLayout.visibleNodes(width,count);
-                assertTrue(visible*28+(overflow?40:0)<=width);
-                assertEquals(count>width/28,overflow);
+                int extra = HueGradientLayout.nodeExtraHeight(count);
+                for (int i=0;i<count;i++) {
+                    assertTrue(HueGradientLayout.nodeX(i)+26 <= l.settingsWidth()-16);
+                    assertTrue(HueGradientLayout.nodeY(i)+24 <= 42+extra);
+                    assertEquals(i/8, (HueGradientLayout.nodeY(i)-16)/28);
+                }
+                int generateBottom = l.bodyTop()+278+extra+20-l.settingsScrollMax(count);
+                assertTrue(generateBottom <= l.bodyBottom());
+                assertTrue(generateBottom-20 >= l.bodyTop());
             }
         }
     }

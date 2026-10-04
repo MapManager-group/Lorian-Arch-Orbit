@@ -4,6 +4,22 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HueBlockPickerLayoutTest {
+    @Test void inlineFacesRemainBesideTheGridEvenAtMinimumCanvasSize() {
+        for(int w:new int[]{320,427,599,600,768,1024}) for(int h:new int[]{180,240,269,270,408,768}) {
+            var l = HueBlockPickerLayout.calculate(w,h,true);
+            assertTrue(l.previewWidth()>=120);
+            assertTrue(l.previewLeft()>l.scrollbarLeft()+6);
+            assertTrue(l.previewLeft()+l.previewWidth()<=w-12);
+            assertTrue(l.gridWidth()>=160);
+            assertTrue(l.faceTop()-4-46>=20);
+            for(int i=0;i<6;i++) {
+                assertTrue(l.faceX(i)>=l.previewLeft()+4);
+                assertTrue(l.faceX(i)+l.faceWidth()<=l.previewLeft()+l.previewWidth()-4);
+                assertTrue(l.faceY(i)+20<=l.faceTop()+44);
+            }
+            assertTrue(l.faceTop()+48+18<=l.footerTop()-18);
+        }
+    }
     @Test void gridAndPreviewFitWithoutCoveringSearchOrFooter() {
         for (int w : new int[]{320,427,599,600,768,1024}) for (int h : new int[]{180,240,269,270,408,768}) {
             var layout = HueBlockPickerLayout.calculate(w,h);
@@ -27,8 +43,8 @@ class HueBlockPickerLayoutTest {
         }
     }
     @Test void scrollingVisitsEveryCandidateAndTheThumbReachesBothEnds() {
-        for(int count:new int[]{0,1,34,452,1906}) for(int[] size:new int[][]{{320,180},{768,408}}) {
-            var layout=HueBlockPickerLayout.calculate(size[0],size[1]);
+        for(boolean inline:new boolean[]{false,true}) for(int count:new int[]{0,1,34,452,1906}) for(int[] size:new int[][]{{320,180},{768,408}}) {
+            var layout=HueBlockPickerLayout.calculate(size[0],size[1],inline);
             var visited = new java.util.HashSet<Integer>();
             for(int row=0;row<=layout.maxScrollRow(count);row++)
                 for(int slot=0;slot<layout.visibleSlots() && row*layout.columns()+slot<count;slot++)
@@ -42,10 +58,10 @@ class HueBlockPickerLayoutTest {
         }
     }
     @Test void resizingKeepsTheOldFirstVisibleCandidateInTheFirstRow() {
-        for(int[] oldSize:new int[][]{{320,180},{427,240},{768,408}})
+        for(boolean inline:new boolean[]{false,true}) for(int[] oldSize:new int[][]{{320,180},{427,240},{768,408}})
             for(int[] newSize:new int[][]{{320,180},{427,240},{768,408}}) {
-                var oldLayout=HueBlockPickerLayout.calculate(oldSize[0],oldSize[1]);
-                var newLayout=HueBlockPickerLayout.calculate(newSize[0],newSize[1]);
+                var oldLayout=HueBlockPickerLayout.calculate(oldSize[0],oldSize[1],inline);
+                var newLayout=HueBlockPickerLayout.calculate(newSize[0],newSize[1],inline);
                 for(int row=0;row<10;row++) {
                     int anchor=row*oldLayout.columns(), next=newLayout.rowForAnchor(anchor);
                     assertTrue(next*newLayout.columns()<=anchor);

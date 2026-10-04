@@ -36,6 +36,8 @@ final class GradientInspectorScreen extends AdaptivePaletteScreen {
             b.setTooltip(Tooltip.create(label.copy().append("\n" + candidate.block().texture())));
         }
         int y = height - 26;
+        button(x + w - 64, 50, 64, HueGradientScreen.text("face_preview"), () -> minecraft.setScreenAndShow(
+                new HueFaceScreen(this, this, parent.model.samples().get(index).candidate(), parent.candidates(), c -> parent.model.replace(index, c))));
         button(x, y, 68, EditorSession.text("search_more"), () -> minecraft.setScreenAndShow(new HueBlockPickerScreen(
                 this, HueGradient.alternatives(target(), parent.candidates(), parent.model.oklab), c -> parent.model.replace(index, c))));
         button(x + 72, y, 60, EditorSession.text(parent.model.samples().get(index).locked() ? "unlock" : "lock"), () -> {
@@ -57,7 +59,7 @@ final class GradientInspectorScreen extends AdaptivePaletteScreen {
                 .append(HueBlocksRuntime.stack(sample.candidate()).getHoverName()), x + 28, 34, w - 56, 0xFFFFFFFF, mx, my);
         graphics.item(HueBlocksRuntime.stack(sample.candidate()), x, 52);
         graphics.fill(x + 22, 53, x + 38, 67, 0xFF000000 | target().displayRgb(parent.model.oklab));
-        boundedText(graphics, EditorSession.text(sample.locked() ? "locked_target" : "unlocked_target"), x + 44, 56, w - 44,
+        boundedText(graphics, EditorSession.text(sample.locked() ? "locked_target" : "unlocked_target"), x + 44, 56, w - 112,
                 parent.model.conflicts(parent.candidates()).contains(index) ? 0xFFFF7777 : 0xFFBBBBBB, mx, my);
         int cw = (w - 12) / 4;
         for (int slot = 0; slot < alternatives.size(); slot++) graphics.item(HueBlocksRuntime.stack(alternatives.get(slot)),

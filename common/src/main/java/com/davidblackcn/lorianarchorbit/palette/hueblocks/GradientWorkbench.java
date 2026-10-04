@@ -24,6 +24,20 @@ public final class GradientWorkbench {
     public String palette = "all";
     public GroupRef sourceGroup;
     public GroupRef targetGroup;
+    public final java.util.Set<String> excluded = new java.util.HashSet<>();
+    public record Comparison(List<Sample> samples, boolean oklab, String face, String palette) {
+        public Comparison { samples = List.copyOf(samples); }
+    }
+    private Comparison comparison;
+    private boolean generatedOklab = true;
+    private String generatedFace = "all", generatedPalette = "all";
+    public Comparison comparison() { return comparison; }
+    public Comparison snapshot() { return new Comparison(samples, generatedOklab, generatedFace, generatedPalette); }
+    public void keepComparison() { if (!samples.isEmpty()) comparison = snapshot(); }
+    public void clearComparison() { comparison = null; }
+    public boolean allows(HueGradient.Candidate candidate) { return !excluded.contains(candidate.key()); }
+    public void exclude(HueGradient.Candidate candidate) { excluded.add(candidate.key()); invalidate(); }
+    public void include(HueGradient.Candidate candidate) { if (excluded.remove(candidate.key())) invalidate(); }
     private final Map<Integer, HueGradient.Candidate> locks = new HashMap<>();
     private List<Sample> samples = List.of();
     private boolean stale = true;
@@ -110,7 +124,8 @@ public final class GradientWorkbench {
         List<Sample> next = new ArrayList<>();
         for (int i = 0; i < result.size(); i++) next.add(new Sample(i, targets.get(i),
                 locks.containsKey(i) ? resolve(locks.get(i), available) : result.get(i), locks.containsKey(i)));
-        samples = List.copyOf(next); stale = false; revision++; return true;
+        samples = List.copyOf(next); generatedOklab = oklab; generatedFace = face; generatedPalette = palette;
+        stale = false; revision++; return true;
     }
     public void replace(int index, HueGradient.Candidate value) {
         if (index < 0 || index >= samples.size()) return;
@@ -133,7 +148,7 @@ public final class GradientWorkbench {
     public List<Sample> preview(boolean hideRepeats) {
         if (!hideRepeats) return samples;
         List<Sample> result = new ArrayList<>();
-        for (Sample sample : samples) if (result.isEmpty() || !result.getLast().candidate().itemId().equals(sample.candidate().itemId())) result.add(sample);
+        for (Sample sample : samples) if (result.isEmpty() || !result.getLast().candidate().key().equals(sample.candidate().key())) result.add(sample);
         return List.copyOf(result);
     }
 }
