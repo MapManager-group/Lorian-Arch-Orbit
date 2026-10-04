@@ -9,7 +9,13 @@ public final class HueGradient {
     public static final int MAX_STEPS = 128;
     private HueGradient() {}
 
-    public record Candidate(String itemId, HueBlocksData.Block block) {}
+    public record Candidate(String itemId, HueBlocksData.Block block, java.util.Set<String> faces,
+                            java.util.Map<String, String> placements) {
+        public Candidate { faces = java.util.Set.copyOf(faces); placements = java.util.Map.copyOf(placements); }
+        public Candidate(String itemId, HueBlocksData.Block block) { this(itemId, block, block.sides(), java.util.Map.of()); }
+        public boolean faces(String face) { return HueBlockFaces.matchesFace(faces, face); }
+        public String key() { return itemId + "|" + block.texture(); }
+    }
     /** steps is the number of samples including both endpoints of the outgoing segment. */
     public record Stop(int rgb, int steps, Candidate pinned) {
         public Stop {
@@ -69,12 +75,12 @@ public final class HueGradient {
         return List.copyOf(result);
     }
 
-    /** Display-only filtering by block item; nonadjacent repeats and original generated samples are preserved. */
+    /** Display-only filtering by item and texture; other faces and original positions are preserved. */
     public static List<Candidate> preview(List<Candidate> samples, boolean hideConsecutive) {
         if (!hideConsecutive) return List.copyOf(samples);
         List<Candidate> visible = new ArrayList<>();
         for (Candidate sample : samples) {
-            if (visible.isEmpty() || !visible.getLast().itemId().equals(sample.itemId())) visible.add(sample);
+            if (visible.isEmpty() || !visible.getLast().key().equals(sample.key())) visible.add(sample);
         }
         return List.copyOf(visible);
     }

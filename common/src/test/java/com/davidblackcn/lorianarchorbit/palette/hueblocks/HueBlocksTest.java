@@ -80,16 +80,16 @@ class HueBlocksTest {
     }
 
     @Test
-    void previewToggleOnlyHidesConsecutiveItemRepeatsAndCanRestoreAllSamples() {
+    void previewToggleOnlyHidesConsecutiveIdenticalTexturesAndCanRestoreAllSamples() {
         var data = decode(BLOCKS);
         var black = new HueGradient.Candidate("minecraft:black_concrete", data.blocks().getFirst());
         var sameItemOtherTexture = new HueGradient.Candidate(black.itemId(), data.blocks().getLast());
         var white = new HueGradient.Candidate("minecraft:white_concrete", data.blocks().getLast());
         var samples = List.of(black, black, sameItemOtherTexture, white, white, black);
-        assertEquals(List.of(black, white, black), HueGradient.preview(samples, true));
+        assertEquals(List.of(black, sameItemOtherTexture, white, black), HueGradient.preview(samples, true));
         assertEquals(samples, HueGradient.preview(samples, false));
         assertEquals(6, samples.size());
-        assertEquals(List.of(black, white, black), HueGradient.preview(samples, true));
+        assertEquals(List.of(black, sameItemOtherTexture, white, black), HueGradient.preview(samples, true));
         assertTrue(HueGradient.preview(List.of(), true).isEmpty());
         assertEquals(List.of(black), HueGradient.preview(java.util.Collections.nCopies(10, black), true));
     }

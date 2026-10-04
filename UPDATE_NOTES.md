@@ -74,3 +74,4 @@
 - 💄 style(editor): simplify page selection and unify the gradient block picker with the wheel editor item grid
 - 🐛 fix(editor): exit directly with Escape and apply valid gradient counts as they are entered
 - 💄 style(editor): align footer actions, hide unnecessary node arrows, and replace block picker pages with a scrollbar
+- 🐛 fix(gradient): resolve item-specific model faces and missing texture mappings while preserving distinct face candidates
