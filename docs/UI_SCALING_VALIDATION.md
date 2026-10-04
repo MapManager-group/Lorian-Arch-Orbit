@@ -66,3 +66,20 @@
 - 新增 `PaletteArrowStyleConfigTest`：默认值、旧文件、非法值、未知字段保留、两个样式在四方向下的序列化往返、通知范围及恢复默认。使用 JDK 25 执行 `.\gradlew.bat build --offline`：**PASS，142/142 测试成功，0 skipped / 0 failed**，Fabric / NeoForge 发布 jar 已生成。中英文 JSON 解析和 `git diff --check` 通过。
 - 从实际代码图案和颜色生成离线预览，检查两种样式在四个方向、深浅背景下的外观。未接管用户桌面进行游戏内配置点击/保存或最终视觉复测；不将离线预览记为客户端检查。
 - 按 `CODE_REVIEW.md` 自检：**PASS WITH RISKS**，无 BLOCKER / MAJOR / MINOR；剩余风险为上述实机未验证项。只修改 `26.2`，保留前序未提交改动；未修改依赖、Mixin 或色轮文件格式，未提交或推送 Git。`UPDATE_NOTES.md` 已追加两种指示样式及默认值说明。
+
+## 后续：Vanilla / Arrow / Pointer / None（2026-10-04）
+
+- 从目标 26.2 客户端 JAR 读取 `textures/map/decorations/frame.png`，核对 8×8 像素形状、黑色描边及 `#00BC38`／`#00E043`／`#00FF4C` 色阶。Vanilla 使用对应图案并成为新默认值；Arrow、Pointer 共用同一色阶，Pointer 削减指尖两角及一个关节边角像素。中英文配置均直接显示 Vanilla、Arrow、Pointer、None。
+- None 不提交箭头绘制，不改变方向、物品强调或文本。旧 shift 字符串（含大小写）迁移为 arrow，保留原样式选择；缺失／无效配置回退 vanilla，已有 pointer／none 读写保持。配置 schema、色轮文件格式及依赖版本未改动。
+- HUD 与色轮编辑器预览共用按可见位置计算的余弦放大，最大为原尺寸的 1.1 倍；滚动重定向与首尾循环保持连续，重复物品按索引独立处理。配色色轮安全边界按半尺寸 11 计算，非配色 HUD 保留半尺寸 10；箭标独立 900 毫秒往复时钟未改变。
+- 一级、二级和临时 HUD 色轮共用两行信息：物品名称；当前位置／总数与滚轮提示。临时名称不再拼接模式前缀及数量，即使所有物品均在环内也保留第二行。渐变配色器实现保持冻结。
+- JDK 25.0.3 在 `26.2` 执行 `.\gradlew.bat build --offline`：**PASS，188/188 JUnit 成功，零失败／跳过**。样式／方向配置往返、旧字段迁移、原版色阶、四方向箭尖、None 空图案、放大连续性和安全距离检查通过；既有箭标独立动画测试通过。Fabric 与 NeoForge 安装包包含新增类及 None 翻译。
+- `git diff --check`、翻译 JSON／重复键／键集合和四个不汉化名称检查：PASS。按 `CODE_REVIEW.md` 自检：**PASS WITH RISKS**，无未解决 BLOCKER／MAJOR；保留此前未提交改动，仅修改 26.2，未提交或推送。
+- 遵循用户要求，未启动客户端或使用 computer-use。待用户手测：四种样式切换／保存、旧配置升级后选择 Vanilla、四方向指向、快速正反滚动及放大观感、临时色轮两行文本、不同 GUI 倍率及全屏／窗口缩放。自动测试与资源核对不代替实机视觉验收。
+
+## 后续：Vanilla 放大与工作区提交审查（2026-10-04）
+
+- Vanilla 保留 8×8 源图案，每个源像素绘制为 2×2 逻辑像素；以原箭尖锚点沿四方向展开，颜色、轮廓与独立动效不变。Arrow／Pointer 仍为 1 倍。更长的内侧轮廓在半径不足 55 时隐藏，避免展开／收拢时压住名称。
+- 审查当前全部未提交源码、资源、测试、脚本和文档，按面映射、渐变编辑工作流、色轮指示三个功能批次整理。构建／运行／测试数据目录已在既有忽略规则内，没有发现需要删除的无关未跟踪文件。保留渐变冻结状态，只审查和提交已有实现。
+- JDK 25 下 `.\gradlew.bat build --offline`：PASS，188 项 JUnit 全部成功，Fabric／NeoForge 构建成功。`python -B -m unittest discover -s scripts -p test_extract_gradient_faces.py`：PASS，3 项；从目标客户端 JAR 内存重新提取，面映射与待提交资源逐字节一致。
+- Code Review: PASS WITH RISKS，无未解决 BLOCKER／MAJOR；客户端仍按用户要求留待手动验证，未操作游戏界面。等比例放大的最终观感及全屏／窗口切换未作实机复测。

@@ -79,3 +79,6 @@
 - ✨ feat(gradient): export and import gradient parameters and candidate palettes through separate JSON files or the clipboard
 - 💄 style(gradient): show translucent color nodes in rows of eight with unobscured color bars
 - ✨ feat(gradient): select block faces and texture variants directly in the picker sidebar
+- ✨ feat(palette): add default Vanilla and None indicators, unify map-green arrow colors, and refine Pointer pixels
+- 💄 style(palette): smoothly emphasize target items and align temporary wheel labels with permanent wheels
+- 💄 style(palette): enlarge Vanilla indicators with crisp two-times pixel scaling

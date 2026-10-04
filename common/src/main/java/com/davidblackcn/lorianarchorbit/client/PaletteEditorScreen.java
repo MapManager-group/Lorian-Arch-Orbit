@@ -408,7 +408,9 @@ public final class PaletteEditorScreen extends WorkbenchScreen {
                 previewRotation.offsetRadians(now)
                         + ClientConfigRuntime.configManager().client().paletteTargetPosition().angleOffset());
         for (var slot : slots) {
-            RadialWheelVisuals.renderItem(graphics, slot.value(), slot.x(), slot.y());
+            RadialWheelVisuals.renderItem(graphics, slot.value(), slot.x(), slot.y(),
+                    PaletteRadialLayout.selectionScale(slot.sourceIndex(), snapshot.selectedIndex(),
+                            snapshot.entries().size(), previewRotation.offsetRadians(now)));
         }
         ItemStack selectedStack = stacks.get(previewSelection);
         if (!selectedStack.isEmpty()) {

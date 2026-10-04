@@ -2,7 +2,8 @@ package com.davidblackcn.lorianarchorbit.interaction;
 
 /** Shared palette ring geometry, independent of Minecraft and of the active GUI scale. */
 public record PaletteRadialLayout(int radius, int visibleCount) {
-    public static final int ITEM_HALF_SIZE = 10;
+    // Includes the selected item's 10% emphasis (16 * 1.2 * 1.1 / 2).
+    public static final int ITEM_HALF_SIZE = 11;
     public static final int MINIMUM_RADIUS = 57;
     // A 16-unit item scaled by 1.2, plus a little breathing room.
     public static final double SLOT_SPACING = 21.2;
@@ -10,6 +11,16 @@ public record PaletteRadialLayout(int radius, int visibleCount) {
     public static final int TOP_HUD_SAFE_AREA = 48;
     // 26.2 Hud.extractSelectedItemName starts at height - 59 (creative: -45), plus backdrop/gap.
     public static final int BOTTOM_HUD_SAFE_AREA = 64;
+
+    /** Smooth emphasis at the target slot; positional indices keep duplicate items independent. */
+    public static float selectionScale(int sourceIndex, int selectedIndex, int count, double rotationRadians) {
+        if (count <= 0) return 1;
+        double step = Math.PI * 2 / count;
+        double angle = step * (sourceIndex - selectedIndex) + rotationRadians;
+        double distance = Math.abs(Math.IEEEremainder(angle, Math.PI * 2)) / step;
+        if (distance >= 1) return 1;
+        return (float) (1 + 0.10 * (1 + Math.cos(distance * Math.PI)) / 2);
+    }
 
     public static PaletteRadialLayout calculate(int count, int maximumRadius) {
         if (count < 0 || maximumRadius < 0) throw new IllegalArgumentException("negative ring dimensions");

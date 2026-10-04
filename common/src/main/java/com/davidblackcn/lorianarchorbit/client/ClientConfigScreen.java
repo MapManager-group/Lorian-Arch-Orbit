@@ -85,7 +85,7 @@ public final class ClientConfigScreen {
         Option<PaletteArrowStyle> arrowStyle = Option.<PaletteArrowStyle>createBuilder()
                 .name(text("palette_wheel.arrow_style.name"))
                 .description(description("palette_wheel.arrow_style"))
-                .binding(PaletteArrowStyle.SHIFT, draft::paletteArrowStyle, draft::setPaletteArrowStyle)
+                .binding(PaletteArrowStyle.VANILLA, draft::paletteArrowStyle, draft::setPaletteArrowStyle)
                 .controller(option -> EnumControllerBuilder.create(option).enumClass(PaletteArrowStyle.class)
                         .valueFormatter(style -> text("palette_wheel.arrow_style."
                                 + style.name().toLowerCase(java.util.Locale.ROOT))))

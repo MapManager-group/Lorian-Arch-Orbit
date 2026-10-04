@@ -31,7 +31,7 @@ class PaletteTargetIndicatorTest {
             assertTrue(PaletteTargetIndicator.at(100, 100, 47.9, position, 0).isEmpty());
             for (int radius : new int[]{48, 57, 80, 130}) {
                 var arrow = PaletteTargetIndicator.at(100, 100, radius, position, 0).orElseThrow();
-                assertEquals(radius - 16, Math.hypot(arrow.tipX() - 100, arrow.tipY() - 100), 1e-8);
+                assertEquals(radius - 17, Math.hypot(arrow.tipX() - 100, arrow.tipY() - 100), 1e-8);
                 var tip = arrow.pixel(0, 0);
                 var base = arrow.pixel(0, -4);
                 assertTrue(Math.hypot(tip.x() - 100, tip.y() - 100) > Math.hypot(base.x() - 100, base.y() - 100));
@@ -57,7 +57,7 @@ class PaletteTargetIndicatorTest {
                 assertTrue(moving.x() != settled.x() || moving.y() != settled.y());
                 assertEquals(marker, PaletteTargetIndicator.at(100, 100, 80, position, 120).orElseThrow());
                 double gap = Math.hypot(settled.x() - marker.tipX(), settled.y() - marker.tipY());
-                assertTrue(gap >= 16 && gap <= 19);
+                assertTrue(gap >= 17 && gap <= 20);
             }
         }
     }
@@ -74,7 +74,7 @@ class PaletteTargetIndicatorTest {
                 assertEquals(0, (marker.tipX() - 100) * start.forwardY()
                         - (marker.tipY() - 100) * start.forwardX(), 1e-8);
                 double distance = Math.hypot(marker.tipX() - 100, marker.tipY() - 100);
-                assertTrue(distance >= 61 && distance <= 64);
+                assertTrue(distance >= 60 && distance <= 63);
             }
         }
     }

@@ -174,7 +174,7 @@ public final class ClientHudOverlayManager {
             label = minecraft.font.plainSubstrByWidth(label, maximum - minecraft.font.width("…")) + "…";
         }
         renderNumeric(graphics, minecraft, new NumericOverlay(numeric.ownerId, Component.literal(label), false, true));
-        if (radial.snapshot.entries().size() > radial.visibleCount) {
+        if (!radial.snapshot.entries().isEmpty()) {
             Component hint = Component.translatable("palette_editor.lorian_arch_orbit.wheel_overflow",
                     radial.snapshot.selectedIndex() + 1, radial.snapshot.entries().size());
             graphics.centeredText(minecraft.font, hint, graphics.guiWidth() / 2,
@@ -235,7 +235,9 @@ public final class ClientHudOverlayManager {
             int slotY = center.y() + (int) Math.round((slot.y() - center.y()) * closeProgress);
             ItemStack icon = slot.value().icon();
             if (!icon.isEmpty()) {
-                RadialWheelVisuals.renderItem(graphics, icon, slotX, slotY);
+                float emphasis = overlay.adaptive ? PaletteRadialLayout.selectionScale(slot.sourceIndex(),
+                        snapshot.selectedIndex(), snapshot.entries().size(), overlay.rotation.offsetRadians(nowMillis)) : 1;
+                RadialWheelVisuals.renderItem(graphics, icon, slotX, slotY, emphasis);
             } else {
                 Component label = slot.value().label();
                 graphics.centeredText(

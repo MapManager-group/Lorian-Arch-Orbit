@@ -250,10 +250,7 @@ public final class ClientPaletteRuntime {
             return;
         }
         radial.selected().ifPresent(selected -> ClientInteractionRuntime.hud().showNumeric(OWNER,
-                activeLayer == PaletteLayerGestureState.Layer.TEMPORARY
-                        ? Component.translatable("hueblocks.lorian_arch_orbit.temporary_selection", selected.stack.getHoverName(),
-                                radial.selectedIndex() + 1, radial.entries().size())
-                        : selected.stack.getHoverName()));
+                selected.stack.getHoverName()));
     }
 
     private static synchronized void close(boolean animate) {

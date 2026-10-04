@@ -75,8 +75,15 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
                 palette, "target_position", PaletteTargetPosition.BOTTOM, PaletteTargetPosition.class,
                 "features.palette_wheel.target_position", warnings
         );
+        JsonElement previousArrowStyle = palette.get("arrow_style");
+        if (previousArrowStyle != null && previousArrowStyle.isJsonPrimitive()
+                && previousArrowStyle.getAsJsonPrimitive().isString()
+                && previousArrowStyle.getAsString().equalsIgnoreCase("shift")) {
+            palette.addProperty("arrow_style", "arrow");
+            migrated = true;
+        }
         PaletteArrowStyle arrowStyle = JsonConfigSupport.enumValue(
-                palette, "arrow_style", PaletteArrowStyle.SHIFT, PaletteArrowStyle.class,
+                palette, "arrow_style", PaletteArrowStyle.VANILLA, PaletteArrowStyle.class,
                 "features.palette_wheel.arrow_style", warnings
         );
         PalettePreset primaryPreset = JsonConfigSupport.enumValue(
