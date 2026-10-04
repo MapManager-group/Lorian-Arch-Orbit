@@ -31,6 +31,8 @@
 
 ## 配色界面尺寸
 
+“行为”设置中的“色轮旋转方向”对应 `features.palette_wheel.rotation_direction`，可选 `clockwise`（默认顺时针）或 `counterclockwise`（逆时针）。方向以滚轮向上为准，向下时反向；默认保持原有行为。一级、二级、临时色轮及编辑器预览同步使用此设置，物品切换和转动动画一起反向，不重排分组或改变目标位置，也不影响智能中键轮盘和开合动画。旧配置缺少该字段或值无效时使用顺时针；保存、热重载及恢复默认均支持此选项，配置版本保持不变。
+
 “行为”设置中新增“目标物品的位置”：`features.palette_wheel.target_position`，可选 `bottom`（默认最下方）、`top`、`left`、`right`。一级、二级、临时色轮及编辑器预览共用此选项；旧配置缺少该字段时自动使用最下方，成员顺序和滚轮方向不变。
 
 “行为”设置中的“指示箭头样式”对应 `features.palette_wheel.arrow_style`，中英文界面均直接显示 `Vanilla`、`Arrow`、`Pointer`、`None`，配置值分别为 `vanilla`、`arrow`、`pointer`、`none`。默认 Vanilla 参考原版地图的绿色标记；Arrow 为短箭头，Pointer 为收细指尖的手形指针，None 不绘制箭头。三个箭头统一使用原版绿色与黑色描边，应用于一级、二级、临时色轮及编辑器预览。缺失或无效值回退 Vanilla；旧 `shift` 兼容迁移为 `arrow`，已保存的 Pointer 选择保留。希望旧配置改用新默认样式时，可手动选择 Vanilla 或恢复默认。

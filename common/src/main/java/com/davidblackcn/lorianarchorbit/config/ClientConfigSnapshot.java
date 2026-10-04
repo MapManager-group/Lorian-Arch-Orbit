@@ -10,6 +10,7 @@ public final class ClientConfigSnapshot {
     private final Map<String, Boolean> enabledFeatures;
     private final int reachDistance;
     private final PaletteAnimation paletteAnimation;
+    private final PaletteRotationDirection paletteRotationDirection;
     private final PaletteTargetPosition paletteTargetPosition;
     private final PaletteArrowStyle paletteArrowStyle;
     private final PalettePreset primaryPalettePreset;
@@ -38,6 +39,7 @@ public final class ClientConfigSnapshot {
             Map<String, Boolean> enabledFeatures,
             int reachDistance,
             PaletteAnimation paletteAnimation,
+            PaletteRotationDirection paletteRotationDirection,
             PaletteTargetPosition paletteTargetPosition,
             PaletteArrowStyle paletteArrowStyle,
             PalettePreset primaryPalettePreset,
@@ -65,6 +67,7 @@ public final class ClientConfigSnapshot {
         this.enabledFeatures = Map.copyOf(enabledFeatures);
         this.reachDistance = reachDistance;
         this.paletteAnimation = Objects.requireNonNull(paletteAnimation, "paletteAnimation");
+        this.paletteRotationDirection = Objects.requireNonNull(paletteRotationDirection, "paletteRotationDirection");
         this.paletteTargetPosition = Objects.requireNonNull(paletteTargetPosition, "paletteTargetPosition");
         this.paletteArrowStyle = Objects.requireNonNull(paletteArrowStyle, "paletteArrowStyle");
         this.primaryPalettePreset = Objects.requireNonNull(primaryPalettePreset, "primaryPalettePreset");
@@ -110,6 +113,8 @@ public final class ClientConfigSnapshot {
     }
 
     public PaletteTargetPosition paletteTargetPosition() { return paletteTargetPosition; }
+
+    public PaletteRotationDirection paletteRotationDirection() { return paletteRotationDirection; }
 
     public PaletteArrowStyle paletteArrowStyle() { return paletteArrowStyle; }
 

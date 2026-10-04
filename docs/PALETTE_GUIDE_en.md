@@ -68,6 +68,7 @@ Share files live in `config/lorian_arch_orbit/palette-shares/` inside the game d
 Press `O` to open the configuration screen and adjust wheel preferences:
 
 - **Target item position**: bottom, top, left, or right; bottom by default
+- **Wheel rotation direction**: clockwise or counterclockwise when scrolling up; scrolling down reverses it. Clockwise is the default and keeps the original behavior
 - **Arrow style**: `Vanilla`, `Arrow`, `Pointer`, or `None`; defaults to `Vanilla`, while `None` hides the arrow
 - Wheels and editor screens adapt to window size and GUI scale. Crowded wheels show fewer members at once, with all members still accessible by scrolling
 

@@ -3,6 +3,7 @@ package com.davidblackcn.lorianarchorbit.client;
 import com.davidblackcn.lorianarchorbit.config.ClientConfigDraft;
 import com.davidblackcn.lorianarchorbit.config.ClientConfigSnapshot;
 import com.davidblackcn.lorianarchorbit.config.PaletteAnimation;
+import com.davidblackcn.lorianarchorbit.config.PaletteRotationDirection;
 import com.davidblackcn.lorianarchorbit.config.PalettePreset;
 import com.davidblackcn.lorianarchorbit.config.PaletteTargetPosition;
 import com.davidblackcn.lorianarchorbit.config.PaletteArrowStyle;
@@ -72,6 +73,16 @@ public final class ClientConfigScreen {
                 draft::fixEndPortals, draft::setFixEndPortals);
         addEnum(behavior, resettable, "palette_wheel.animation", PaletteAnimation.CLOCKWISE,
                 PaletteAnimation.class, draft::paletteAnimation, draft::setPaletteAnimation);
+        Option<PaletteRotationDirection> rotationDirection = Option.<PaletteRotationDirection>createBuilder()
+                .name(text("palette_wheel.rotation_direction.name"))
+                .description(description("palette_wheel.rotation_direction"))
+                .binding(PaletteRotationDirection.CLOCKWISE, draft::paletteRotationDirection, draft::setPaletteRotationDirection)
+                .controller(option -> EnumControllerBuilder.create(option).enumClass(PaletteRotationDirection.class)
+                        .valueFormatter(direction -> text("palette_wheel.rotation_direction."
+                                + direction.name().toLowerCase(java.util.Locale.ROOT))))
+                .build();
+        resettable.add(rotationDirection);
+        behavior.option(rotationDirection);
         Option<PaletteTargetPosition> targetPosition = Option.<PaletteTargetPosition>createBuilder()
                 .name(text("palette_wheel.target_position.name"))
                 .description(description("palette_wheel.target_position"))

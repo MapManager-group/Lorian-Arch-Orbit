@@ -82,3 +82,4 @@
 - ✨ feat(palette): add default Vanilla and None indicators, unify map-green arrow colors, and refine Pointer pixels
 - 💄 style(palette): smoothly emphasize target items and align temporary wheel labels with permanent wheels
 - 💄 style(palette): enlarge Vanilla indicators with crisp two-times pixel scaling
+- ✨ feat(palette): add configurable clockwise or counterclockwise scrolling for all palette wheels and editor previews, preserving the original direction by default

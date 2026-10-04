@@ -41,6 +41,12 @@ public final class ClientConfigDraft {
 
     public PaletteTargetPosition paletteTargetPosition() { return snapshot().paletteTargetPosition(); }
 
+    public PaletteRotationDirection paletteRotationDirection() { return snapshot().paletteRotationDirection(); }
+
+    public void setPaletteRotationDirection(PaletteRotationDirection direction) {
+        feature("palette_wheel").addProperty("rotation_direction", direction.name().toLowerCase(java.util.Locale.ROOT));
+    }
+
     public void setPaletteTargetPosition(PaletteTargetPosition position) {
         feature("palette_wheel").addProperty("target_position", position.name().toLowerCase(java.util.Locale.ROOT));
     }
@@ -222,6 +228,7 @@ public final class ClientConfigDraft {
         }
         setReachDistance(defaults.reachDistance());
         setPaletteAnimation(defaults.paletteAnimation());
+        setPaletteRotationDirection(defaults.paletteRotationDirection());
         setPaletteTargetPosition(defaults.paletteTargetPosition());
         setPaletteArrowStyle(defaults.paletteArrowStyle());
         setPrimaryPalettePreset(defaults.primaryPalettePreset());

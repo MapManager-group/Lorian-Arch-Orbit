@@ -654,7 +654,7 @@ public final class PaletteEditorScreen extends WorkbenchScreen {
             if (group != null && !group.members().isEmpty()) {
                 int steps = previewScroll.add(amount);
                 if (steps != 0) {
-                    int selectionSteps = -steps;
+                    int selectionSteps = ClientConfigRuntime.configManager().client().paletteRotationDirection().selectionSteps(steps);
                     long now = System.currentTimeMillis();
                     previewSelection = Math.floorMod(previewSelection + selectionSteps, group.members().size());
                     if (previewRotation == null) {

@@ -228,7 +228,7 @@ public final class ClientPaletteRuntime {
         double amount = amountY != 0.0 ? amountY : amountX;
         int steps = SCROLL.add(amount);
         if (steps != 0) {
-            int selectionSteps = -steps;
+            int selectionSteps = ClientConfigRuntime.configManager().client().paletteRotationDirection().selectionSteps(steps);
             radial = radial.rotate(selectionSteps);
             ClientInteractionRuntime.hud().rotateRadial(
                     OWNER, hudSnapshot(radial), selectionSteps, ClientInteractionRuntime.nowMillis()

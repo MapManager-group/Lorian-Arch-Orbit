@@ -71,6 +71,10 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
                 "features.palette_wheel.animation",
                 warnings
         );
+        PaletteRotationDirection rotationDirection = JsonConfigSupport.enumValue(
+                palette, "rotation_direction", PaletteRotationDirection.CLOCKWISE, PaletteRotationDirection.class,
+                "features.palette_wheel.rotation_direction", warnings
+        );
         PaletteTargetPosition targetPosition = JsonConfigSupport.enumValue(
                 palette, "target_position", PaletteTargetPosition.BOTTOM, PaletteTargetPosition.class,
                 "features.palette_wheel.target_position", warnings
@@ -176,6 +180,7 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
                 enabled,
                 reachDistance,
                 animation,
+                rotationDirection,
                 targetPosition,
                 arrowStyle,
                 primaryPreset,
@@ -232,6 +237,7 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
         return switch (id) {
             case "reach_extension" -> previous.reachDistance() != next.reachDistance();
             case "palette_wheel" -> previous.paletteAnimation() != next.paletteAnimation()
+                    || previous.paletteRotationDirection() != next.paletteRotationDirection()
                     || previous.paletteTargetPosition() != next.paletteTargetPosition()
                     || previous.paletteArrowStyle() != next.paletteArrowStyle()
                     || previous.primaryPalettePreset() != next.primaryPalettePreset()
