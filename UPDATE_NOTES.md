@@ -85,3 +85,5 @@
 - ✨ feat(palette): add configurable clockwise or counterclockwise scrolling for all palette wheels and editor previews, preserving the original direction by default
 - 🐛 fix(palette): center overflow windows on the selected item so adjacent previews match actual scrolling in both directions
 - 🐛 fix(connected-textures): repair closed double-chest joining faces in Optimized Block Entities terrain models while preserving chest animation and optimization
+- 💄 style(palette): redraw Vanilla, Arrow and Pointer on a shared pixel grid with matching indicator sizes
+- 💄 style(palette): refine Arrow with a distinct arrowhead and stem and Pointer with a recognizable hand silhouette

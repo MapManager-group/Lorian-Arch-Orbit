@@ -20,8 +20,8 @@ public final class RadialWheelVisuals {
                                          long nowMillis) {
         if (style == PaletteArrowStyle.NONE) return;
         var sprite = PaletteArrowSprite.of(style);
-        // The larger sprite extends inward; delay it in tiny/opening rings to protect the name.
-        if (radius < 48 + (sprite.pixelScale() - 1) * (sprite.rows().size() - 1)) return;
+        // All three 14-pixel sprites share the enlarged Vanilla marker's safe radius.
+        if (radius < 55) return;
         var indicator = com.davidblackcn.lorianarchorbit.interaction.PaletteTargetIndicator
                 .at(centerX, centerY, radius, position, nowMillis);
         if (indicator.isEmpty()) return;
@@ -31,11 +31,8 @@ public final class RadialWheelVisuals {
             for (int column = 0; column < sprite.rows().get(row).length(); column++) {
                 int color = sprite.color(column, row);
                 if (color == 0) continue;
-                for (int y = 0; y < sprite.pixelScale(); y++) for (int x = 0; x < sprite.pixelScale(); x++) {
-                    var point = arrow.pixel((sprite.tipX() - column) * sprite.pixelScale() + x,
-                            -row * sprite.pixelScale() - y);
-                    graphics.fill(point.x(), point.y(), point.x() + 1, point.y() + 1, color);
-                }
+                var point = arrow.pixel(sprite.tipX() - column, -row);
+                graphics.fill(point.x(), point.y(), point.x() + 1, point.y() + 1, color);
             }
         }
     }

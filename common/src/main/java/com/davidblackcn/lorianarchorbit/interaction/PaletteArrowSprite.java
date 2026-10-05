@@ -3,39 +3,54 @@ package com.davidblackcn.lorianarchorbit.interaction;
 import com.davidblackcn.lorianarchorbit.config.PaletteArrowStyle;
 import java.util.List;
 
-/** Upright pixel shapes share the exact green ramp of 26.2's map frame marker. */
-public record PaletteArrowSprite(int tipX, int pixelScale, List<String> rows) {
-    private static final PaletteArrowSprite NONE = new PaletteArrowSprite(0, 1, List.of());
-    private static final PaletteArrowSprite VANILLA = new PaletteArrowSprite(4, 2, List.of(
-            "....O...",
-            "...OSO..",
-            "..OSGSO.",
-            "..OGHGO.",
-            "..OGHGO.",
-            "..OSGSO.",
-            "...OOO..",
-            "........"));
-    private static final PaletteArrowSprite ARROW = new PaletteArrowSprite(4, 1, List.of(
-            "....O....",
-            "...OHO...",
-            "..OHHHO..",
-            ".OHGGGHO.",
-            "OHGGGGGHO",
-            "OHGGGGGHO",
-            ".OGGGGGO.",
-            ".OSSSSSO.",
-            "..OOOOO.."));
-    private static final PaletteArrowSprite POINTER = new PaletteArrowSprite(3, 1, List.of(
-            "...O.....",
-            "..OHO....",
-            "..OHO....",
-            "..OHO....",
-            "..OHHOO..",
-            "..OHGHHO.",
-            "OSGHGGGO.",
-            "OSGGSSSO.",
-            ".OSSSSSO.",
-            "..OOOOO.."));
+/** One cell is one logical pixel for every style; colors match 26.2's map frame marker. */
+public record PaletteArrowSprite(int tipX, List<String> rows) {
+    private static final PaletteArrowSprite NONE = new PaletteArrowSprite(0, List.of());
+    private static final PaletteArrowSprite VANILLA = new PaletteArrowSprite(5, List.of(
+            ".....O.....",
+            "....OSO....",
+            "...OSGSO...",
+            "..OSGGGSO..",
+            ".OSGGGGGSO.",
+            "OSGGHHHGGSO",
+            "OGGHHHHHGGO",
+            "OGGHHHHHGGO",
+            "OGGGHHHGGGO",
+            "OSGGGHGGGSO",
+            ".OSGGGGGSO.",
+            ".OSSGGGSSO.",
+            "..OSSSSSO..",
+            "...OOOOO..."));
+    private static final PaletteArrowSprite ARROW = new PaletteArrowSprite(5, List.of(
+            ".....O.....",
+            "....OHO....",
+            "...OHGHO...",
+            "..OHGGGHO..",
+            ".OHGGGGGHO.",
+            "OHGGGGGGGHO",
+            "OGGGGGGGGSO",
+            "OOOOGGSOOOO",
+            "...OHGSO...",
+            "...OHGSO...",
+            "...OHGSO...",
+            "...OHGSO...",
+            "...OHGSO...",
+            "...OOOOO..."));
+    private static final PaletteArrowSprite POINTER = new PaletteArrowSprite(3, List.of(
+            "...O.......",
+            "..OHO......",
+            "..OHO......",
+            "..OHO......",
+            "..OHOOO....",
+            "..OHOGHOO..",
+            "..OHOGOGHO.",
+            ".OOHGGOGGHO",
+            "OHGHGGGGGSO",
+            "OHGGGGGGGSO",
+            ".OGGGGGGGSO",
+            "..OGGGGGSO.",
+            "...OSSSSO..",
+            "...OOOOOO.."));
 
     public PaletteArrowSprite { rows = List.copyOf(rows); }
     public static PaletteArrowSprite of(PaletteArrowStyle style) {

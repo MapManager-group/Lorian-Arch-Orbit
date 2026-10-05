@@ -32,12 +32,30 @@ class PaletteWheelVisualTest {
         }
         var pointer = PaletteArrowSprite.of(PaletteArrowStyle.POINTER);
         assertEquals(1,pointer.rows().getFirst().chars().filter(c->c!='.').count());
-        var vanilla = PaletteArrowSprite.of(PaletteArrowStyle.VANILLA);
-        assertEquals(8,vanilla.rows().size());
-        assertEquals(2,vanilla.pixelScale());
-        assertEquals(1,PaletteArrowSprite.of(PaletteArrowStyle.ARROW).pixelScale());
-        assertEquals(1,pointer.pixelScale());
-        assertEquals(0xFF00FF4C,vanilla.color(4,3));
+    }
+
+    @Test void visibleSpritesHaveEqualBoundsOnTheSamePixelGridInEveryDirection() {
+        for (var style : PaletteArrowStyle.values()) {
+            if (style == PaletteArrowStyle.NONE) continue;
+            var sprite = PaletteArrowSprite.of(style);
+            assertEquals(14, sprite.rows().size());
+            assertTrue(sprite.rows().stream().allMatch(row -> row.length() == 11));
+            for (var position : PaletteTargetPosition.values()) {
+                var indicator = PaletteTargetIndicator.at(100,100,80,position,0).orElseThrow();
+                var pixels = new HashSet<HudPoint>();
+                int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
+                int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
+                for (int y = 0; y < 14; y++) for (int x = 0; x < 11; x++) {
+                    if (sprite.color(x,y) == 0) continue;
+                    var pixel = indicator.pixel(sprite.tipX()-x,-y);
+                    assertTrue(pixels.add(pixel), "Sprite cells must stay separate: " + style);
+                    minX = Math.min(minX,pixel.x()); maxX = Math.max(maxX,pixel.x());
+                    minY = Math.min(minY,pixel.y()); maxY = Math.max(maxY,pixel.y());
+                }
+                assertEquals(indicator.forwardX() == 0 ? 11 : 14, maxX-minX+1);
+                assertEquals(indicator.forwardX() == 0 ? 14 : 11, maxY-minY+1);
+            }
+        }
     }
 
     @Test void emphasisFollowsPositionsContinuouslyAcrossSelectionAndWraparound() {
