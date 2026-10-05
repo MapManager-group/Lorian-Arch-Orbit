@@ -84,3 +84,4 @@
 - 💄 style(palette): enlarge Vanilla indicators with crisp two-times pixel scaling
 - ✨ feat(palette): add configurable clockwise or counterclockwise scrolling for all palette wheels and editor previews, preserving the original direction by default
 - 🐛 fix(palette): center overflow windows on the selected item so adjacent previews match actual scrolling in both directions
+- 🐛 fix(connected-textures): repair closed double-chest joining faces in Optimized Block Entities terrain models while preserving chest animation and optimization

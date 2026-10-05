@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.object.chest.ChestModel;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public final class ChestConnectionCapModelTest {
     @Test
@@ -49,6 +52,50 @@ public final class ChestConnectionCapModelTest {
         assertEquals(0.0F, model.root().getChild("bottom").xRot);
         assertEquals(-(float) Math.PI / 4.0F, model.root().getChild("lid").xRot, 0.000001F);
         assertEquals(-(float) Math.PI / 4.0F, model.root().getChild("lock").xRot, 0.000001F);
+    }
+
+    @Test
+    public void terrainCapsStayClosedWhileDynamicChestsAnimate() {
+        for (ChestType type : List.of(ChestType.LEFT, ChestType.RIGHT)) {
+            ChestConnectionCapModel animated = ChestConnectionCapModel.select(type);
+            try {
+                animated.setupAnim(1.0F);
+                ModelPart closed = ChestConnectionCapModel.closedRoot(type);
+                assertNotSame(animated.root(), closed);
+                for (String name : List.of("bottom", "lid", "lock")) {
+                    assertEquals(0.0F, closed.getChild(name).xRot);
+                    assertEquals(animated.root().getChild(name).getInitialPose(),
+                            closed.getChild(name).storePose());
+                    assertEquals(1, onlyCube(closed.getChild(name)).polygons.length);
+                }
+                animated.setupAnim(0.5F);
+                assertEquals(0.0F, closed.getChild("lid").xRot);
+            } finally {
+                animated.setupAnim(0.0F);
+            }
+        }
+    }
+
+    @Test
+    public void terrainTexturesPreserveMaterialAndNamespace() {
+        for (String material : List.of("normal", "trapped", "christmas", "copper",
+                "copper_exposed", "copper_weathered", "copper_oxidized")) {
+            for (String namespace : List.of("minecraft", "custom")) {
+                Identifier left = Identifier.fromNamespaceAndPath(namespace, "entity/chest/" + material + "_left");
+                Identifier right = Identifier.fromNamespaceAndPath(namespace, "entity/chest/" + material + "_right");
+                assertEquals(right, ChestConnectionCapModel.oppositeTexture(left, ChestType.LEFT));
+                assertEquals(left, ChestConnectionCapModel.oppositeTexture(right, ChestType.RIGHT));
+            }
+        }
+    }
+
+    @Test
+    public void terrainTexturesDoNotGuessSingleOrUnknownLayouts() {
+        Identifier single = Identifier.withDefaultNamespace("entity/chest/normal");
+        Identifier left = Identifier.withDefaultNamespace("entity/chest/normal_left");
+        assertNull(ChestConnectionCapModel.oppositeTexture(single, ChestType.LEFT));
+        assertNull(ChestConnectionCapModel.oppositeTexture(left, ChestType.RIGHT));
+        assertNull(ChestConnectionCapModel.oppositeTexture(left, ChestType.SINGLE));
     }
 
     private static void assertFace(

@@ -4,6 +4,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.object.chest.ChestModel;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.state.properties.ChestType;
 
 import java.util.List;
@@ -26,6 +27,25 @@ public final class ChestConnectionCapModel extends ChestModel {
             case RIGHT -> RIGHT;
             case SINGLE -> throw new IllegalArgumentException("A single chest has no connection face");
         };
+    }
+
+    /** A separate rest-pose model: terrain baking must not read the animated render model. */
+    public static ModelPart closedRoot(ChestType type) {
+        return create(type).root();
+    }
+
+    /** Preserve the material and namespace chosen by the static renderer, swapping only the half. */
+    public static Identifier oppositeTexture(Identifier texture, ChestType type) {
+        String suffix = switch (type) {
+            case LEFT -> "_left";
+            case RIGHT -> "_right";
+            case SINGLE -> "";
+        };
+        String path = texture.getPath();
+        if (suffix.isEmpty() || !path.endsWith(suffix)) return null;
+        return Identifier.fromNamespaceAndPath(texture.getNamespace(),
+                path.substring(0, path.length() - suffix.length())
+                        + (type == ChestType.LEFT ? "_right" : "_left"));
     }
 
     static ChestConnectionCapModel create(ChestType type) {

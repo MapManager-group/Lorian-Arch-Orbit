@@ -23,11 +23,17 @@
 - `features.palette_wheel.animation`：`clockwise`、`expand` 或 `none`。
 - `features.palette_wheel.primary_default_preset` / `secondary_default_preset`：`item_tag_a`（同类方块）、`item_tag_b`（同系列方块）或 `color_categories`（颜色分类）。这些内部枚举名为兼容已有配置而保留，界面不显示开发代号。
 - `features.smart_pick.mode`：`adjacent`、`range` 或 `context`。
-- `features.connected_texture_fix.walls|beds|doors|pistons|nether_portals|end_portals`：各类连接面修复开关；活塞修复伸出的普通与粘性活塞底座和活塞头之间的连接截面，两个传送门修复可独立开关且默认开启。旧配置中的 `chests` 字段会保留但不再使用；此前的单一 `portals` 字段会作为两个新开关的默认值。
+- `features.connected_texture_fix.walls|beds|doors|glass_panes|chests|pistons|nether_portals|end_portals`：各类连接面修复开关；箱子修复保留双箱状态的半箱裸露连接面；活塞修复伸出的普通与粘性活塞底座和活塞头之间的连接截面，两个传送门修复可独立开关且默认开启。此前的单一 `portals` 字段会作为两个新开关的默认值。
 - `features.invisible_blocks.currently_visible`：上次显示状态；`show_barriers` 与 `show_light_blocks` 控制类型。
 - `ui.hud_enabled`：是否允许功能显示 HUD。
 
 色轮文件的 `groups` 数组仅保存用户覆盖。删除某个内置组的覆盖后会自动回退到当前选择的内置预设。
+
+### 箱子连接面与渲染优化
+
+箱子修复需要同时开启连接面修复总开关与 `chests` 子开关。它补齐保留 `left`／`right` 双箱状态的半箱连接面，不修改世界中的箱子状态或物品。
+
+Optimized Block Entities（OBE）会将关闭的箱子转换为静态地形模型，打开时恢复原版动态渲染。仅修复原版渲染会导致“打开才补面”；本模组额外在 OBE 的静态模型生成时补齐箱体、箱盖和锁扣，沿用对应材质及资源包纹理。未安装 OBE 时跳过这项兼容注入。修改修复开关会沿用现有资源重载流程刷新模型缓存。
 
 ## 配色界面尺寸
 

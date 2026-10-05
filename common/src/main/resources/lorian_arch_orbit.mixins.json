@@ -10,6 +10,7 @@
     "client.BlockStateRenderShapeMixin",
     "client.ClientLevelBreakingEffectMixin",
     "client.ChestRendererMixin",
+    "client.compat.ObeChestModelMixin",
     "client.EndPortalRendererMixin",
     "client.GlassPaneFaceCullingMixin"
   ],
