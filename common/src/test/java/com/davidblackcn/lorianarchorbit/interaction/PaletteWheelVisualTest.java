@@ -34,26 +34,27 @@ class PaletteWheelVisualTest {
         assertEquals(1,pointer.rows().getFirst().chars().filter(c->c!='.').count());
     }
 
-    @Test void visibleSpritesHaveEqualBoundsOnTheSamePixelGridInEveryDirection() {
+    @Test void visibleSpritesKeepComparableBoundsInEveryDirection() {
         for (var style : PaletteArrowStyle.values()) {
             if (style == PaletteArrowStyle.NONE) continue;
             var sprite = PaletteArrowSprite.of(style);
+            int width = style == PaletteArrowStyle.VANILLA ? 10 : 11;
             assertEquals(14, sprite.rows().size());
-            assertTrue(sprite.rows().stream().allMatch(row -> row.length() == 11));
+            assertTrue(sprite.rows().stream().allMatch(row -> row.length() == width));
             for (var position : PaletteTargetPosition.values()) {
                 var indicator = PaletteTargetIndicator.at(100,100,80,position,0).orElseThrow();
                 var pixels = new HashSet<HudPoint>();
                 int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE;
                 int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE;
-                for (int y = 0; y < 14; y++) for (int x = 0; x < 11; x++) {
+                for (int y = 0; y < 14; y++) for (int x = 0; x < width; x++) {
                     if (sprite.color(x,y) == 0) continue;
                     var pixel = indicator.pixel(sprite.tipX()-x,-y);
                     assertTrue(pixels.add(pixel), "Sprite cells must stay separate: " + style);
                     minX = Math.min(minX,pixel.x()); maxX = Math.max(maxX,pixel.x());
                     minY = Math.min(minY,pixel.y()); maxY = Math.max(maxY,pixel.y());
                 }
-                assertEquals(indicator.forwardX() == 0 ? 11 : 14, maxX-minX+1);
-                assertEquals(indicator.forwardX() == 0 ? 14 : 11, maxY-minY+1);
+                assertEquals(indicator.forwardX() == 0 ? width : 14, maxX-minX+1);
+                assertEquals(indicator.forwardX() == 0 ? 14 : width, maxY-minY+1);
             }
         }
     }

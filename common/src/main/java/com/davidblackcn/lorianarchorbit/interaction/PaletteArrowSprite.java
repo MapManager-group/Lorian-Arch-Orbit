@@ -6,21 +6,22 @@ import java.util.List;
 /** One cell is one logical pixel for every style; colors match 26.2's map frame marker. */
 public record PaletteArrowSprite(int tipX, List<String> rows) {
     private static final PaletteArrowSprite NONE = new PaletteArrowSprite(0, List.of());
-    private static final PaletteArrowSprite VANILLA = new PaletteArrowSprite(5, List.of(
-            ".....O.....",
-            "....OSO....",
-            "...OSGSO...",
-            "..OSGGGSO..",
-            ".OSGGGGGSO.",
-            "OSGGHHHGGSO",
-            "OGGHHHHHGGO",
-            "OGGHHHHHGGO",
-            "OGGGHHHGGGO",
-            "OSGGGHGGGSO",
-            ".OSGGGGGSO.",
-            ".OSSGGGSSO.",
-            "..OSSSSSO..",
-            "...OOOOO..."));
+    // Preserve the original map marker exactly at 2x, without smoothing its silhouette.
+    private static final PaletteArrowSprite VANILLA = new PaletteArrowSprite(4, List.of(
+            "....OO....",
+            "....OO....",
+            "..OOSSOO..",
+            "..OOSSOO..",
+            "OOSSGGSSOO",
+            "OOSSGGSSOO",
+            "OOGGHHGGOO",
+            "OOGGHHGGOO",
+            "OOGGHHGGOO",
+            "OOGGHHGGOO",
+            "OOSSGGSSOO",
+            "OOSSGGSSOO",
+            "..OOOOOO..",
+            "..OOOOOO.."));
     private static final PaletteArrowSprite ARROW = new PaletteArrowSprite(5, List.of(
             ".....O.....",
             "....OHO....",

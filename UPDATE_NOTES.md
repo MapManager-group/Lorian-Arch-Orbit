@@ -87,3 +87,4 @@
 - 🐛 fix(connected-textures): repair closed double-chest joining faces in Optimized Block Entities terrain models while preserving chest animation and optimization
 - 💄 style(palette): redraw Vanilla, Arrow and Pointer on a shared pixel grid with matching indicator sizes
 - 💄 style(palette): refine Arrow with a distinct arrowhead and stem and Pointer with a recognizable hand silhouette
+- 🐛 fix(palette): restore the original Vanilla map-marker pixels at exact double size instead of the rounded redraw
