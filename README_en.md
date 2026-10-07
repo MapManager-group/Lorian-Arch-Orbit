@@ -107,7 +107,7 @@ The configuration, data, migration, and update documents above are currently ava
 - [LotTweaks](https://github.com/aruma256/LotTweaks): behavioral reference for color wheels, smart pick, and interaction reach.
 - [Visible Barriers](https://github.com/AmyMialeeMods/visiblebarriers): behavioral reference for invisible-block display.
 - [HueBlocks](https://github.com/1280px/hueblocks): reference for gradient functionality and source of block color data.
-- The lovely Jiu Hu (酒狐): contributed this project's icon.
+- The lovely Jiu Hu (酒狐).
 
 ## License
 

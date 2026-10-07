@@ -5,7 +5,7 @@
 
 中文 · [English](README_en.md)
 
-<img src="./docs/image/icon.png" width="400" alt="色轮在自己动w~">
+<img src="./docs/image/icon-old.png" width="400" alt="色轮在自己动w~">
 
 面向创造模式建筑师、地图作者和整合包团队的建筑辅助 Mod。支持 Minecraft 26.2、Fabric 与 NeoForge，主要功能均可独立开关并热重载。
 
@@ -106,7 +106,7 @@ Fabric 端提供 **Radial** 可选兼容：两个轮盘绑定同一个键时，�
 - [LotTweaks](https://github.com/aruma256/LotTweaks)：色轮、智能选取和交互距离的行为参考。
 - [Visible Barriers](https://github.com/AmyMialeeMods/visiblebarriers)：不可见方块显示行为参考。
 - [HueBlocks](https://github.com/1280px/hueblocks)：渐变配色功能参考及方块颜色数据来源。
-- 可爱的酒狐：贡献了该项目的Icon。
+- 可爱的酒狐。
 
 ## 协议
 
