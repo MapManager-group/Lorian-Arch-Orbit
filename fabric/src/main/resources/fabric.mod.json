@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "lorian_arch_orbit",
+  "version": "${version}",
+  "name": "Lorian’s Arch Orbit",
+  "icon": "assets/lorian_arch_orbit/icon.png",
+  "description": "Building-assistance tools for creative builders, map makers, and modpack teams.",
+  "authors": [
+    "DavidBlackCN"
+  ],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.davidblackcn.lorianarchorbit.fabric.LorianArchOrbitFabric"
+    ],
+    "client": [
+      "com.davidblackcn.lorianarchorbit.fabric.client.LorianArchOrbitFabricClient"
+    ],
+    "modmenu": [
+      "com.davidblackcn.lorianarchorbit.fabric.client.LorianArchOrbitModMenu"
+    ],
+    "fabric-datagen": [
+      "com.davidblackcn.lorianarchorbit.fabric.datagen.LorianArchOrbitDataGenerator"
+    ],
+    "radial": [
+      "com.davidblackcn.lorianarchorbit.fabric.client.compat.radial.LorianRadialEntrypoint"
+    ]
+  },
+  "mixins": [
+    "lorian_arch_orbit.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.20.0",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "architectury": ">=22.0.3",
+    "fabric-api": ">=0.163.0+26.3"
+  },
+  "recommends": {
+    "yet_another_config_lib_v3": ">=3.9.7",
+    "modmenu": ">=21.0.0"
+  },
+  "suggests": {
+    "radial": ">=3.2.2+26.3 <3.3.0"
+  }
+}

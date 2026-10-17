@@ -1,0 +1,1404 @@
+{
+  "acacia_log.png": [
+    "minecraft:acacia_log",
+    "minecraft:acacia_wood"
+  ],
+  "acacia_planks.png": [
+    "minecraft:acacia_planks",
+    "minecraft:acacia_slab",
+    "minecraft:acacia_button",
+    "minecraft:acacia_stairs",
+    "minecraft:acacia_fence_gate",
+    "minecraft:acacia_pressure_plate"
+  ],
+  "amethyst_block.png": [
+    "minecraft:amethyst_block"
+  ],
+  "ancient_debris_side.png": [
+    "minecraft:ancient_debris"
+  ],
+  "ancient_debris_top.png": [
+    "minecraft:ancient_debris"
+  ],
+  "andesite.png": [
+    "minecraft:andesite",
+    "minecraft:andesite_slab",
+    "minecraft:andesite_stairs"
+  ],
+  "azalea_top.png": [
+    "minecraft:azalea"
+  ],
+  "bamboo_block.png": [
+    "minecraft:bamboo_block"
+  ],
+  "bamboo_block_top.png": [
+    "minecraft:bamboo_block"
+  ],
+  "bamboo_planks.png": [
+    "minecraft:bamboo_planks",
+    "minecraft:bamboo_slab",
+    "minecraft:bamboo_button",
+    "minecraft:bamboo_stairs",
+    "minecraft:bamboo_pressure_plate"
+  ],
+  "barrel_side.png": [
+    "minecraft:barrel"
+  ],
+  "barrel_top.png": [
+    "minecraft:barrel"
+  ],
+  "basalt_side.png": [
+    "minecraft:basalt"
+  ],
+  "basalt_top.png": [
+    "minecraft:basalt"
+  ],
+  "bedrock.png": [
+    "minecraft:bedrock"
+  ],
+  "birch_log.png": [
+    "minecraft:birch_log",
+    "minecraft:birch_wood"
+  ],
+  "birch_planks.png": [
+    "minecraft:birch_planks",
+    "minecraft:birch_slab",
+    "minecraft:birch_button",
+    "minecraft:birch_stairs",
+    "minecraft:fletching_table",
+    "minecraft:birch_fence_gate",
+    "minecraft:birch_pressure_plate"
+  ],
+  "black_concrete.png": [
+    "minecraft:black_concrete"
+  ],
+  "black_concrete_powder.png": [
+    "minecraft:black_concrete_powder"
+  ],
+  "black_glazed_terracotta.png": [
+    "minecraft:black_glazed_terracotta"
+  ],
+  "black_stained_glass.png": [
+    "minecraft:black_stained_glass"
+  ],
+  "black_terracotta.png": [
+    "minecraft:black_terracotta"
+  ],
+  "black_wool.png": [
+    "minecraft:black_wool",
+    "minecraft:black_carpet"
+  ],
+  "blackstone.png": [
+    "minecraft:blackstone",
+    "minecraft:blackstone_slab",
+    "minecraft:blackstone_stairs"
+  ],
+  "blackstone_top.png": [
+    "minecraft:blackstone",
+    "minecraft:blackstone_slab",
+    "minecraft:blackstone_stairs"
+  ],
+  "blast_furnace_side.png": [
+    "minecraft:blast_furnace"
+  ],
+  "blast_furnace_top.png": [
+    "minecraft:blast_furnace"
+  ],
+  "blue_concrete.png": [
+    "minecraft:blue_concrete"
+  ],
+  "blue_concrete_powder.png": [
+    "minecraft:blue_concrete_powder"
+  ],
+  "blue_glazed_terracotta.png": [
+    "minecraft:blue_glazed_terracotta"
+  ],
+  "blue_ice.png": [
+    "minecraft:blue_ice"
+  ],
+  "blue_stained_glass.png": [
+    "minecraft:blue_stained_glass"
+  ],
+  "blue_terracotta.png": [
+    "minecraft:blue_terracotta"
+  ],
+  "blue_wool.png": [
+    "minecraft:blue_wool",
+    "minecraft:blue_carpet"
+  ],
+  "bone_block_side.png": [
+    "minecraft:bone_block"
+  ],
+  "bone_block_top.png": [
+    "minecraft:bone_block"
+  ],
+  "bookshelf.png": [
+    "minecraft:bookshelf"
+  ],
+  "brain_coral_block.png": [
+    "minecraft:brain_coral_block"
+  ],
+  "bricks.png": [
+    "minecraft:bricks",
+    "minecraft:brick_slab",
+    "minecraft:brick_stairs"
+  ],
+  "brown_concrete.png": [
+    "minecraft:brown_concrete"
+  ],
+  "brown_concrete_powder.png": [
+    "minecraft:brown_concrete_powder"
+  ],
+  "brown_glazed_terracotta.png": [
+    "minecraft:brown_glazed_terracotta"
+  ],
+  "brown_mushroom_block.png": [
+    "minecraft:brown_mushroom_block"
+  ],
+  "brown_stained_glass.png": [
+    "minecraft:brown_stained_glass"
+  ],
+  "brown_terracotta.png": [
+    "minecraft:brown_terracotta"
+  ],
+  "brown_wool.png": [
+    "minecraft:brown_wool",
+    "minecraft:brown_carpet"
+  ],
+  "bubble_coral_block.png": [
+    "minecraft:bubble_coral_block"
+  ],
+  "budding_amethyst.png": [
+    "minecraft:budding_amethyst"
+  ],
+  "calcite.png": [
+    "minecraft:calcite"
+  ],
+  "cartography_table_side2.png": [
+    "minecraft:cartography_table"
+  ],
+  "cartography_table_top.png": [
+    "minecraft:cartography_table"
+  ],
+  "carved_pumpkin.png": [
+    "minecraft:carved_pumpkin"
+  ],
+  "cherry_log.png": [
+    "minecraft:cherry_log",
+    "minecraft:cherry_wood"
+  ],
+  "cherry_planks.png": [
+    "minecraft:cherry_planks",
+    "minecraft:cherry_slab",
+    "minecraft:cherry_button",
+    "minecraft:cherry_stairs",
+    "minecraft:cherry_fence_gate",
+    "minecraft:cherry_pressure_plate"
+  ],
+  "chiseled_cinnabar.png": [
+    "minecraft:chiseled_cinnabar"
+  ],
+  "chiseled_copper.png": [
+    "minecraft:chiseled_copper"
+  ],
+  "chiseled_deepslate.png": [
+    "minecraft:chiseled_deepslate"
+  ],
+  "chiseled_nether_bricks.png": [
+    "minecraft:chiseled_nether_bricks"
+  ],
+  "chiseled_polished_blackstone.png": [
+    "minecraft:chiseled_polished_blackstone"
+  ],
+  "chiseled_red_sandstone.png": [
+    "minecraft:chiseled_red_sandstone"
+  ],
+  "chiseled_resin_bricks.png": [
+    "minecraft:chiseled_resin_bricks"
+  ],
+  "chiseled_sandstone.png": [
+    "minecraft:chiseled_sandstone"
+  ],
+  "chiseled_stone_bricks.png": [
+    "minecraft:chiseled_stone_bricks"
+  ],
+  "chiseled_sulfur.png": [
+    "minecraft:chiseled_sulfur"
+  ],
+  "chiseled_tuff.png": [
+    "minecraft:chiseled_tuff"
+  ],
+  "chiseled_tuff_bricks_top.png": [
+    "minecraft:chiseled_tuff_bricks"
+  ],
+  "chiseled_tuff_top.png": [
+    "minecraft:chiseled_tuff"
+  ],
+  "cinnabar.png": [
+    "minecraft:cinnabar",
+    "minecraft:cinnabar_slab",
+    "minecraft:cinnabar_stairs"
+  ],
+  "cinnabar_bricks.png": [
+    "minecraft:cinnabar_bricks",
+    "minecraft:cinnabar_brick_slab",
+    "minecraft:cinnabar_brick_stairs"
+  ],
+  "clay.png": [
+    "minecraft:clay"
+  ],
+  "coal_block.png": [
+    "minecraft:coal_block"
+  ],
+  "coal_ore.png": [
+    "minecraft:coal_ore"
+  ],
+  "coarse_dirt.png": [
+    "minecraft:coarse_dirt"
+  ],
+  "cobbled_deepslate.png": [
+    "minecraft:cobbled_deepslate",
+    "minecraft:cobbled_deepslate_slab",
+    "minecraft:cobbled_deepslate_stairs"
+  ],
+  "cobblestone.png": [
+    "minecraft:cobblestone",
+    "minecraft:cobblestone_slab",
+    "minecraft:cobblestone_stairs"
+  ],
+  "copper_block.png": [
+    "minecraft:copper_block"
+  ],
+  "copper_bulb.png": [
+    "minecraft:copper_bulb"
+  ],
+  "copper_ore.png": [
+    "minecraft:copper_ore"
+  ],
+  "crafting_table_side.png": [
+    "minecraft:crafting_table"
+  ],
+  "crafting_table_top.png": [
+    "minecraft:crafting_table"
+  ],
+  "creaking_heart.png": [
+    "minecraft:creaking_heart"
+  ],
+  "creaking_heart_top.png": [
+    "minecraft:creaking_heart"
+  ],
+  "crimson_nylium.png": [
+    "minecraft:crimson_nylium"
+  ],
+  "crimson_planks.png": [
+    "minecraft:crimson_planks",
+    "minecraft:crimson_slab",
+    "minecraft:crimson_button",
+    "minecraft:crimson_stairs",
+    "minecraft:crimson_fence_gate",
+    "minecraft:crimson_pressure_plate"
+  ],
+  "crimson_stem.png": [
+    "minecraft:crimson_stem",
+    "minecraft:crimson_hyphae"
+  ],
+  "crying_obsidian.png": [
+    "minecraft:crying_obsidian"
+  ],
+  "cut_copper.png": [
+    "minecraft:cut_copper",
+    "minecraft:cut_copper_slab",
+    "minecraft:cut_copper_stairs"
+  ],
+  "cut_red_sandstone.png": [
+    "minecraft:cut_red_sandstone",
+    "minecraft:cut_red_sandstone_slab"
+  ],
+  "cut_sandstone.png": [
+    "minecraft:cut_sandstone",
+    "minecraft:cut_sandstone_slab"
+  ],
+  "cyan_concrete.png": [
+    "minecraft:cyan_concrete"
+  ],
+  "cyan_concrete_powder.png": [
+    "minecraft:cyan_concrete_powder"
+  ],
+  "cyan_glazed_terracotta.png": [
+    "minecraft:cyan_glazed_terracotta"
+  ],
+  "cyan_stained_glass.png": [
+    "minecraft:cyan_stained_glass"
+  ],
+  "cyan_terracotta.png": [
+    "minecraft:cyan_terracotta"
+  ],
+  "cyan_wool.png": [
+    "minecraft:cyan_wool",
+    "minecraft:cyan_carpet"
+  ],
+  "dark_oak_log.png": [
+    "minecraft:dark_oak_log",
+    "minecraft:dark_oak_wood"
+  ],
+  "dark_oak_planks.png": [
+    "minecraft:dark_oak_planks",
+    "minecraft:dark_oak_slab",
+    "minecraft:dark_oak_button",
+    "minecraft:dark_oak_stairs",
+    "minecraft:cartography_table",
+    "minecraft:dark_oak_fence_gate",
+    "minecraft:dark_oak_pressure_plate"
+  ],
+  "dark_prismarine.png": [
+    "minecraft:dark_prismarine",
+    "minecraft:dark_prismarine_slab",
+    "minecraft:dark_prismarine_stairs"
+  ],
+  "daylight_detector_side.png": [
+    "minecraft:daylight_detector"
+  ],
+  "daylight_detector_top.png": [
+    "minecraft:daylight_detector"
+  ],
+  "dead_brain_coral_block.png": [
+    "minecraft:dead_brain_coral_block"
+  ],
+  "dead_bubble_coral_block.png": [
+    "minecraft:dead_bubble_coral_block"
+  ],
+  "dead_fire_coral_block.png": [
+    "minecraft:dead_fire_coral_block"
+  ],
+  "dead_horn_coral_block.png": [
+    "minecraft:dead_horn_coral_block"
+  ],
+  "dead_tube_coral_block.png": [
+    "minecraft:dead_tube_coral_block"
+  ],
+  "deepslate.png": [
+    "minecraft:deepslate"
+  ],
+  "deepslate_bricks.png": [
+    "minecraft:deepslate_bricks",
+    "minecraft:deepslate_brick_slab",
+    "minecraft:deepslate_brick_stairs"
+  ],
+  "deepslate_coal_ore.png": [
+    "minecraft:deepslate_coal_ore"
+  ],
+  "deepslate_copper_ore.png": [
+    "minecraft:deepslate_copper_ore"
+  ],
+  "deepslate_diamond_ore.png": [
+    "minecraft:deepslate_diamond_ore"
+  ],
+  "deepslate_emerald_ore.png": [
+    "minecraft:deepslate_emerald_ore"
+  ],
+  "deepslate_gold_ore.png": [
+    "minecraft:deepslate_gold_ore"
+  ],
+  "deepslate_iron_ore.png": [
+    "minecraft:deepslate_iron_ore"
+  ],
+  "deepslate_lapis_ore.png": [
+    "minecraft:deepslate_lapis_ore"
+  ],
+  "deepslate_redstone_ore.png": [
+    "minecraft:deepslate_redstone_ore"
+  ],
+  "deepslate_tiles.png": [
+    "minecraft:deepslate_tiles",
+    "minecraft:deepslate_tile_slab",
+    "minecraft:deepslate_tile_stairs"
+  ],
+  "deepslate_top.png": [
+    "minecraft:deepslate"
+  ],
+  "diamond_block.png": [
+    "minecraft:diamond_block"
+  ],
+  "diamond_ore.png": [
+    "minecraft:diamond_ore"
+  ],
+  "diorite.png": [
+    "minecraft:diorite",
+    "minecraft:diorite_slab",
+    "minecraft:diorite_stairs"
+  ],
+  "dirt.png": [
+    "minecraft:dirt",
+    "minecraft:podzol",
+    "minecraft:farmland",
+    "minecraft:mycelium"
+  ],
+  "dispenser_front.png": [
+    "minecraft:dispenser"
+  ],
+  "dripstone_block.png": [
+    "minecraft:dripstone_block"
+  ],
+  "emerald_block.png": [
+    "minecraft:emerald_block"
+  ],
+  "emerald_ore.png": [
+    "minecraft:emerald_ore"
+  ],
+  "end_stone.png": [
+    "minecraft:end_stone"
+  ],
+  "end_stone_bricks.png": [
+    "minecraft:end_stone_bricks",
+    "minecraft:end_stone_brick_slab",
+    "minecraft:end_stone_brick_stairs"
+  ],
+  "exposed_chiseled_copper.png": [
+    "minecraft:exposed_chiseled_copper"
+  ],
+  "exposed_copper.png": [
+    "minecraft:exposed_copper"
+  ],
+  "exposed_copper_bulb.png": [
+    "minecraft:exposed_copper_bulb"
+  ],
+  "exposed_cut_copper.png": [
+    "minecraft:exposed_cut_copper",
+    "minecraft:exposed_cut_copper_slab",
+    "minecraft:exposed_cut_copper_stairs"
+  ],
+  "farmland.png": [
+    "minecraft:farmland"
+  ],
+  "fire_coral_block.png": [
+    "minecraft:fire_coral_block"
+  ],
+  "flowering_azalea_top.png": [
+    "minecraft:flowering_azalea"
+  ],
+  "furnace_front.png": [
+    "minecraft:furnace"
+  ],
+  "furnace_side.png": [
+    "minecraft:dropper",
+    "minecraft:furnace",
+    "minecraft:dispenser"
+  ],
+  "furnace_top.png": [
+    "minecraft:dropper",
+    "minecraft:furnace",
+    "minecraft:dispenser"
+  ],
+  "gilded_blackstone.png": [
+    "minecraft:gilded_blackstone"
+  ],
+  "glowstone.png": [
+    "minecraft:glowstone"
+  ],
+  "gold_block.png": [
+    "minecraft:gold_block",
+    "minecraft:light_weighted_pressure_plate"
+  ],
+  "gold_ore.png": [
+    "minecraft:gold_ore"
+  ],
+  "granite.png": [
+    "minecraft:granite",
+    "minecraft:granite_slab",
+    "minecraft:granite_stairs"
+  ],
+  "gravel.png": [
+    "minecraft:gravel"
+  ],
+  "gray_concrete.png": [
+    "minecraft:gray_concrete"
+  ],
+  "gray_concrete_powder.png": [
+    "minecraft:gray_concrete_powder"
+  ],
+  "gray_glazed_terracotta.png": [
+    "minecraft:gray_glazed_terracotta"
+  ],
+  "gray_stained_glass.png": [
+    "minecraft:gray_stained_glass"
+  ],
+  "gray_terracotta.png": [
+    "minecraft:gray_terracotta"
+  ],
+  "gray_wool.png": [
+    "minecraft:gray_wool",
+    "minecraft:gray_carpet"
+  ],
+  "green_concrete.png": [
+    "minecraft:green_concrete"
+  ],
+  "green_concrete_powder.png": [
+    "minecraft:green_concrete_powder"
+  ],
+  "green_glazed_terracotta.png": [
+    "minecraft:green_glazed_terracotta"
+  ],
+  "green_stained_glass.png": [
+    "minecraft:green_stained_glass"
+  ],
+  "green_terracotta.png": [
+    "minecraft:green_terracotta"
+  ],
+  "green_wool.png": [
+    "minecraft:green_wool",
+    "minecraft:green_carpet"
+  ],
+  "hay_block_side.png": [
+    "minecraft:hay_block"
+  ],
+  "hay_block_top.png": [
+    "minecraft:hay_block"
+  ],
+  "honeycomb_block.png": [
+    "minecraft:honeycomb_block"
+  ],
+  "horn_coral_block.png": [
+    "minecraft:horn_coral_block"
+  ],
+  "ice.png": [
+    "minecraft:ice"
+  ],
+  "iron_block.png": [
+    "minecraft:iron_block",
+    "minecraft:heavy_weighted_pressure_plate"
+  ],
+  "iron_ore.png": [
+    "minecraft:iron_ore"
+  ],
+  "jack_o_lantern.png": [
+    "minecraft:jack_o_lantern"
+  ],
+  "jungle_log.png": [
+    "minecraft:jungle_log",
+    "minecraft:jungle_wood"
+  ],
+  "jungle_planks.png": [
+    "minecraft:jungle_planks",
+    "minecraft:jungle_slab",
+    "minecraft:jungle_button",
+    "minecraft:jungle_stairs",
+    "minecraft:jungle_fence_gate",
+    "minecraft:jungle_pressure_plate"
+  ],
+  "lapis_block.png": [
+    "minecraft:lapis_block"
+  ],
+  "lapis_ore.png": [
+    "minecraft:lapis_ore"
+  ],
+  "light_blue_concrete.png": [
+    "minecraft:light_blue_concrete"
+  ],
+  "light_blue_concrete_powder.png": [
+    "minecraft:light_blue_concrete_powder"
+  ],
+  "light_blue_glazed_terracotta.png": [
+    "minecraft:light_blue_glazed_terracotta"
+  ],
+  "light_blue_stained_glass.png": [
+    "minecraft:light_blue_stained_glass"
+  ],
+  "light_blue_terracotta.png": [
+    "minecraft:light_blue_terracotta"
+  ],
+  "light_blue_wool.png": [
+    "minecraft:light_blue_wool",
+    "minecraft:light_blue_carpet"
+  ],
+  "light_gray_concrete.png": [
+    "minecraft:light_gray_concrete"
+  ],
+  "light_gray_concrete_powder.png": [
+    "minecraft:light_gray_concrete_powder"
+  ],
+  "light_gray_glazed_terracotta.png": [
+    "minecraft:light_gray_glazed_terracotta"
+  ],
+  "light_gray_stained_glass.png": [
+    "minecraft:light_gray_stained_glass"
+  ],
+  "light_gray_terracotta.png": [
+    "minecraft:light_gray_terracotta"
+  ],
+  "light_gray_wool.png": [
+    "minecraft:light_gray_wool",
+    "minecraft:light_gray_carpet"
+  ],
+  "lime_concrete.png": [
+    "minecraft:lime_concrete"
+  ],
+  "lime_concrete_powder.png": [
+    "minecraft:lime_concrete_powder"
+  ],
+  "lime_glazed_terracotta.png": [
+    "minecraft:lime_glazed_terracotta"
+  ],
+  "lime_stained_glass.png": [
+    "minecraft:lime_stained_glass"
+  ],
+  "lime_terracotta.png": [
+    "minecraft:lime_terracotta"
+  ],
+  "lime_wool.png": [
+    "minecraft:lime_wool",
+    "minecraft:lime_carpet"
+  ],
+  "lodestone_side.png": [
+    "minecraft:lodestone"
+  ],
+  "lodestone_top.png": [
+    "minecraft:lodestone"
+  ],
+  "loom_bottom.png": [
+    "minecraft:loom"
+  ],
+  "loom_front.png": [
+    "minecraft:loom"
+  ],
+  "loom_side.png": [
+    "minecraft:loom"
+  ],
+  "loom_top.png": [
+    "minecraft:loom"
+  ],
+  "magenta_concrete.png": [
+    "minecraft:magenta_concrete"
+  ],
+  "magenta_concrete_powder.png": [
+    "minecraft:magenta_concrete_powder"
+  ],
+  "magenta_glazed_terracotta.png": [
+    "minecraft:magenta_glazed_terracotta"
+  ],
+  "magenta_stained_glass.png": [
+    "minecraft:magenta_stained_glass"
+  ],
+  "magenta_terracotta.png": [
+    "minecraft:magenta_terracotta"
+  ],
+  "magenta_wool.png": [
+    "minecraft:magenta_wool",
+    "minecraft:magenta_carpet"
+  ],
+  "magma.png": [
+    "minecraft:magma_block"
+  ],
+  "mangrove_log.png": [
+    "minecraft:mangrove_log",
+    "minecraft:mangrove_wood"
+  ],
+  "mangrove_planks.png": [
+    "minecraft:mangrove_planks",
+    "minecraft:mangrove_slab",
+    "minecraft:mangrove_button",
+    "minecraft:mangrove_stairs",
+    "minecraft:mangrove_fence_gate",
+    "minecraft:mangrove_pressure_plate"
+  ],
+  "melon_side.png": [
+    "minecraft:melon"
+  ],
+  "melon_top.png": [
+    "minecraft:melon"
+  ],
+  "moss_block.png": [
+    "minecraft:moss_block",
+    "minecraft:moss_carpet"
+  ],
+  "mossy_cobblestone.png": [
+    "minecraft:mossy_cobblestone",
+    "minecraft:mossy_cobblestone_slab",
+    "minecraft:mossy_cobblestone_stairs"
+  ],
+  "mossy_stone_bricks.png": [
+    "minecraft:mossy_stone_bricks",
+    "minecraft:mossy_stone_brick_slab",
+    "minecraft:mossy_stone_brick_stairs"
+  ],
+  "mud.png": [
+    "minecraft:mud"
+  ],
+  "mud_bricks.png": [
+    "minecraft:mud_bricks",
+    "minecraft:mud_brick_slab",
+    "minecraft:mud_brick_stairs"
+  ],
+  "muddy_mangrove_roots_side.png": [
+    "minecraft:muddy_mangrove_roots"
+  ],
+  "muddy_mangrove_roots_top.png": [
+    "minecraft:muddy_mangrove_roots"
+  ],
+  "mushroom_stem.png": [
+    "minecraft:mushroom_stem"
+  ],
+  "mycelium_top.png": [
+    "minecraft:mycelium"
+  ],
+  "nether_bricks.png": [
+    "minecraft:nether_bricks",
+    "minecraft:nether_brick_slab",
+    "minecraft:nether_brick_stairs"
+  ],
+  "nether_gold_ore.png": [
+    "minecraft:nether_gold_ore"
+  ],
+  "nether_quartz_ore.png": [
+    "minecraft:nether_quartz_ore"
+  ],
+  "nether_wart_block.png": [
+    "minecraft:nether_wart_block"
+  ],
+  "netherite_block.png": [
+    "minecraft:netherite_block"
+  ],
+  "netherrack.png": [
+    "minecraft:netherrack",
+    "minecraft:warped_nylium",
+    "minecraft:crimson_nylium"
+  ],
+  "note_block.png": [
+    "minecraft:note_block"
+  ],
+  "oak_log.png": [
+    "minecraft:oak_log",
+    "minecraft:oak_wood"
+  ],
+  "oak_planks.png": [
+    "minecraft:oak_planks",
+    "minecraft:oak_slab",
+    "minecraft:bookshelf",
+    "minecraft:oak_button",
+    "minecraft:oak_stairs",
+    "minecraft:crafting_table",
+    "minecraft:oak_fence_gate",
+    "minecraft:oak_pressure_plate",
+    "minecraft:petrified_oak_slab"
+  ],
+  "obsidian.png": [
+    "minecraft:obsidian"
+  ],
+  "ochre_froglight_side.png": [
+    "minecraft:ochre_froglight"
+  ],
+  "ochre_froglight_top.png": [
+    "minecraft:ochre_froglight"
+  ],
+  "orange_concrete.png": [
+    "minecraft:orange_concrete"
+  ],
+  "orange_concrete_powder.png": [
+    "minecraft:orange_concrete_powder"
+  ],
+  "orange_glazed_terracotta.png": [
+    "minecraft:orange_glazed_terracotta"
+  ],
+  "orange_stained_glass.png": [
+    "minecraft:orange_stained_glass"
+  ],
+  "orange_terracotta.png": [
+    "minecraft:orange_terracotta"
+  ],
+  "orange_wool.png": [
+    "minecraft:orange_wool",
+    "minecraft:orange_carpet"
+  ],
+  "oxidized_chiseled_copper.png": [
+    "minecraft:oxidized_chiseled_copper"
+  ],
+  "oxidized_copper.png": [
+    "minecraft:oxidized_copper"
+  ],
+  "oxidized_copper_bulb.png": [
+    "minecraft:oxidized_copper_bulb"
+  ],
+  "oxidized_cut_copper.png": [
+    "minecraft:oxidized_cut_copper",
+    "minecraft:oxidized_cut_copper_slab",
+    "minecraft:oxidized_cut_copper_stairs"
+  ],
+  "packed_ice.png": [
+    "minecraft:packed_ice"
+  ],
+  "packed_mud.png": [
+    "minecraft:packed_mud"
+  ],
+  "pale_moss_block.png": [
+    "minecraft:pale_moss_block"
+  ],
+  "pale_oak_log.png": [
+    "minecraft:pale_oak_log",
+    "minecraft:pale_oak_wood"
+  ],
+  "pale_oak_planks.png": [
+    "minecraft:pale_oak_planks",
+    "minecraft:pale_oak_slab",
+    "minecraft:pale_oak_button",
+    "minecraft:pale_oak_stairs",
+    "minecraft:pale_oak_fence_gate",
+    "minecraft:pale_oak_pressure_plate"
+  ],
+  "pearlescent_froglight_side.png": [
+    "minecraft:pearlescent_froglight"
+  ],
+  "pearlescent_froglight_top.png": [
+    "minecraft:pearlescent_froglight"
+  ],
+  "pink_concrete.png": [
+    "minecraft:pink_concrete"
+  ],
+  "pink_concrete_powder.png": [
+    "minecraft:pink_concrete_powder"
+  ],
+  "pink_glazed_terracotta.png": [
+    "minecraft:pink_glazed_terracotta"
+  ],
+  "pink_stained_glass.png": [
+    "minecraft:pink_stained_glass"
+  ],
+  "pink_terracotta.png": [
+    "minecraft:pink_terracotta"
+  ],
+  "pink_wool.png": [
+    "minecraft:pink_wool",
+    "minecraft:pink_carpet"
+  ],
+  "piston_side.png": [
+    "minecraft:piston",
+    "minecraft:sticky_piston"
+  ],
+  "piston_top.png": [
+    "minecraft:piston"
+  ],
+  "piston_top_sticky.png": [
+    "minecraft:sticky_piston"
+  ],
+  "podzol_top.png": [
+    "minecraft:podzol"
+  ],
+  "polished_andesite.png": [
+    "minecraft:polished_andesite",
+    "minecraft:polished_andesite_slab",
+    "minecraft:polished_andesite_stairs"
+  ],
+  "polished_basalt_side.png": [
+    "minecraft:polished_basalt"
+  ],
+  "polished_basalt_top.png": [
+    "minecraft:polished_basalt"
+  ],
+  "polished_blackstone.png": [
+    "minecraft:polished_blackstone",
+    "minecraft:polished_blackstone_slab",
+    "minecraft:polished_blackstone_button",
+    "minecraft:polished_blackstone_stairs",
+    "minecraft:polished_blackstone_pressure_plate"
+  ],
+  "polished_blackstone_bricks.png": [
+    "minecraft:polished_blackstone_bricks",
+    "minecraft:polished_blackstone_brick_slab",
+    "minecraft:polished_blackstone_brick_stairs"
+  ],
+  "polished_cinnabar.png": [
+    "minecraft:polished_cinnabar",
+    "minecraft:polished_cinnabar_slab",
+    "minecraft:polished_cinnabar_stairs"
+  ],
+  "polished_deepslate.png": [
+    "minecraft:polished_deepslate",
+    "minecraft:polished_deepslate_slab",
+    "minecraft:polished_deepslate_stairs"
+  ],
+  "polished_diorite.png": [
+    "minecraft:polished_diorite",
+    "minecraft:polished_diorite_slab",
+    "minecraft:polished_diorite_stairs"
+  ],
+  "polished_granite.png": [
+    "minecraft:polished_granite",
+    "minecraft:polished_granite_slab",
+    "minecraft:polished_granite_stairs"
+  ],
+  "polished_sulfur.png": [
+    "minecraft:polished_sulfur",
+    "minecraft:polished_sulfur_slab",
+    "minecraft:polished_sulfur_stairs"
+  ],
+  "polished_tuff.png": [
+    "minecraft:polished_tuff",
+    "minecraft:polished_tuff_slab",
+    "minecraft:polished_tuff_stairs"
+  ],
+  "potent_sulfur.png": [
+    "minecraft:potent_sulfur"
+  ],
+  "prismarine.png": [
+    "minecraft:prismarine",
+    "minecraft:prismarine_slab",
+    "minecraft:prismarine_stairs"
+  ],
+  "prismarine_bricks.png": [
+    "minecraft:prismarine_bricks",
+    "minecraft:prismarine_brick_slab",
+    "minecraft:prismarine_brick_stairs"
+  ],
+  "pumpkin_side.png": [
+    "minecraft:carved_pumpkin",
+    "minecraft:jack_o_lantern"
+  ],
+  "pumpkin_top.png": [
+    "minecraft:carved_pumpkin",
+    "minecraft:jack_o_lantern"
+  ],
+  "purple_concrete.png": [
+    "minecraft:purple_concrete"
+  ],
+  "purple_concrete_powder.png": [
+    "minecraft:purple_concrete_powder"
+  ],
+  "purple_glazed_terracotta.png": [
+    "minecraft:purple_glazed_terracotta"
+  ],
+  "purple_stained_glass.png": [
+    "minecraft:purple_stained_glass"
+  ],
+  "purple_terracotta.png": [
+    "minecraft:purple_terracotta"
+  ],
+  "purple_wool.png": [
+    "minecraft:purple_wool",
+    "minecraft:purple_carpet"
+  ],
+  "purpur_block.png": [
+    "minecraft:purpur_block",
+    "minecraft:purpur_slab",
+    "minecraft:purpur_stairs"
+  ],
+  "purpur_pillar_side.png": [
+    "minecraft:purpur_pillar"
+  ],
+  "purpur_pillar_top.png": [
+    "minecraft:purpur_pillar"
+  ],
+  "quartz_block_bottom.png": [
+    "minecraft:smooth_quartz",
+    "minecraft:smooth_quartz_slab",
+    "minecraft:smooth_quartz_stairs"
+  ],
+  "quartz_block_side.png": [
+    "minecraft:quartz_slab",
+    "minecraft:quartz_block",
+    "minecraft:quartz_stairs"
+  ],
+  "quartz_block_top.png": [
+    "minecraft:quartz_slab",
+    "minecraft:quartz_block",
+    "minecraft:quartz_stairs"
+  ],
+  "quartz_pillar_side.png": [
+    "minecraft:quartz_pillar"
+  ],
+  "raw_copper_block.png": [
+    "minecraft:raw_copper_block"
+  ],
+  "raw_gold_block.png": [
+    "minecraft:raw_gold_block"
+  ],
+  "raw_iron_block.png": [
+    "minecraft:raw_iron_block"
+  ],
+  "red_concrete.png": [
+    "minecraft:red_concrete"
+  ],
+  "red_concrete_powder.png": [
+    "minecraft:red_concrete_powder"
+  ],
+  "red_glazed_terracotta.png": [
+    "minecraft:red_glazed_terracotta"
+  ],
+  "red_mushroom_block.png": [
+    "minecraft:red_mushroom_block"
+  ],
+  "red_nether_bricks.png": [
+    "minecraft:red_nether_bricks",
+    "minecraft:red_nether_brick_slab",
+    "minecraft:red_nether_brick_stairs"
+  ],
+  "red_sand.png": [
+    "minecraft:red_sand"
+  ],
+  "red_sandstone.png": [
+    "minecraft:red_sandstone",
+    "minecraft:red_sandstone_slab",
+    "minecraft:red_sandstone_stairs"
+  ],
+  "red_sandstone_bottom.png": [
+    "minecraft:red_sandstone",
+    "minecraft:red_sandstone_slab",
+    "minecraft:red_sandstone_stairs"
+  ],
+  "red_sandstone_top.png": [
+    "minecraft:red_sandstone",
+    "minecraft:cut_red_sandstone",
+    "minecraft:red_sandstone_slab",
+    "minecraft:red_sandstone_stairs",
+    "minecraft:smooth_red_sandstone",
+    "minecraft:chiseled_red_sandstone",
+    "minecraft:cut_red_sandstone_slab",
+    "minecraft:smooth_red_sandstone_slab",
+    "minecraft:smooth_red_sandstone_stairs"
+  ],
+  "red_stained_glass.png": [
+    "minecraft:red_stained_glass"
+  ],
+  "red_terracotta.png": [
+    "minecraft:red_terracotta"
+  ],
+  "red_wool.png": [
+    "minecraft:red_wool",
+    "minecraft:red_carpet"
+  ],
+  "redstone_block.png": [
+    "minecraft:redstone_block"
+  ],
+  "redstone_lamp.png": [
+    "minecraft:redstone_lamp"
+  ],
+  "redstone_ore.png": [
+    "minecraft:redstone_ore"
+  ],
+  "reinforced_deepslate_bottom.png": [
+    "minecraft:reinforced_deepslate"
+  ],
+  "reinforced_deepslate_side.png": [
+    "minecraft:reinforced_deepslate"
+  ],
+  "reinforced_deepslate_top.png": [
+    "minecraft:reinforced_deepslate"
+  ],
+  "resin_block.png": [
+    "minecraft:resin_block"
+  ],
+  "resin_bricks.png": [
+    "minecraft:resin_bricks",
+    "minecraft:resin_brick_slab",
+    "minecraft:resin_brick_stairs"
+  ],
+  "rooted_dirt.png": [
+    "minecraft:rooted_dirt"
+  ],
+  "sand.png": [
+    "minecraft:sand"
+  ],
+  "sandstone.png": [
+    "minecraft:sandstone",
+    "minecraft:sandstone_slab",
+    "minecraft:sandstone_stairs"
+  ],
+  "sandstone_bottom.png": [
+    "minecraft:sandstone",
+    "minecraft:sandstone_slab",
+    "minecraft:sandstone_stairs"
+  ],
+  "sandstone_top.png": [
+    "minecraft:sandstone",
+    "minecraft:cut_sandstone",
+    "minecraft:sandstone_slab",
+    "minecraft:sandstone_stairs",
+    "minecraft:smooth_sandstone",
+    "minecraft:chiseled_sandstone",
+    "minecraft:cut_sandstone_slab",
+    "minecraft:smooth_sandstone_slab",
+    "minecraft:smooth_sandstone_stairs"
+  ],
+  "sculk.png": [
+    "minecraft:sculk"
+  ],
+  "sculk_catalyst_bottom.png": [
+    "minecraft:sculk_catalyst"
+  ],
+  "sculk_catalyst_side.png": [
+    "minecraft:sculk_catalyst"
+  ],
+  "sea_lantern.png": [
+    "minecraft:sea_lantern"
+  ],
+  "shroomlight.png": [
+    "minecraft:shroomlight"
+  ],
+  "smithing_table_bottom.png": [
+    "minecraft:smithing_table"
+  ],
+  "smithing_table_front.png": [
+    "minecraft:smithing_table"
+  ],
+  "smithing_table_top.png": [
+    "minecraft:smithing_table"
+  ],
+  "smoker_bottom.png": [
+    "minecraft:smoker"
+  ],
+  "smoker_side.png": [
+    "minecraft:smoker"
+  ],
+  "smoker_top.png": [
+    "minecraft:smoker"
+  ],
+  "smooth_basalt.png": [
+    "minecraft:smooth_basalt"
+  ],
+  "smooth_stone.png": [
+    "minecraft:smooth_stone",
+    "minecraft:smooth_stone_slab"
+  ],
+  "smooth_stone_slab_side.png": [
+    "minecraft:smooth_stone_slab"
+  ],
+  "snow.png": [
+    "minecraft:snow_block"
+  ],
+  "soul_sand.png": [
+    "minecraft:soul_sand"
+  ],
+  "soul_soil.png": [
+    "minecraft:soul_soil"
+  ],
+  "sponge.png": [
+    "minecraft:sponge"
+  ],
+  "spruce_log.png": [
+    "minecraft:spruce_log",
+    "minecraft:spruce_wood"
+  ],
+  "spruce_planks.png": [
+    "minecraft:spruce_planks",
+    "minecraft:spruce_slab",
+    "minecraft:spruce_button",
+    "minecraft:spruce_stairs",
+    "minecraft:spruce_fence_gate",
+    "minecraft:spruce_pressure_plate"
+  ],
+  "stone.png": [
+    "minecraft:stone",
+    "minecraft:stone_slab",
+    "minecraft:stone_button",
+    "minecraft:stone_stairs",
+    "minecraft:stone_pressure_plate"
+  ],
+  "stone_bricks.png": [
+    "minecraft:stone_bricks",
+    "minecraft:stone_brick_slab",
+    "minecraft:stone_brick_stairs"
+  ],
+  "stripped_acacia_log.png": [
+    "minecraft:stripped_acacia_log",
+    "minecraft:stripped_acacia_wood"
+  ],
+  "stripped_acacia_log_top.png": [
+    "minecraft:stripped_acacia_log"
+  ],
+  "stripped_bamboo_block.png": [
+    "minecraft:stripped_bamboo_block"
+  ],
+  "stripped_bamboo_block_top.png": [
+    "minecraft:stripped_bamboo_block"
+  ],
+  "stripped_birch_log.png": [
+    "minecraft:stripped_birch_log",
+    "minecraft:stripped_birch_wood"
+  ],
+  "stripped_birch_log_top.png": [
+    "minecraft:stripped_birch_log"
+  ],
+  "stripped_cherry_log.png": [
+    "minecraft:stripped_cherry_log",
+    "minecraft:stripped_cherry_wood"
+  ],
+  "stripped_cherry_log_top.png": [
+    "minecraft:stripped_cherry_log"
+  ],
+  "stripped_crimson_stem.png": [
+    "minecraft:stripped_crimson_stem",
+    "minecraft:stripped_crimson_hyphae"
+  ],
+  "stripped_crimson_stem_top.png": [
+    "minecraft:stripped_crimson_stem"
+  ],
+  "stripped_dark_oak_log.png": [
+    "minecraft:stripped_dark_oak_log",
+    "minecraft:stripped_dark_oak_wood"
+  ],
+  "stripped_dark_oak_log_top.png": [
+    "minecraft:stripped_dark_oak_log"
+  ],
+  "stripped_jungle_log.png": [
+    "minecraft:stripped_jungle_log",
+    "minecraft:stripped_jungle_wood"
+  ],
+  "stripped_jungle_log_top.png": [
+    "minecraft:stripped_jungle_log"
+  ],
+  "stripped_mangrove_log.png": [
+    "minecraft:stripped_mangrove_log",
+    "minecraft:stripped_mangrove_wood"
+  ],
+  "stripped_mangrove_log_top.png": [
+    "minecraft:stripped_mangrove_log"
+  ],
+  "stripped_oak_log.png": [
+    "minecraft:stripped_oak_log",
+    "minecraft:stripped_oak_wood"
+  ],
+  "stripped_oak_log_top.png": [
+    "minecraft:stripped_oak_log"
+  ],
+  "stripped_pale_oak_log.png": [
+    "minecraft:stripped_pale_oak_log",
+    "minecraft:stripped_pale_oak_wood"
+  ],
+  "stripped_pale_oak_log_top.png": [
+    "minecraft:stripped_pale_oak_log"
+  ],
+  "stripped_spruce_log.png": [
+    "minecraft:stripped_spruce_log",
+    "minecraft:stripped_spruce_wood"
+  ],
+  "stripped_spruce_log_top.png": [
+    "minecraft:stripped_spruce_log"
+  ],
+  "stripped_warped_stem.png": [
+    "minecraft:stripped_warped_stem",
+    "minecraft:stripped_warped_hyphae"
+  ],
+  "stripped_warped_stem_top.png": [
+    "minecraft:stripped_warped_stem"
+  ],
+  "sulfur.png": [
+    "minecraft:sulfur",
+    "minecraft:sulfur_slab",
+    "minecraft:sulfur_stairs"
+  ],
+  "sulfur_bricks.png": [
+    "minecraft:sulfur_bricks",
+    "minecraft:sulfur_brick_slab",
+    "minecraft:sulfur_brick_stairs"
+  ],
+  "target_side.png": [
+    "minecraft:target"
+  ],
+  "target_top.png": [
+    "minecraft:target"
+  ],
+  "terracotta.png": [
+    "minecraft:terracotta"
+  ],
+  "tinted_glass.png": [
+    "minecraft:tinted_glass"
+  ],
+  "tnt_bottom.png": [
+    "minecraft:tnt"
+  ],
+  "tnt_side.png": [
+    "minecraft:tnt"
+  ],
+  "tnt_top.png": [
+    "minecraft:tnt"
+  ],
+  "tube_coral_block.png": [
+    "minecraft:tube_coral_block"
+  ],
+  "tuff.png": [
+    "minecraft:tuff",
+    "minecraft:tuff_slab",
+    "minecraft:tuff_stairs"
+  ],
+  "tuff_bricks.png": [
+    "minecraft:tuff_bricks",
+    "minecraft:tuff_brick_slab",
+    "minecraft:tuff_brick_stairs"
+  ],
+  "verdant_froglight_side.png": [
+    "minecraft:verdant_froglight"
+  ],
+  "verdant_froglight_top.png": [
+    "minecraft:verdant_froglight"
+  ],
+  "warped_nylium.png": [
+    "minecraft:warped_nylium"
+  ],
+  "warped_planks.png": [
+    "minecraft:warped_planks",
+    "minecraft:warped_slab",
+    "minecraft:warped_button",
+    "minecraft:warped_stairs",
+    "minecraft:warped_fence_gate",
+    "minecraft:warped_pressure_plate"
+  ],
+  "warped_stem.png": [
+    "minecraft:warped_stem",
+    "minecraft:warped_hyphae"
+  ],
+  "warped_wart_block.png": [
+    "minecraft:warped_wart_block"
+  ],
+  "weathered_chiseled_copper.png": [
+    "minecraft:weathered_chiseled_copper"
+  ],
+  "weathered_copper.png": [
+    "minecraft:weathered_copper"
+  ],
+  "weathered_copper_bulb.png": [
+    "minecraft:weathered_copper_bulb"
+  ],
+  "weathered_cut_copper.png": [
+    "minecraft:weathered_cut_copper",
+    "minecraft:weathered_cut_copper_slab",
+    "minecraft:weathered_cut_copper_stairs"
+  ],
+  "wet_sponge.png": [
+    "minecraft:wet_sponge"
+  ],
+  "white_concrete.png": [
+    "minecraft:white_concrete"
+  ],
+  "white_concrete_powder.png": [
+    "minecraft:white_concrete_powder"
+  ],
+  "white_glazed_terracotta.png": [
+    "minecraft:white_glazed_terracotta"
+  ],
+  "white_stained_glass.png": [
+    "minecraft:white_stained_glass"
+  ],
+  "white_terracotta.png": [
+    "minecraft:white_terracotta"
+  ],
+  "white_wool.png": [
+    "minecraft:white_wool",
+    "minecraft:white_carpet"
+  ],
+  "yellow_concrete.png": [
+    "minecraft:yellow_concrete"
+  ],
+  "yellow_concrete_powder.png": [
+    "minecraft:yellow_concrete_powder"
+  ],
+  "yellow_glazed_terracotta.png": [
+    "minecraft:yellow_glazed_terracotta"
+  ],
+  "yellow_stained_glass.png": [
+    "minecraft:yellow_stained_glass"
+  ],
+  "yellow_terracotta.png": [
+    "minecraft:yellow_terracotta"
+  ],
+  "yellow_wool.png": [
+    "minecraft:yellow_wool",
+    "minecraft:yellow_carpet"
+  ]
+}

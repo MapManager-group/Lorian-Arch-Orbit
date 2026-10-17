@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "package": "com.davidblackcn.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "minVersion": "0.8",
+  "client": [
+    "client.PaletteScreenMixin",
+    "client.PaletteGraphicsMixin",
+    "client.MinecraftPickMixin",
+    "client.BlockStateRenderShapeMixin",
+    "client.ClientLevelBreakingEffectMixin",
+    "client.ChestRendererMixin",
+    "client.compat.ObeChestModelMixin",
+    "client.EndPortalRendererMixin",
+    "client.GlassPaneFaceCullingMixin"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

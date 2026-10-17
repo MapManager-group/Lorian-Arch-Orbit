@@ -1,0 +1,92 @@
+- ✨ feat(palette): add new gradient color options and temporary color wheel feature
+- ✨ feat(compat): add optional Radial 3.1.x integration for Minecraft 26.2
+- ✨ feat(input): arbitrate a shared R key from current palette eligibility while preserving independently bound keys
+- ✨ feat(radial): add the localized Pick Item slot mode with component-aware item parsing
+- ♻️ refactor(inventory): share creative selected-slot synchronization without `/give` permissions
+- 🏗️ build(core): establish the 0.1.0-alpha Fabric and NeoForge project foundation
+- ✨ feat(core): add the shared feature lifecycle and state management foundation
+- ✨ feat(config): add safe versioned configuration and shared YACL settings
+- ✨ feat(interaction): add shared gesture, wheel arbitration, and adaptive radial HUD foundations
+- ✨ feat(palette): add two-layer component-aware item wheels and an in-game palette editor
+- 🐛 fix(palette): prevent duplicate background blur when opening the palette editor
+- ✨ feat(palette): refine adaptive transparent wheels with immediate opening and exclusive scrolling
+- ✨ feat(palette): enlarge wheel visuals and animate directional scrolling with a 20-item recommendation
+- ✨ feat(palette): show every wheel member and redesign the editor with creative tabs, live preview, and overflow-safe member rows
+- ✨ feat(palette): add configurable built-in wood presets and animated editor interactions
+- ✨ feat(palette): add layered fallback presets for wood, color, copper, stone, and building families
+- 🐛 fix(editor): make creative-tab arrow clicks visibly respond after page changes
+- ✨ feat(palette): complete dyed material defaults with beds, banners, uncolored bases, and stone-family variants
+- ✨ feat(editor): add draggable item and group scrollbars with a taller responsive group list
+- ✨ feat(palette): add versioned clipboard and JSON sharing with previewed conflict-safe imports
+- ✨ feat(smart-pick): add component-aware adjacent, range, and context wheels while preserving vanilla short-press picking
+- 🔧 feat(config): add configurable smart-pick timing, scan limits, history weighting, and opt-in performance statistics
+- 🐛 fix(smart-pick): defer vanilla pick-key binding until client options finish initializing
+- ✨ feat(smart-pick): open the candidate wheel immediately on pick-key press without a long-press delay
+- 🐛 fix(smart-pick): use a brief intent delay so vanilla middle-click taps never flash the candidate wheel
+- 🐛 fix(smart-pick): execute vanilla pick immediately, then open the wheel only after the 100 ms hold intent
+- ✨ feat(reach): add server-authorized block reach adjustment with a hold shortcut, scroll control, and crosshair HUD
+- 🔒 feat(network): validate reach requests with protocol negotiation, permissions, rate limits, and lifecycle cleanup
+- 🐛 fix(network): prevent duplicate reach payload registration during Fabric client startup
+- 🐛 fix(reach): prevent saved values and rate limiting from causing abrupt distance jumps while scrolling
+- ✨ feat(reach): allow vanilla five-block reach and show a transparent compact distance HUD
+- 🐛 fix(reach): hot-reload server reach settings and resync capabilities to connected players
+- ✨ feat(connected-textures): repair missing connection faces for standard-state walls, beds, and doors on Fabric and NeoForge
+- ♻️ refactor(config): migrate the wall visual fix into configurable connected-texture wall, bed, and door options
+- 🐛 fix(connected-textures): reload models safely when toggled and copy source-face UVs for correctly textured connection faces
+- 🐛 fix(connected-textures): source door seam textures from the matching horizontal end face instead of a vertical side
+- 🐛 fix(connected-textures): use each bed foot's colored end texture for both halves of the repaired bed seam
+- 🛠️ ci(build): run the configured shared unit-test task in GitHub Actions before building both loader artifacts
+- ✨ feat(palette): add eight cross-material visual color groups and complete masonry, copper, cinnabar, and sulfur defaults
+- ✨ feat(invisible-blocks): add one shortcut to display barrier and light blocks with independent visibility filters
+- 🐛 fix(invisible-blocks): rebuild extracted geometry immediately, bake two-layer marker models with atlas-local sprite aliases, and report state in the action bar
+- 💄 style(invisible-blocks): use translucent stained-glass backing while preserving barrier marks and per-face light-level indicators
+- 🐛 fix(invisible-blocks): skip vanilla breaking-hit particles for empty-shape barrier and light markers to prevent client crashes
+- 🚀 release(build): prepare reproducible Fabric and NeoForge 1.0.0 artifacts with Minecraft 26.2 in their filenames
+- 💬 fix(localization): align Chinese and English UI text, simplify palette terminology, and honor the configured smart-pick hold threshold
+- 📝 docs(release): add bilingual project overviews, configuration troubleshooting, Preliminary Art Form defaults, and forward/backport guides
+- ⏸️ chore(connected-textures): defer the unreliable retained double-chest joining-face repair pending a later rendering redesign
+- ✨ feat(connected-textures): add independently configurable Nether Portal edge and End Portal non-top face repairs with pixel-exact Nether Portal UV crops
+- 🐛 fix(palette): scale wheel icons down and make the palette editor adapt to compact GUI resolutions without overlapping controls
+- 🐛 fix(editor): space the group and item columns apart and align creative-tab paging with the item scrollbar
+- ✨ feat(editor): show an additional creative category per page and add a draggable member-list scrollbar
+- 🐛 fix(editor): balance creative-tab paging controls and scroll member rows one at a time with edge auto-scroll during drag sorting
+- 🐛 fix(localization): localize the keybinding category name in the controls screen
+- ✨ feat(connected-textures): restore exposed horizontal faces between stacked straight and corner glass panes with an independent default-enabled option
+- 🐛 fix(connected-textures): restore exposed joining faces on orphaned double-chest halves without changing their block state
+- 🐛 fix(connected-textures): detect orphaned chest halves through Vanilla combine results and map cap UVs by matching face corners
+- 🐛 fix(connected-textures): replace orphan chest cap overlays with sealed Vanilla-compatible double-chest models
+- 🧪 test(connected-textures): add production chest-render counters, one-shot logs, and forced sealed-model diagnostics
+- 🐛 fix(connected-textures): render double-chest connection caps with Vanilla face UVs and opposite-half sprites
+- 🧹 chore(connected-textures): remove temporary production chest diagnostics after in-game validation
+- 🐛 fix(ui): adapt palette wheels and workbench screens to window sizes and GUI scales
+- 🐛 fix(editor): keep item browsing safe before joining a world on Minecraft 26.2
+- 🐛 fix(ui): reserve palette wheel clearance for top HUD overlays and hotbar item names
+- ✨ feat(palette): add an animated green target arrow and configurable target position
+- 🐛 fix(palette): decouple target arrow motion from wheel rotation and use a muted green triangle
+- 💄 style(palette): redraw the target marker as a dark green notched arrowhead with beveled pixel edges
+- ✨ feat(palette): add selectable Pointer and Shift indicators with Shift as the default
+- ✨ feat(editor): unify editor navigation and retain wheel drafts and gradient work across pages
+- 💄 style(editor): organize wheel actions into menus and arrange gradient settings and results with compact tabs
+- ✨ feat(gradient): add node overview, position-based replacement and locking, and matched-texture tiling previews
+- 💄 style(editor): use compact flat dropdown lists and illustrated translucent home cards with an expandable grid layout
+- 🐛 fix(editor): align dropdowns with their headers and separate pointer and keyboard highlights from current values
+- 💄 style(editor): halve home card dimensions and remove the exit button while retaining Escape confirmation
+- 💄 style(editor): simplify page selection and unify the gradient block picker with the wheel editor item grid
+- 🐛 fix(editor): exit directly with Escape and apply valid gradient counts as they are entered
+- 💄 style(editor): align footer actions, hide unnecessary node arrows, and replace block picker pages with a scrollbar
+- 🐛 fix(gradient): resolve item-specific model faces and missing texture mappings while preserving distinct face candidates
+- ✨ feat(gradient): inspect and select face textures, customize candidate exclusions, and compare retained results
+- ✨ feat(gradient): export and import gradient parameters and candidate palettes through separate JSON files or the clipboard
+- 💄 style(gradient): show translucent color nodes in rows of eight with unobscured color bars
+- ✨ feat(gradient): select block faces and texture variants directly in the picker sidebar
+- ✨ feat(palette): add default Vanilla and None indicators, unify map-green arrow colors, and refine Pointer pixels
+- 💄 style(palette): smoothly emphasize target items and align temporary wheel labels with permanent wheels
+- 💄 style(palette): enlarge Vanilla indicators with crisp two-times pixel scaling
+- ✨ feat(palette): add configurable clockwise or counterclockwise scrolling for all palette wheels and editor previews, preserving the original direction by default
+- 🐛 fix(palette): center overflow windows on the selected item so adjacent previews match actual scrolling in both directions
+- 🐛 fix(connected-textures): repair closed double-chest joining faces in Optimized Block Entities terrain models while preserving chest animation and optimization
+- 💄 style(palette): redraw Vanilla, Arrow and Pointer on a shared pixel grid with matching indicator sizes
+- 💄 style(palette): refine Arrow with a distinct arrowhead and stem and Pointer with a recognizable hand silhouette
+- 🐛 fix(palette): restore the original Vanilla map-marker pixels at exact double size instead of the rounded redraw
+- ✨ feat(migration): support Minecraft 26.3 on Fabric and NeoForge while preserving existing configuration, reach protocol, palette presets and sharing formats
+- 🐛 fix(gradient): use Minecraft 26.2 HueBlocks data when 26.3 data is unavailable, show its source and switch safely when native data becomes available
