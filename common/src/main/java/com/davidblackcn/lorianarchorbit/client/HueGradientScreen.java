@@ -336,9 +336,11 @@ final class HueGradientScreen extends WorkbenchScreen {
     @Override protected void renderWorkbench(GuiGraphicsExtractor graphics, int mx, int my, float tick) {
         var l = layout(); graphics.text(font, title, l.left(), 10, 0xFFFFFFFF);
         Component status = !model.conflicts(candidates()).isEmpty() ? work("lock_conflicts")
-                : model.pendingSteps() ? work("pending_count") : !model.valid() ? text("invalid_inputs") : dataStatus();
+                : model.pendingSteps() ? work("pending_count") : !model.valid() ? text("invalid_inputs") : dataStatus(false);
         if (minecraft.level == null) status = Component.translatable("palette_editor.lorian_arch_orbit.world_required");
-        boundedText(graphics, status, l.left(), l.compact() ? 56 : 34,
+        Component statusTooltip = minecraft.level != null && model.conflicts(candidates()).isEmpty()
+                && !model.pendingSteps() && model.valid() ? dataStatus(true) : status;
+        boundedText(graphics, status, statusTooltip, l.left(), l.compact() ? 56 : 34,
                 l.compact() ? l.width() - 154 : l.settingsWidth(), 0xFFFFC14D, mx, my);
         if (!l.compact()) boundedText(graphics, model.samples().isEmpty() ? text("preview")
                 : work("result_count", model.samples().size(), model.results().stream().map(HueGradient.Candidate::itemId).distinct().count())
@@ -468,7 +470,7 @@ final class HueGradientScreen extends WorkbenchScreen {
     private void changePage(int delta) { page = Math.clamp(page + delta, 0, maxPage()); }
     private int maxPage() { return Math.max(0, (visibleSamples().size() - 1) / layout().pageSize()); }
     private static boolean inside(int x, int y, int left, int top, int w, int h) { return x >= left && x < left + w && y >= top && y < top + h; }
-    private Component dataStatus() {
+    private Component dataStatus(boolean includeSkipped) {
         var repository = HueBlocksRuntime.repository();
         if (repository.checking()) return text(repository.data() == null ? "loading" : "checking_cached");
         if (repository.failed()) return text(repository.data() == null ? "local_failed" : "local_cached");
@@ -478,7 +480,7 @@ final class HueGradientScreen extends WorkbenchScreen {
         var keys = HueBlocksRuntime.candidates().stream().map(HueGradient.Candidate::key).collect(Collectors.toSet());
         long missing = model.nodes.stream().filter(node -> node.pinned != null && !keys.contains(node.pinned.key())).count();
         if (missing > 0) status = status.copy().append("; ").append(text("local_missing_nodes", missing));
-        if (!repository.skipped().isEmpty()) {
+        if (includeSkipped && !repository.skipped().isEmpty()) {
             status = status.copy().append("; ").append(text("local_skipped"));
             for (var entry : new java.util.TreeMap<>(repository.skipped()).entrySet())
                 status = status.copy().append(" ").append(text("skip." + entry.getKey(), entry.getValue()));

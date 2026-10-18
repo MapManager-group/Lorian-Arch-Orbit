@@ -93,7 +93,7 @@
   "config.lorian_arch_orbit.palette_wheel.secondary_default_preset.description": "Select the built-in layout used for a new secondary wheel file and Restore Defaults. Existing custom content is not overwritten.",
   "config.lorian_arch_orbit.palette_wheel.preset.item_tag_a": "Block types",
   "config.lorian_arch_orbit.palette_wheel.preset.item_tag_b": "Block families",
-  "config.lorian_arch_orbit.palette_wheel.preset.color_categories": "Color categories",
+  "config.lorian_arch_orbit.palette_wheel.preset.color_categories": "Block Color Gradients",
   "config.lorian_arch_orbit.palette_wheel.editor.name": "Building editors",
   "config.lorian_arch_orbit.palette_wheel.editor.button": "Open editor",
   "config.lorian_arch_orbit.palette_wheel.editor.description": "Open the editor home to choose palette editing or gradient matching.",

@@ -21,7 +21,7 @@ public final class GradientWorkbench {
     public int selectedNode;
     public boolean oklab = true;
     public String face = "all";
-    public String palette = "all";
+    public String palette = "build";
     public GroupRef sourceGroup;
     public GroupRef targetGroup;
     public final java.util.Set<String> excluded = new java.util.HashSet<>();

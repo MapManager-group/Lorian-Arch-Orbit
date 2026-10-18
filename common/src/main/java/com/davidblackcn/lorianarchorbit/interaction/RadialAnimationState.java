@@ -35,8 +35,8 @@ public final class RadialAnimationState {
         if (mode == RadialAnimationMode.EXPAND || visibleCount == 1) {
             return easeOut(global);
         }
-        double delay = ((double) visibleIndex / visibleCount) * CLOCKWISE_DELAY_PORTION;
-        double local = clamp((global - delay) / (1.0 - delay));
+        double delay = ((double) visibleIndex / (visibleCount - 1)) * CLOCKWISE_DELAY_PORTION;
+        double local = clamp((global - delay) / (1.0 - CLOCKWISE_DELAY_PORTION));
         return easeOut(local);
     }
 

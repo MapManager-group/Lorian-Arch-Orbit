@@ -11,6 +11,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class GradientRecipeTest {
     private final HueGradient.Candidate candidate = new HueGradient.Candidate("minecraft:stone",
             new HueBlocksData.Block("stone.png", 0x808080, HueColor.fromRgb(0x808080), Set.of("north")));
+    @Test void newWorkbenchUsesBuildButSavedPaletteChoiceSurvives() {
+        var state = new GradientWorkbench(); assertEquals("build", state.palette);
+        state.palette = "all";
+        var recipe = GradientRecipe.decode(GradientRecipe.encode(state, false));
+        var restored = new GradientWorkbench(); recipe.apply(restored, List.of());
+        assertEquals("all", restored.palette);
+    }
     @Test void parametersAndExclusionsRoundTripWithoutResultsOrLocks() {
         var source = new GradientWorkbench(); source.setBlock(candidate); source.oklab = false; source.face = "north";
         source.palette = "group"; source.sourceGroup = new GroupRef(false, "a-stable-id");

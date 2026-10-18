@@ -93,7 +93,7 @@
   "config.lorian_arch_orbit.palette_wheel.secondary_default_preset.description": "选择新建二级色轮文件和编辑器“恢复默认”使用的内置布局；不会覆盖已自定义内容。",
   "config.lorian_arch_orbit.palette_wheel.preset.item_tag_a": "同类方块",
   "config.lorian_arch_orbit.palette_wheel.preset.item_tag_b": "同系列方块",
-  "config.lorian_arch_orbit.palette_wheel.preset.color_categories": "颜色分类",
+  "config.lorian_arch_orbit.palette_wheel.preset.color_categories": "方块色系渐变",
   "config.lorian_arch_orbit.palette_wheel.editor.name": "建筑编辑器",
   "config.lorian_arch_orbit.palette_wheel.editor.button": "打开编辑器",
   "config.lorian_arch_orbit.palette_wheel.editor.description": "打开编辑器首页，选择色轮编辑或渐变配色。",

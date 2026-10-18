@@ -66,7 +66,7 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
         PaletteAnimation animation = JsonConfigSupport.enumValue(
                 palette,
                 "animation",
-                PaletteAnimation.CLOCKWISE,
+                PaletteAnimation.EXPAND,
                 PaletteAnimation.class,
                 "features.palette_wheel.animation",
                 warnings
@@ -93,7 +93,7 @@ public final class ClientConfigCodec implements ConfigCodec<ClientConfigSnapshot
         PalettePreset primaryPreset = JsonConfigSupport.enumValue(
                 palette,
                 "primary_default_preset",
-                PalettePreset.ITEM_TAG_A,
+                PalettePreset.COLOR_CATEGORIES,
                 PalettePreset.class,
                 "features.palette_wheel.primary_default_preset",
                 warnings

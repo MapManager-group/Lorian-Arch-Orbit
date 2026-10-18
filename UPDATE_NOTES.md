@@ -96,3 +96,8 @@
 - ✨ feat(palette): add an unbound hold shortcut for temporary palettes
 - 🐛 fix(editor): restore custom mouse selection, right-click removal and dragging on Minecraft 26.3
 - ✨ feat(palette): add 87 new Minecraft 26.3 block items to color categories while preserving existing order
+- ✨ feat(defaults): use building-friendly gradients, Block Color Gradients primary wheels and EXPAND for new configurations
+- 💄 style(gradient): keep skipped-resource details in hover tooltips instead of the status line
+- 🐛 fix(animation): give CLOCKWISE entries uniform stagger intervals and expansion durations
+- 🐛 fix(radial): reserve shared wheel keys for nonempty main hands even when the next palette layer is missing
+- 🔖 chore(release): bump mod version to 1.2.0

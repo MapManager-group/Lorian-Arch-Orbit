@@ -136,12 +136,17 @@ public abstract class AdaptivePaletteScreen extends Screen {
 
     protected final void boundedText(GuiGraphicsExtractor graphics, Component text, int x, int y, int maxWidth,
                                      int color, int mouseX, int mouseY) {
+        boundedText(graphics, text, null, x, y, maxWidth, color, mouseX, mouseY);
+    }
+
+    protected final void boundedText(GuiGraphicsExtractor graphics, Component text, Component tooltip,
+                                     int x, int y, int maxWidth, int color, int mouseX, int mouseY) {
         String value = text.getString();
         boolean truncated = font.width(value) > maxWidth;
         String shown = truncated ? font.plainSubstrByWidth(value, Math.max(0, maxWidth - font.width("…"))) + "…" : value;
         graphics.text(font, shown, x, y, color);
-        if (truncated && mouseX >= x && mouseX < x + maxWidth && mouseY >= y && mouseY < y + font.lineHeight) {
-            graphics.setTooltipForNextFrame(font, font.split(text, Math.max(40, width - 24)), mouseX, mouseY);
+        if ((truncated || tooltip != null) && mouseX >= x && mouseX < x + maxWidth && mouseY >= y && mouseY < y + font.lineHeight) {
+            graphics.setTooltipForNextFrame(font, font.split(tooltip == null ? text : tooltip, Math.max(40, width - 24)), mouseX, mouseY);
         }
     }
 }

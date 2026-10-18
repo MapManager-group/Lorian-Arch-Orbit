@@ -20,8 +20,8 @@
 
 - `features.<功能>.enabled`：独立开关。
 - `features.reach_extension.distance`：请求距离，范围 5–128，最终值由服务端确认。
-- `features.palette_wheel.animation`：`clockwise`、`expand` 或 `none`。
-- `features.palette_wheel.primary_default_preset` / `secondary_default_preset`：`item_tag_a`（同类方块）、`item_tag_b`（同系列方块）或 `color_categories`（颜色分类）。这些内部枚举名为兼容已有配置而保留，界面不显示开发代号。
+- `features.palette_wheel.animation`：`clockwise`、`expand` 或 `none`，新配置默认 `expand`。
+- `features.palette_wheel.primary_default_preset` / `secondary_default_preset`：`item_tag_a`（同类方块）、`item_tag_b`（同系列方块）或 `color_categories`（方块色系渐变）。新配置的一级默认 `color_categories`，二级默认 `item_tag_b`；已有选择保留。这些内部枚举名为兼容已有配置而保留，界面不显示开发代号。
 - `features.smart_pick.mode`：`adjacent`、`range` 或 `context`。
 - `features.connected_texture_fix.walls|beds|doors|glass_panes|chests|pistons|nether_portals|end_portals`：各类连接面修复开关；箱子修复保留双箱状态的半箱裸露连接面；活塞修复伸出的普通与粘性活塞底座和活塞头之间的连接截面，两个传送门修复可独立开关且默认开启。此前的单一 `portals` 字段会作为两个新开关的默认值。
 - `features.invisible_blocks.currently_visible`：上次显示状态；`show_barriers` 与 `show_light_blocks` 控制类型。
