@@ -16,3 +16,12 @@ Code Review: PASS WITH RISKS
 The Architectury development transformer can retain non-daemon threads after the client stops; Fabric then reports its shutdown watchdog. Test verdicts above are explicit assertions emitted before shutdown, not the launch task exit status. Not every resolution, third-party resource pack or Radial macro composition was manually exercised.
 
 NeoForge 26.3.0.41-beta editor fixture: INTERACTION_SMOKE PASS (selection, reorder, left/right/middle behavior). All 87 new obtainable block-state item IDs are present; existing member order and non-color presets were checked against Git HEAD.
+
+## Radial editor regression (2026-10-18)
+
+- Real-client fixture now opens the mode dropdown, selects the registered pick-item mode through mouse events, opens its target picker, closes it and asserts that the populated editor returns.
+- Runtime assertions: PASS with Radial 3.2.2+26.3. This includes the existing independent-target and item-component checks.
+- `./gradlew.bat build --offline`: PASS with JDK 25.0.3. `git diff --check`: PASS.
+- These are automated client event checks, not manual mouse QA. The development shutdown-watchdog limitation above still applies; launch task exit status is not reported as success.
+- The existing 26.3 implementation already uses the 3.2 editor API; no production-code fix was needed. Only the regression fixture and this report changed. Release update notes are not applicable to this test-only change.
+- Code Review: PASS WITH RISKS (development shutdown limitation only); no BLOCKER/MAJOR findings.
