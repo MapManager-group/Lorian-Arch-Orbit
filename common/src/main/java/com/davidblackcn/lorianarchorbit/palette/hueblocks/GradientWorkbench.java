@@ -35,6 +35,22 @@ public final class GradientWorkbench {
     public Comparison snapshot() { return new Comparison(samples, generatedOklab, generatedFace, generatedPalette); }
     public void keepComparison() { if (!samples.isEmpty()) comparison = snapshot(); }
     public void clearComparison() { comparison = null; }
+    private Object resourceSnapshot;
+    /** Rebind live nodes, but preserve immutable comparison samples and missing lock references. */
+    public void bindResources(Object snapshot, List<HueGradient.Candidate> available) {
+        if (snapshot == null) return;
+        boolean changed = resourceSnapshot != null && snapshot != resourceSnapshot;
+        resourceSnapshot = snapshot;
+        for (var node : nodes) if (node.pinned != null) {
+            var replacement = available.stream().filter(c -> c.key().equals(node.pinned.key())).findFirst().orElse(null);
+            if (replacement != null) {
+                changed |= !replacement.equals(node.pinned);
+                node.hex = String.format(java.util.Locale.ROOT, "%06X", replacement.block().rgb());
+                node.pinned = replacement;
+            }
+        }
+        if (changed) invalidate();
+    }
     public boolean allows(HueGradient.Candidate candidate) { return !excluded.contains(candidate.key()); }
     public void exclude(HueGradient.Candidate candidate) { excluded.add(candidate.key()); invalidate(); }
     public void include(HueGradient.Candidate candidate) { if (excluded.remove(candidate.key())) invalidate(); }

@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/** Immutable, validated upstream data. The first blockdata entry is metadata, not a texture. */
+/** Immutable color snapshot. The legacy decoder also supports historical HueBlocks fixtures. */
 public record HueBlocksData(String version, String generatedAt, List<Block> blocks, List<Palette> palettes) {
     private static final Set<String> FACES = Set.of("top", "bottom", "north", "south", "east", "west");
 

@@ -88,3 +88,5 @@
 - 💄 style(palette): redraw Vanilla, Arrow and Pointer on a shared pixel grid with matching indicator sizes
 - 💄 style(palette): refine Arrow with a distinct arrowhead and stem and Pointer with a recognizable hand silhouette
 - 🐛 fix(palette): restore the original Vanilla map-marker pixels at exact double size instead of the rounded redraw
+- ✨ feat(gradient): calculate colors and discover block faces from active local resources without HueBlocks downloads
+- ✨ feat(gradient): support namespaced textures and version 2 gradient exports with version 1 import compatibility

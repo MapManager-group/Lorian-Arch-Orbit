@@ -14,7 +14,7 @@ class GradientRecipeTest {
     @Test void parametersAndExclusionsRoundTripWithoutResultsOrLocks() {
         var source = new GradientWorkbench(); source.setBlock(candidate); source.oklab = false; source.face = "north";
         source.palette = "group"; source.sourceGroup = new GroupRef(false, "a-stable-id");
-        source.excluded.add("minecraft:granite|granite.png"); source.generate(List.of(candidate)); source.replace(2, candidate);
+        source.excluded.add("minecraft:granite|minecraft:block/granite"); source.generate(List.of(candidate)); source.replace(2, candidate);
         var recipe = GradientRecipe.decode(GradientRecipe.encode(source, false));
         var target = new GradientWorkbench(); recipe.apply(target, List.of(candidate));
         assertEquals(candidate, target.nodes.getFirst().pinned); assertEquals("808080", target.nodes.getFirst().hex);

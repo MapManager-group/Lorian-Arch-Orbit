@@ -31,7 +31,7 @@ See the [Color Wheel Guide](docs/PALETTE_GUIDE_en.md) for details.
 - Select textures from different block faces, replace and lock individual results, and inspect tiled textures or compare results
 - Apply results to a **temporary wheel, inventory, or permanent wheel group**; gradient parameters and candidate palettes can also be imported and exported separately
 
-See the [Gradient Guide](docs/GRADIENT_GUIDE_en.md) for details. Color data comes from [HueBlocks](https://github.com/1280px/hueblocks) and needs to be downloaded initially; valid cached data can be used afterward.
+See the [Gradient Guide](docs/GRADIENT_GUIDE_en.md) for details. Colors are calculated locally from active game resources and resource packs. No initial download is required; new blocks using standard models are discovered automatically.
 
 ![Color stop example](./docs/image/颜色节点示例.png)
 
@@ -106,7 +106,7 @@ The configuration, data, migration, and update documents above are currently ava
 
 - [LotTweaks](https://github.com/aruma256/LotTweaks): behavioral reference for color wheels, smart pick, and interaction reach.
 - [Visible Barriers](https://github.com/AmyMialeeMods/visiblebarriers): behavioral reference for invisible-block display.
-- [HueBlocks](https://github.com/1280px/hueblocks): reference for gradient functionality and source of block color data.
+- [HueBlocks](https://github.com/1280px/hueblocks): reference for gradient functionality and historical candidate presets; colors are now calculated locally.
 - The lovely Jiu Hu (酒狐).
 
 ## License

@@ -253,6 +253,7 @@ final class HueGradientScreen extends WorkbenchScreen {
     }
     private List<HueGradient.Candidate> candidates(boolean exclusions) {
         var data = HueBlocksRuntime.repository().data(); if (data == null) return List.of();
+        model.bindResources(data, HueBlocksRuntime.candidates());
         Set<String> textures = null, ids = null;
         if (model.palette.equals("group")) {
             var group = session.wheelState.resolve(model.sourceGroup); if (group == null) return List.of();
@@ -403,7 +404,7 @@ final class HueGradientScreen extends WorkbenchScreen {
         for (int i = tile.first(); i < tile.last(); i++) {
             var sample = model.samples().get(i); String texture = sample.candidate().block().texture();
             var sprite = graphics.getSprite(new SpriteId(TextureAtlas.LOCATION_BLOCKS,
-                    Identifier.withDefaultNamespace("block/" + texture.substring(0, texture.length() - 4))));
+                    Identifier.parse(com.davidblackcn.lorianarchorbit.palette.hueblocks.HueResourceId.texture(texture))));
             for (int cross = tile.firstCross(); cross < tile.lastCross(); cross++) {
                 int along = i * cell - tile.offset(), across = cross * cell - tile.crossOffset();
                 int x = l.resultLeft() + (vertical ? across : along), y = l.previewTop() + (vertical ? along : across);
@@ -469,13 +470,21 @@ final class HueGradientScreen extends WorkbenchScreen {
     private Component dataStatus() {
         var repository = HueBlocksRuntime.repository();
         if (repository.checking()) return text(repository.data() == null ? "loading" : "checking_cached");
-        return switch (repository.state()) {
-            case READY -> candidates().isEmpty() ? text("no_candidates") : text("coverage", repository.data().blocks().size(),
-                    HueBlocksRuntime.candidates().stream().map(c -> c.block().texture()).distinct().count(),
-                    candidates().stream().map(HueGradient.Candidate::itemId).distinct().count(), candidates().size());
-            case CACHED -> text("cached"); case UNSUPPORTED -> text("unsupported"); default -> text("download_failed");
-        };
+        if (repository.failed()) return text(repository.data() == null ? "local_failed" : "local_cached");
+        if (repository.data() == null) return text("loading");
+        Component status = text("local_coverage", repository.data().blocks().size(),
+                HueBlocksRuntime.candidates().stream().map(HueGradient.Candidate::itemId).distinct().count(), candidates().size());
+        var keys = HueBlocksRuntime.candidates().stream().map(HueGradient.Candidate::key).collect(Collectors.toSet());
+        long missing = model.nodes.stream().filter(node -> node.pinned != null && !keys.contains(node.pinned.key())).count();
+        if (missing > 0) status = status.copy().append("; ").append(text("local_missing_nodes", missing));
+        if (!repository.skipped().isEmpty()) {
+            status = status.copy().append("; ").append(text("local_skipped"));
+            for (var entry : new java.util.TreeMap<>(repository.skipped()).entrySet())
+                status = status.copy().append(" ").append(text("skip." + entry.getKey(), entry.getValue()));
+        }
+        return status;
     }
+
     private enum ApplyTarget {
         TEMPORARY("temporary_wheel"), INVENTORY("inventory"), CREATE("create_group"), REPLACE("replace_group");
         final String key; ApplyTarget(String key) { this.key = key; }

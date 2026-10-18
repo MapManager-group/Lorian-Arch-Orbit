@@ -40,6 +40,7 @@ final class GradientComparisonScreen extends AdaptivePaletteScreen {
         for (int i = offset; i < Math.min(samples.size(), offset + capacity()); i++) {
             var sample = samples.get(i); int slot = i - offset, x = 12 + slot % columns() * 24, y = top + 14 + slot / columns() * 24;
             HueTexture.draw(graphics, sample.candidate().block().texture(), x, y, 22);
+            graphics.fill(x, y + 19, x + 22, y + 22, 0xFF000000 | sample.candidate().block().rgb());
             if (mx >= x && mx < x + 22 && my >= y && my < y + 22) graphics.setTooltipForNextFrame(font,
                     HueGradientScreen.text("block_hint", HueBlocksRuntime.stack(sample.candidate()).getHoverName(), sample.candidate().itemId(), sample.candidate().block().texture()), mx, my);
         }

@@ -1,0 +1,23 @@
+gradle.projectsEvaluated {
+    ['fabric', 'neoforge'].each { platform ->
+        def p = gradle.rootProject.project(":${platform}")
+        def root = gradle.rootProject.file('scripts/local-colors-smoke')
+        def output = gradle.rootProject.file('integration/local-colors')
+        def compile = p.tasks.register('compileLocalSmoke', JavaCompile) {
+            dependsOn p.tasks.named('classes'), gradle.rootProject.project(':common').tasks.named('classes')
+            source = files(new File(root, 'src'), new File(root, platform + '-src'))
+            classpath = p.sourceSets.main.compileClasspath + p.sourceSets.main.output + gradle.rootProject.project(':common').sourceSets.main.output
+            destinationDirectory = new File(output, platform + '-smoke-classes')
+            javaCompiler = p.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+            options.encoding = 'UTF-8'
+        }
+        def jar = p.tasks.register('localSmokeJar', Jar) {
+            dependsOn compile
+            from compile
+            from new File(root, platform + '-resources')
+            archiveFileName = 'lorian-local-smoke.jar'
+            destinationDirectory = p.file('run/mods')
+        }
+        p.tasks.named('runClient') { dependsOn jar }
+    }
+}

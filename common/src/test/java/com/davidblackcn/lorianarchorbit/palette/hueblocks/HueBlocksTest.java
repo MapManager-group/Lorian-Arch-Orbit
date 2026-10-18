@@ -1,17 +1,9 @@
 package com.davidblackcn.lorianarchorbit.palette.hueblocks;
 
 import com.google.gson.JsonParser;
-import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 class HueBlocksTest {
@@ -94,72 +86,9 @@ class HueBlocksTest {
         assertEquals(List.of(black), HueGradient.preview(java.util.Collections.nCopies(10, black), true));
     }
 
-    @Test
-    void refreshUsesConditionalRequestsAndFailedPartialUpdatesPreserveCache(@TempDir Path directory) throws Exception {
-        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-        AtomicBoolean corrupt = new AtomicBoolean();
-        AtomicInteger unchanged = new AtomicInteger();
-        server.createContext("/", exchange -> {
-            String path = exchange.getRequestURI().getPath();
-            String etag = path.endsWith("_palettes.json") ? "\"palettes\"" : "\"blocks\"";
-            String body = path.endsWith("_blocksets.json")
-                    ? "[{\"name\":\"Minecraft 26.2\",\"dir\":\"Minecraft 26.2\",\"count\":999}]"
-                    : path.endsWith("_palettes.json") ? (corrupt.get() ? "broken json" : PALETTES) : BLOCKS;
-            exchange.getResponseHeaders().set("ETag", etag);
-            if (!corrupt.get() && !path.endsWith("_blocksets.json")
-                    && etag.equals(exchange.getRequestHeaders().getFirst("If-None-Match"))) {
-                unchanged.incrementAndGet();
-                exchange.sendResponseHeaders(304, -1);
-            } else {
-                byte[] bytes = body.getBytes(java.nio.charset.StandardCharsets.UTF_8);
-                exchange.sendResponseHeaders(200, bytes.length);
-                exchange.getResponseBody().write(bytes);
-            }
-            exchange.close();
-        });
-        server.start();
-        URI source = URI.create("http://127.0.0.1:" + server.getAddress().getPort() + "/");
-        try {
-            try (HueBlocksRepository repository = new HueBlocksRepository(directory, "26.2", source)) {
-                refresh(repository);
-                assertEquals(HueBlocksRepository.State.READY, repository.state());
-                assertEquals(2, repository.data().blocks().size());
-                Path cache = directory.resolve("hueblocks/26.2.json");
-                String valid = Files.readString(cache);
-                refresh(repository);
-                assertEquals(2, unchanged.get());
-                corrupt.set(true);
-                refresh(repository);
-                assertEquals(HueBlocksRepository.State.CACHED, repository.state());
-                assertEquals(valid, Files.readString(cache));
-                assertEquals(2, repository.data().blocks().size());
-            }
-            server.stop(0);
-            try (HueBlocksRepository repository = new HueBlocksRepository(directory, "26.2", source)) {
-                refresh(repository);
-                assertEquals(HueBlocksRepository.State.CACHED, repository.state());
-                assertEquals(2, repository.data().blocks().size());
-            }
-            Files.writeString(directory.resolve("hueblocks/26.2.json"), "broken cache");
-            try (HueBlocksRepository repository = new HueBlocksRepository(directory, "26.2", source)) {
-                refresh(repository);
-                assertEquals(HueBlocksRepository.State.FAILED, repository.state());
-                assertNull(repository.data());
-            }
-        } finally {
-            server.stop(0);
-        }
-    }
-
     private static HueBlocksData decode(String blocks) {
         return HueBlocksData.decode("26.2", JsonParser.parseString(blocks).getAsJsonArray(),
                 JsonParser.parseString(PALETTES).getAsJsonArray());
     }
 
-    private static void refresh(HueBlocksRepository repository) throws InterruptedException {
-        repository.refresh();
-        long deadline = System.nanoTime() + 5_000_000_000L;
-        while (repository.checking() && System.nanoTime() < deadline) Thread.sleep(10);
-        assertFalse(repository.checking(), "Refresh did not finish in five seconds");
-    }
 }
