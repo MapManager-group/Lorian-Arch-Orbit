@@ -1,5 +1,6 @@
 package com.davidblackcn.lorianarchorbit.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Tooltip;
@@ -136,7 +137,7 @@ abstract class WorkbenchScreen extends AdaptivePaletteScreen {
     @Override protected final boolean mouseClickedContent(MouseButtonEvent event, boolean twice) {
         if (menuOpen()) {
             consumeRelease = true;
-            if (event.button() == 0 && menuLayout.rows() < menu.size()
+            if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && menuLayout.rows() < menu.size()
                     && event.x() >= menuLayout.x() + menuLayout.width() - 9 && event.x() < menuLayout.x() + menuLayout.width() - 1
                     && event.y() > menuLayout.y() && event.y() < menuLayout.y() + menuLayout.height() - 1) {
                 int thumbY = menuLayout.thumbY(menuStart, menu.size()), thumbHeight = menuLayout.thumbHeight(menu.size());

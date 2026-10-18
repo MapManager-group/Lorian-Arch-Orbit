@@ -1,5 +1,6 @@
 package com.davidblackcn.lorianarchorbit.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.davidblackcn.lorianarchorbit.palette.PaletteMember;
 import com.davidblackcn.lorianarchorbit.palette.WheelEditorState.GroupRef;
 import com.davidblackcn.lorianarchorbit.palette.hueblocks.GradientWorkbench;
@@ -426,7 +427,7 @@ final class HueGradientScreen extends WorkbenchScreen {
     @Override protected boolean clickWorkbench(MouseButtonEvent event, boolean twice) {
         if (super.clickWorkbench(event, twice)) return true;
         var l = layout(); int x = (int)event.x(), y = (int)event.y();
-        if (event.button() != 0 || !resultsVisible() || !inside(x, y, l.resultLeft(), l.previewTop(), l.resultWidth(), l.bodyBottom() - l.previewTop())) return false;
+        if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || !resultsVisible() || !inside(x, y, l.resultLeft(), l.previewTop(), l.resultWidth(), l.bodyBottom() - l.previewTop())) return false;
         int index;
         if (textures) {
             tiling(); int cross = (vertical ? x - l.resultLeft() : y - l.previewTop()) + crossOffset;

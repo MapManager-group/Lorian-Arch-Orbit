@@ -92,3 +92,7 @@
 - 🐛 fix(gradient): use Minecraft 26.2 HueBlocks data when 26.3 data is unavailable, show its source and switch safely when native data becomes available
 - ✨ feat(gradient): calculate colors and discover block faces from active local resources without HueBlocks downloads
 - ✨ feat(gradient): support namespaced textures and version 2 gradient exports with version 1 import compatibility
+- 🐛 fix(radial): yield empty-hand shared keys and configure independent pick-item targets with legacy compatibility
+- ✨ feat(palette): add an unbound hold shortcut for temporary palettes
+- 🐛 fix(editor): restore custom mouse selection, right-click removal and dragging on Minecraft 26.3
+- ✨ feat(palette): add 87 new Minecraft 26.3 block items to color categories while preserving existing order

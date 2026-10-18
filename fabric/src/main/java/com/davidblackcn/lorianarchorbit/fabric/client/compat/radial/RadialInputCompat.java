@@ -32,17 +32,19 @@ public final class RadialInputCompat {
             return;
         }
         KeyMapping lorianKey = ClientPaletteRuntime.wheelKey();
-        if (lorianKey == null
-                || !lorianKey.isDown()
-                || !lorianKey.saveString().equals(radialKey.saveString())
-                || !ClientPaletteRuntime.canHandleCurrentInput(minecraft)) {
-            return;
-        }
+        KeyMapping temporaryKey = ClientPaletteRuntime.temporaryWheelKey();
+        boolean palette = sharesPressedKey(lorianKey) && ClientPaletteRuntime.canHandleCurrentInput(minecraft);
+        boolean temporary = sharesPressedKey(temporaryKey) && ClientPaletteRuntime.canHandleTemporaryInput(minecraft);
+        if (!palette && !temporary) return;
         try {
             lockKey.invoke(null);
         } catch (ReflectiveOperationException | RuntimeException exception) {
             disable("Could not lock Radial's open key; key conflict arbitration is disabled", exception);
         }
+    }
+
+    private static boolean sharesPressedKey(KeyMapping key) {
+        return key != null && !key.isUnbound() && key.isDown() && key.saveString().equals(radialKey.saveString());
     }
 
     private static synchronized boolean resolveRadialAccess() {

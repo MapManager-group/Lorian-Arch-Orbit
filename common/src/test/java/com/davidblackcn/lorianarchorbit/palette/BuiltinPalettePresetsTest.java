@@ -78,11 +78,27 @@ public final class BuiltinPalettePresetsTest {
         }
         List<PaletteGroup> colors = BuiltinPalettePresets.groups(PalettePreset.COLOR_CATEGORIES);
         assertEquals(8, colors.size());
-        assertEquals(34, group(colors, "builtin_visual_color_red").members().size());
-        assertEquals(25, group(colors, "builtin_visual_color_yellow").members().size());
+        assertEquals(40, group(colors, "builtin_visual_color_red").members().size());
+        assertEquals(31, group(colors, "builtin_visual_color_yellow").members().size());
         assertContains(group(colors, "builtin_visual_color_red"), "minecraft:cinnabar_bricks");
         assertContains(group(colors, "builtin_visual_color_yellow"), "minecraft:potent_sulfur");
         assertContains(group(colors, "builtin_visual_color_cyan_blue"), "minecraft:prismarine_bricks");
+    }
+
+    @Test
+    void newColoredFormsAndPoplarMaterialsAreAvailable() {
+        var groups = BuiltinPalettePresets.groups(PalettePreset.COLOR_CATEGORIES);
+        var items = groups.stream().flatMap(g -> g.members().stream()).map(PaletteMember::itemId).collect(java.util.stream.Collectors.toSet());
+        for (String color : List.of("white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray",
+                "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black")) {
+            for (String material : List.of("wool", "concrete")) {
+                for (String form : List.of("stairs", "slab")) assertTrue(items.contains("minecraft:" + color + "_" + material + "_" + form));
+            }
+        }
+        for (String id : List.of("poplar_log", "poplar_planks", "stripped_poplar_log", "red_poplar_leaves",
+                "orange_poplar_leaves", "yellow_poplar_leaves", "red_shrub", "shelf_mushroom", "straw_bed")) {
+            assertTrue(items.contains("minecraft:" + id), id);
+        }
     }
 
     private static PaletteGroup group(List<PaletteGroup> groups, String id) {

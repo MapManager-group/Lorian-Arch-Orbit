@@ -1,5 +1,6 @@
 package com.davidblackcn.lorianarchorbit.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.davidblackcn.lorianarchorbit.palette.share.PaletteShareBundle;
 import com.davidblackcn.lorianarchorbit.palette.share.PaletteShareCodec;
 import com.davidblackcn.lorianarchorbit.palette.share.PaletteShareEntry;
@@ -117,7 +118,7 @@ final class PaletteShareScreen extends AdaptivePaletteScreen {
         if (super.mouseClickedContent(event, doubleClick)) {
             return true;
         }
-        if (event.button() != 0) {
+        if (event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
             return false;
         }
         int panelWidth = Math.min(520, width - 40);

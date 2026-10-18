@@ -1,5 +1,6 @@
 package com.davidblackcn.lorianarchorbit.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.davidblackcn.lorianarchorbit.palette.hueblocks.HueGradient;
 import com.davidblackcn.lorianarchorbit.palette.hueblocks.HueBlockFaces;
 import com.davidblackcn.lorianarchorbit.palette.hueblocks.HueFaceSelection;
@@ -269,7 +270,7 @@ final class HueBlockPickerScreen extends AdaptivePaletteScreen {
 
     @Override protected boolean mouseClickedContent(MouseButtonEvent event, boolean twice) {
         var layout = layout();
-        if (event.button() == 0 && event.x() >= layout.scrollbarLeft() && event.x() < layout.scrollbarLeft() + 6
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && event.x() >= layout.scrollbarLeft() && event.x() < layout.scrollbarLeft() + 6
                 && event.y() >= HueBlockPickerLayout.GRID_TOP && event.y() < layout.gridBottom()) {
             if (layout.maxScrollRow(filtered.size()) > 0) {
                 int top = layout.thumbTop(filtered.size(), scrollRow), thumb = layout.thumbHeight(filtered.size());

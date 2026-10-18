@@ -15,8 +15,7 @@ public final class PaletteLayerGestureState {
         if (now < lastTimestamp) reset();
         lastTimestamp = now;
         if (event.gesture() == InputGesture.PRESSED) {
-            presses = lastShortRelease >= 0 && now - lastShortRelease <= 250
-                    ? Math.min(3, presses + 1) : 1;
+            presses = nextPressCount(now);
             lastShortRelease = -1;
             return Optional.of(switch (presses) {
                 case 1 -> Layer.PRIMARY;
@@ -28,6 +27,20 @@ public final class PaletteLayerGestureState {
         if (event.gesture() == InputGesture.LONG_PRESSED || event.gesture() == InputGesture.CANCELLED) reset();
         // The shared input machine also emits DOUBLE_PRESSED after PRESSED; ignore it here.
         return Optional.empty();
+    }
+
+    /** Preview without advancing the gesture during key arbitration. */
+    public Layer nextLayer(long now) {
+        return switch (nextPressCount(now)) {
+            case 1 -> Layer.PRIMARY;
+            case 2 -> Layer.SECONDARY;
+            default -> Layer.TEMPORARY;
+        };
+    }
+
+    private int nextPressCount(long now) {
+        return now >= lastTimestamp && lastShortRelease >= 0 && now - lastShortRelease <= 250
+                ? Math.min(3, presses + 1) : 1;
     }
 
     public void reset() {

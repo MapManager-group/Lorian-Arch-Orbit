@@ -1,5 +1,6 @@
 package com.davidblackcn.lorianarchorbit.client;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.davidblackcn.lorianarchorbit.config.ConfigLoadResult;
 import com.davidblackcn.lorianarchorbit.config.WheelConfigCodec;
 import com.davidblackcn.lorianarchorbit.interaction.HudPoint;
@@ -563,16 +564,16 @@ public final class PaletteEditorScreen extends WorkbenchScreen {
         int mouseX = (int) event.x();
         int mouseY = (int) event.y();
         PaletteEditorLayout layout = layout();
-        if (shows(Pane.GROUPS) && event.button() == 0 && startGroupScrollbarDrag(layout, mouseX, mouseY)) {
+        if (shows(Pane.GROUPS) && event.button() == InputConstants.MOUSE_BUTTON_LEFT && startGroupScrollbarDrag(layout, mouseX, mouseY)) {
             return true;
         }
-        if (shows(Pane.ITEMS) && event.button() == 0 && startBrowserScrollbarDrag(layout, mouseX, mouseY)) {
+        if (shows(Pane.ITEMS) && event.button() == InputConstants.MOUSE_BUTTON_LEFT && startBrowserScrollbarDrag(layout, mouseX, mouseY)) {
             return true;
         }
-        if (shows(Pane.MEMBERS) && event.button() == 0 && startMemberScrollbarDrag(layout, mouseX, mouseY)) {
+        if (shows(Pane.MEMBERS) && event.button() == InputConstants.MOUSE_BUTTON_LEFT && startMemberScrollbarDrag(layout, mouseX, mouseY)) {
             return true;
         }
-        if (shows(Pane.GROUPS) && event.button() == 0 && inside(mouseX, mouseY, layout.groupLeft(), layout.groupTop(),
+        if (shows(Pane.GROUPS) && event.button() == InputConstants.MOUSE_BUTTON_LEFT && inside(mouseX, mouseY, layout.groupLeft(), layout.groupTop(),
                 layout.groupWidth(), groupRows(layout) * 18)) {
             int index = groupScroll + (mouseY - layout.groupTop()) / 18;
             if (index < draft().groups().size()) {
@@ -584,11 +585,11 @@ public final class PaletteEditorScreen extends WorkbenchScreen {
                 return true;
             }
         }
-        if (shows(Pane.ITEMS) && !layout.compact() && event.button() == 0 && clickCreativeTab(layout, mouseX, mouseY)) {
+        if (shows(Pane.ITEMS) && !layout.compact() && event.button() == InputConstants.MOUSE_BUTTON_LEFT && clickCreativeTab(layout, mouseX, mouseY)) {
             return true;
         }
         int gridIndex = shows(Pane.ITEMS) ? gridIndex(layout, mouseX, mouseY) : -1;
-        if (event.button() == 0 && gridIndex >= 0) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT && gridIndex >= 0) {
             List<ItemStack> items = filteredCreativeItems();
             int itemIndex = itemScrollRow * layout.gridColumns() + gridIndex;
             if (itemIndex < items.size()) {
@@ -598,9 +599,9 @@ public final class PaletteEditorScreen extends WorkbenchScreen {
         }
         int member = shows(Pane.MEMBERS) ? memberIndex(layout, mouseX, mouseY) : -1;
         if (member >= 0) {
-            if (event.button() == 1) {
+            if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
                 removeMember(member);
-            } else if (event.button() == 0) {
+            } else if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
                 draggedMember = member;
                 dragTarget = member;
                 previousDragTarget = member;

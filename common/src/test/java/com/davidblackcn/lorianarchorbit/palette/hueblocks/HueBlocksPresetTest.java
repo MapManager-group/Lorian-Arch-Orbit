@@ -39,7 +39,7 @@ class HueBlocksPresetTest {
     }
 
     @Test
-    void optimizedGroupsPreserveMembershipMissingSlotsAndImproveKnownColorTransitions() throws Exception {
+    void historicalMembersKeepTheirOptimizedOrderWhenNewBlocksAreInserted() throws Exception {
         Path root = Path.of(System.getProperty("user.dir"));
         while (root != null && !Files.exists(root.resolve("docs/HUEBLOCKS_PRESET_REPORT.json"))) root = root.getParent();
         assertNotNull(root);
@@ -51,7 +51,7 @@ class HueBlocksPresetTest {
             String id = object.get("id").getAsString();
             List<String> original = object.getAsJsonArray("original_members").asList().stream().map(v -> v.getAsString()).toList();
             List<String> optimized = groups.stream().filter(g -> g.id().equals(id)).findFirst().orElseThrow()
-                    .members().stream().map(m -> m.itemId()).toList();
+                    .members().stream().map(m -> m.itemId()).filter(original::contains).toList();
             assertEquals(original.stream().sorted().toList(), optimized.stream().sorted().toList(), id);
             assertEquals(object.getAsJsonArray("optimized_members").asList().stream().map(v -> v.getAsString()).toList(), optimized);
             for (var missing : object.getAsJsonArray("missing")) {

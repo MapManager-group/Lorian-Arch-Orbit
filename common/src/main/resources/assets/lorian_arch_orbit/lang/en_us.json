@@ -1,4 +1,9 @@
 {
+  "key.lorian_arch_orbit.temporary_palette": "Temporary Palette (hold)",
+  "radial.mode.lorian_arch_orbit.target": "Target item (blank: use icon for legacy slots)",
+  "radial.mode.lorian_arch_orbit.select_target": "Select item",
+  "radial.mode.lorian_arch_orbit.held_target": "Use held item",
+
   "palette_editor.lorian_arch_orbit.world_required": "Join a world to browse items and preview blocks.",
   "palette_editor.lorian_arch_orbit.items": "Items",
   "palette_editor.lorian_arch_orbit.preview_tab": "Preview",
