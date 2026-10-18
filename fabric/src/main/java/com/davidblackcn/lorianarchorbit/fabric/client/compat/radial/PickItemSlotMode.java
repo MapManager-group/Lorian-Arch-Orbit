@@ -10,7 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
-import dev.velolib.radial.ui.screen.iconpicker.IconPickerScreen;
+import net.minecraft.client.gui.screens.Screen;
 import dev.velolib.radial.util.EncoderUtils;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.commands.arguments.item.ItemInput;
@@ -28,6 +28,11 @@ public final class PickItemSlotMode extends IconEnabledSlotMode {
 
     @Override
     public void buildEditorWidgets(SlotEditorScreen screen, RadialSlot slot, int width, LinearLayout container) {
+        buildEditorWidgets((Screen) screen, slot, width, container);
+    }
+
+    // Radial 3.2 widened the API parameter; keep both JVM descriptors for 3.1/3.2.
+    public void buildEditorWidgets(Screen screen, RadialSlot slot, int width, LinearLayout container) {
         Minecraft minecraft = Minecraft.getInstance();
         container.addChild(new StringWidget(Component.translatable("radial.mode.lorian_arch_orbit.target"), minecraft.font));
         EditBox target = new EditBox(minecraft.font, width, 20,
@@ -45,14 +50,14 @@ public final class PickItemSlotMode extends IconEnabledSlotMode {
         container.addChild(target);
         LinearLayout actions = LinearLayout.horizontal().spacing(4);
         actions.addChild(Button.builder(Component.translatable("radial.mode.lorian_arch_orbit.select_target"),
-                button -> minecraft.setScreenAndShow(new IconPickerScreen(screen, target::setValue))).width((width - 4) / 2).build());
+                button -> minecraft.setScreenAndShow(RadialEditorCompat.createPicker(screen, target.getValue(), target::setValue))).width((width - 4) / 2).build());
         actions.addChild(Button.builder(Component.translatable("radial.mode.lorian_arch_orbit.held_target"), button -> {
             if (minecraft.player != null && minecraft.level != null && !minecraft.player.getMainHandItem().isEmpty()) {
                 target.setValue(EncoderUtils.toGiveCommandString(minecraft.player.getMainHandItem(), minecraft.level.registryAccess()));
             }
         }).width((width - 4) / 2).build());
         container.addChild(actions);
-        buildIconRow(screen, slot, width, container);
+        RadialEditorCompat.buildIconRow(this, screen, slot, width, container);
     }
 
     @Override

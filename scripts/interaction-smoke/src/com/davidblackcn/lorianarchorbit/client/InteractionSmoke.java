@@ -83,7 +83,38 @@ public final class InteractionSmoke implements net.fabricmc.api.ClientModInitial
             };
             mode.performAction(slot, context);
             require(c.player.getMainHandItem().is(Items.STONE), "legacy icon target");
-            var parent = new dev.velolib.radial.ui.screen.SlotEditorScreen(slot, true);
+            slot.mode = SlotModeRegistry.getDefaultMode();
+            var parent = createSlotEditor(slot);
+            c.setScreenAndShow(parent);
+            var dropdown = (dev.velolib.radial.ui.widget.DropdownButtonWidget<?>) parent.children().stream()
+                    .filter(w -> w instanceof dev.velolib.radial.ui.widget.DropdownButtonWidget).findFirst().orElseThrow();
+            parent.mouseClicked(new MouseButtonEvent(dropdown.getX()+2, dropdown.getY()+2,
+                    new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
+            var menu = dropdown.getActiveMenu();
+            require(menu != null, "mode dropdown opens");
+            var optionsField = menu.getClass().getDeclaredField("options"); optionsField.setAccessible(true);
+            var options = (List<?>) optionsField.get(menu);
+            int index = -1;
+            for (int i=0; i<options.size(); i++) if (options.get(i) instanceof PickItemSlotMode) index=i;
+            require(index >= 0, "pick-item mode registered in dropdown");
+            var heightField = menu.getClass().getDeclaredField("itemHeight"); heightField.setAccessible(true);
+            int rowHeight = heightField.getInt(menu);
+            menu.mouseScrolled(menu.getX()+2, menu.getY()+2, 0, -100);
+            var scrollField = menu.getClass().getDeclaredField("scrollAmount"); scrollField.setAccessible(true);
+            double rowY = menu.getY()+index*rowHeight-scrollField.getDouble(menu)+rowHeight/2.0;
+            parent.mouseClicked(new MouseButtonEvent(menu.getX()+2, rowY,
+                    new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
+            require(slot.mode instanceof PickItemSlotMode, "mouse selection switches to pick-item mode");
+            require(parent.children().size() > 5, "real Radial editor registers widgets");
+            var select = (net.minecraft.client.gui.components.Button) parent.children().stream()
+                    .filter(w -> w instanceof net.minecraft.client.gui.components.Button button
+                            && button.getMessage().equals(Component.translatable("radial.mode.lorian_arch_orbit.select_target")))
+                    .findFirst().orElseThrow();
+            parent.mouseClicked(new MouseButtonEvent(select.getX()+2, select.getY()+2,
+                    new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false);
+            require(c.gui.screen() instanceof dev.velolib.radial.ui.screen.iconpicker.IconPickerScreen, "target picker opens");
+            c.gui.screen().onClose();
+            require(c.gui.screen() == parent && parent.children().size() > 5, "picker returns to populated editor");
             var layout = LinearLayout.vertical();
             mode.buildEditorWidgets(parent, slot, 300, layout);
             var edits = new ArrayList<EditBox>();
@@ -127,6 +158,11 @@ public final class InteractionSmoke implements net.fabricmc.api.ClientModInitial
             wheel.setDown(false);
             c.player.getInventory().setItem(c.player.getInventory().getSelectedSlot(),original);
         }
+    }
+    private static dev.velolib.radial.ui.screen.SlotEditorScreen createSlotEditor(RadialSlot slot) throws Exception {
+        var type = dev.velolib.radial.ui.screen.SlotEditorScreen.class;
+        try { return type.getConstructor(RadialSlot.class).newInstance(slot); }
+        catch (NoSuchMethodException oldApi) { return type.getConstructor(RadialSlot.class, boolean.class).newInstance(slot, true); }
     }
     private static PaletteGroup selected(PaletteEditorScreen s) throws Exception { return (PaletteGroup)call(PaletteEditorScreen.class,s,"selected",new Class<?>[]{}); }
     private static void click(PaletteEditorScreen s,int x,int y,int button) throws Exception { s.mouseClicked(event(s,x,y,button),false); }

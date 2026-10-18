@@ -92,3 +92,4 @@
 - ✨ feat(gradient): support namespaced textures and version 2 gradient exports with version 1 import compatibility
 - 🐛 fix(radial): yield empty-hand shared keys and configure independent pick-item targets with legacy compatibility
 - ✨ feat(palette): add an unbound hold shortcut for temporary palettes
+- 🐛 fix(radial): prevent blank pick-item editors on Radial 3.2 while retaining 3.1 support
