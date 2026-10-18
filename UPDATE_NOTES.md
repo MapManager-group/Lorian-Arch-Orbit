@@ -90,3 +90,5 @@
 - 🐛 fix(palette): restore the original Vanilla map-marker pixels at exact double size instead of the rounded redraw
 - ✨ feat(migration): support Minecraft 26.3 on Fabric and NeoForge while preserving existing configuration, reach protocol, palette presets and sharing formats
 - 🐛 fix(gradient): use Minecraft 26.2 HueBlocks data when 26.3 data is unavailable, show its source and switch safely when native data becomes available
+- ✨ feat(gradient): calculate colors and discover block faces from active local resources without HueBlocks downloads
+- ✨ feat(gradient): support namespaced textures and version 2 gradient exports with version 1 import compatibility

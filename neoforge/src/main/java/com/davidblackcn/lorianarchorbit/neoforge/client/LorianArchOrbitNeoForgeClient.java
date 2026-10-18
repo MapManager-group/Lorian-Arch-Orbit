@@ -15,6 +15,9 @@ public final class LorianArchOrbitNeoForgeClient {
     public LorianArchOrbitNeoForgeClient(ModContainer container, IEventBus modBus) {
         modBus.addListener(LorianArchOrbitNeoForgeClient::modifyModels);
         ClientConfigRuntime.initialize();
+        modBus.addListener((net.neoforged.neoforge.client.event.AddClientReloadListenersEvent event) ->
+                event.addListener(net.minecraft.resources.Identifier.fromNamespaceAndPath("lorian_arch_orbit", "local_colors"),
+                        com.davidblackcn.lorianarchorbit.client.HueBlocksRuntime.reloadListener()));
         IConfigScreenFactory factory = (ignored, parent) -> ClientConfigRuntime.createScreen(parent);
         container.registerExtensionPoint(IConfigScreenFactory.class, factory);
     }

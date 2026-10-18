@@ -31,7 +31,7 @@
 - 支持选择方块不同面的纹理、替换并锁定单个结果，以及真实纹理平铺和前后结果对比
 - 结果可应用到**临时色轮、物品栏或永久色轮分组**；渐变参数与候选集合也可以单独导入导出
 
-详细使用方法见 [渐变配色教程](docs/GRADIENT_GUIDE.md)。配色数据来自 [HueBlocks](https://github.com/1280px/hueblocks)，首次使用需要下载，之后可使用有效缓存。
+详细使用方法见 [渐变配色教程](docs/GRADIENT_GUIDE.md)。颜色由当前启用的游戏资源与资源包在本地计算，首次使用无需联网；标准模型的新方块会自动加入候选。
 
 ![颜色节点示例](./docs/image/颜色节点示例.png)
 
@@ -105,7 +105,7 @@ Fabric 端提供 **Radial** 可选兼容：两个轮盘绑定同一个键时，�
 
 - [LotTweaks](https://github.com/aruma256/LotTweaks)：色轮、智能选取和交互距离的行为参考。
 - [Visible Barriers](https://github.com/AmyMialeeMods/visiblebarriers)：不可见方块显示行为参考。
-- [HueBlocks](https://github.com/1280px/hueblocks)：渐变配色功能参考及方块颜色数据来源。
+- [HueBlocks](https://github.com/1280px/hueblocks)：渐变配色功能参考及历史候选预设来源；当前颜色在本地计算。
 - 可爱的酒狐。
 
 ## 协议

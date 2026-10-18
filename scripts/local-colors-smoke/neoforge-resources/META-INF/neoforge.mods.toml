@@ -1,0 +1,6 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="MIT"
+[[mods]]
+modId="lorian_local_smoke"
+version="1.0.0"

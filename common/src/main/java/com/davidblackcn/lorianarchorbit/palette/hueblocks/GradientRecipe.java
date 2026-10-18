@@ -40,7 +40,7 @@ public final class GradientRecipe {
         if (!paletteOnly && (!model.valid() || model.pendingSteps())) throw new IllegalArgumentException("Invalid gradient parameters");
         JsonObject root = new JsonObject();
         root.addProperty("format", paletteOnly ? "lorian-gradient-palette" : "lorian-gradient-recipe");
-        root.addProperty("version", 1); root.addProperty("oklab", model.oklab);
+        root.addProperty("version", 2); root.addProperty("oklab", model.oklab);
         root.addProperty("face", model.face); root.addProperty("palette", model.palette);
         if (model.sourceGroup != null) {
             JsonObject group = new JsonObject(); group.addProperty("primary", model.sourceGroup.primary()); group.addProperty("id", model.sourceGroup.id()); root.add("group", group);
@@ -61,7 +61,7 @@ public final class GradientRecipe {
             String format = string(root, "format", 40);
             boolean paletteOnly = format.equals("lorian-gradient-palette");
             if (!paletteOnly && !format.equals("lorian-gradient-recipe")) throw new IllegalArgumentException("Not a gradient file");
-            if (!root.get("version").getAsString().equals("1")) throw new IllegalArgumentException("Unsupported gradient format version");
+            if (!Set.of("1", "2").contains(root.get("version").getAsString())) throw new IllegalArgumentException("Unsupported gradient format version");
             String face = string(root, "face", 16), palette = string(root, "palette", 160);
             if (!face.equals("all") && !face.equals("sides") && !HueBlockFaces.DIRECTIONS.contains(face)) throw new IllegalArgumentException("Invalid face");
             GroupRef group = null;
@@ -98,7 +98,6 @@ public final class GradientRecipe {
         return value;
     }
     private static String key(String value) {
-        if (value.length() > 256 || !value.matches("[a-z0-9_.-]+:[a-z0-9_./-]+\\|[a-z0-9_]+\\.png")) throw new IllegalArgumentException("Invalid candidate reference");
-        return value;
+        return HueResourceId.candidate(value);
     }
 }

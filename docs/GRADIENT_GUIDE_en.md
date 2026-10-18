@@ -58,7 +58,7 @@ Selecting a face chooses the texture used for color matching. It **does not chan
 
 - **Color space**: `OkLAB` matches perceptual colors, while `RGB` matches color channels. Generate with each and compare the results
 - **Facing**: try sides for walls or top faces for floors, or choose a specific direction
-- **Candidate source**: use all indexed blocks, a HueBlocks palette, or a wheel group you select
+- **Candidate source**: use all local candidates, a local preset, or a wheel group you select
 - **Edit candidate palette**: exclude unwanted candidates; a red line marks excluded entries. Search and batch actions are available
 
 “Current group” remembers the layer and group you explicitly selected. Choosing another group in the wheel editor does not silently change it. If that group is deleted, select a new one.
@@ -90,7 +90,7 @@ Switch the results view to **Tiled textures** to see the actual textures laid ou
 
 ![Tiled texture preview](image/纹理平铺示例.png)
 
-Tiling displays textures from the current resource pack, but **color matching still uses HueBlocks data**. It does not simulate scene lighting, biome tinting, or complete block models. Try the blocks in your build before settling on a result.
+Tiling and color matching both use active resource-pack textures; representative colors are calculated locally. It does not simulate scene lighting, biome tinting, or complete block models. Try the blocks in your build before settling on a result.
 
 ### Keep a Result for Comparison
 
@@ -140,6 +140,6 @@ Generated results, positional locks, application targets, and comparison snapsho
 - Applying the current gradient clears its unapplied-change warning, but a permanent wheel draft created by the application still needs **Save**
 - The editor does not automatically save the whole session. Export parameters explicitly if you want to reuse them later
 
-The candidate count is not Minecraft's total block count. Only textures with upstream color data that can be mapped to blocks in the current game participate in matching. Different faces of one block may contribute multiple candidates, and facing, palette, and custom exclusions further affect the count.
+The candidate count is not Minecraft's total block count. Only supported standard model faces with valid textures participate in matching. Tinted faces and special renderers are skipped. Different faces of one block may contribute multiple candidates, and facing, palette, and custom exclusions further affect the count.
 
-The client checks for data updates in the background at startup. A successful download is required initially; valid cached data remains available if the network later fails. See [HueBlocks Data and Preset Optimization](HUEBLOCKS.md) and [Configuration and Troubleshooting](../CONFIGURATION.md), both in Chinese, for more details.
+The client scans active resources and calculates colors at startup and on resource reload, without downloading data. Regenerate results after changing packs; Recalculate retries the current resources. Gradient and candidate-palette exports use format 2, with format 1 import compatibility; older mod versions cannot read format 2. See [HueBlocks Data and Preset Optimization](HUEBLOCKS.md) and [Configuration and Troubleshooting](../CONFIGURATION.md), both in Chinese, for more details.

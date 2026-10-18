@@ -17,6 +17,9 @@ public final class LorianArchOrbitFabricClient implements ClientModInitializer {
             );
         });
         ClientConfigRuntime.initialize();
+        net.fabricmc.fabric.api.resource.v1.ResourceLoader.get(net.minecraft.server.packs.PackType.CLIENT_RESOURCES)
+                .registerReloadListener(net.minecraft.resources.Identifier.fromNamespaceAndPath("lorian_arch_orbit", "local_colors"),
+                        com.davidblackcn.lorianarchorbit.client.HueBlocksRuntime.reloadListener());
         if (FabricLoader.getInstance().isModLoaded("radial")) {
             RadialInputCompat.initialize();
         }

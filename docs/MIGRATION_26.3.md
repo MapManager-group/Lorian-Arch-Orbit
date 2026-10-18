@@ -6,6 +6,8 @@ Migration Result: SUCCESS
 
 Code Review: PASS WITH RISKS
 
+本文记录版本迁移完成时的状态；后续配色已改为本地资源计算，见 [本地资源配色实现与验证](LOCAL_RESOURCE_COLORS.md)。
+
 ## 版本与工程
 
 | 项目 | 最终版本 |

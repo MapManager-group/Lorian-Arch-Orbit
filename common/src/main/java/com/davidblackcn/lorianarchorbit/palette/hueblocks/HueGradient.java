@@ -14,7 +14,7 @@ public final class HueGradient {
         public Candidate { faces = java.util.Set.copyOf(faces); placements = java.util.Map.copyOf(placements); }
         public Candidate(String itemId, HueBlocksData.Block block) { this(itemId, block, block.sides(), java.util.Map.of()); }
         public boolean faces(String face) { return HueBlockFaces.matchesFace(faces, face); }
-        public String key() { return itemId + "|" + block.texture(); }
+        public String key() { return itemId + "|" + HueResourceId.texture(block.texture()); }
     }
     /** steps is the number of samples including both endpoints of the outgoing segment. */
     public record Stop(int rgb, int steps, Candidate pinned) {
