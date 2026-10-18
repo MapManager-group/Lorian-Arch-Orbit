@@ -1,0 +1,23 @@
+gradle.projectsEvaluated {
+    def p = gradle.rootProject.project(':fabric')
+    def root = gradle.rootProject.file('scripts/interaction-smoke')
+    def compile = p.tasks.register('compileInteractionSmoke', JavaCompile) {
+        dependsOn p.tasks.named('classes'), gradle.rootProject.project(':common').tasks.named('classes')
+        source = new File(root, 'src')
+        classpath = p.sourceSets.main.compileClasspath + p.sourceSets.main.output + gradle.rootProject.project(':common').sourceSets.main.output
+        destinationDirectory = gradle.rootProject.file('integration/interaction/classes')
+        javaCompiler = p.javaToolchains.compilerFor { languageVersion = JavaLanguageVersion.of(25) }
+        options.encoding = 'UTF-8'
+    }
+    def jar = p.tasks.register('interactionSmokeJar', Jar) {
+        dependsOn compile
+        from compile
+        from new File(root, 'fabric-resources')
+        archiveFileName = 'lorian-interaction-smoke.jar'
+        destinationDirectory = p.file('run/mods')
+    }
+    p.tasks.named('runClient') {
+        dependsOn jar
+        args '--quickPlaySingleplayer', 'lorian-interaction-smoke', '--width', '1280', '--height', '720'
+    }
+}

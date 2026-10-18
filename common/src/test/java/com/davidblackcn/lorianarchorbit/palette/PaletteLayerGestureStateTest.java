@@ -69,6 +69,21 @@ class PaletteLayerGestureStateTest {
         assertEquals(PaletteLayerGestureState.Layer.TEMPORARY, state.accept(event(InputGesture.PRESSED, 300)).orElseThrow());
     }
 
+    @Test
+    void arbitrationPreviewDoesNotConsumePressAndRespectsTimeout() {
+        var state = new PaletteLayerGestureState();
+        assertEquals(PaletteLayerGestureState.Layer.PRIMARY, state.nextLayer(0));
+        state.accept(event(InputGesture.PRESSED, 0));
+        state.accept(event(InputGesture.SHORT_PRESSED, 10));
+        assertEquals(PaletteLayerGestureState.Layer.SECONDARY, state.nextLayer(100));
+        assertEquals(PaletteLayerGestureState.Layer.SECONDARY, state.nextLayer(100));
+        assertEquals(state.nextLayer(100), state.accept(event(InputGesture.PRESSED, 100)).orElseThrow());
+        state.accept(event(InputGesture.SHORT_PRESSED, 110));
+        assertEquals(PaletteLayerGestureState.Layer.TEMPORARY, state.nextLayer(200));
+        assertEquals(PaletteLayerGestureState.Layer.PRIMARY, state.nextLayer(361));
+        assertEquals(PaletteLayerGestureState.Layer.PRIMARY, state.nextLayer(50));
+    }
+
     private static InputGestureEvent event(InputGesture gesture, long time) {
         return new InputGestureEvent(gesture, time, 0);
     }

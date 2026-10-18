@@ -1,0 +1,1 @@
+{"schemaVersion":1,"id":"lorian_interaction_smoke","version":"1.0","environment":"client","entrypoints":{"client":["com.davidblackcn.lorianarchorbit.client.InteractionSmoke"]}}

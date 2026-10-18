@@ -90,3 +90,5 @@
 - 🐛 fix(palette): restore the original Vanilla map-marker pixels at exact double size instead of the rounded redraw
 - ✨ feat(gradient): calculate colors and discover block faces from active local resources without HueBlocks downloads
 - ✨ feat(gradient): support namespaced textures and version 2 gradient exports with version 1 import compatibility
+- 🐛 fix(radial): yield empty-hand shared keys and configure independent pick-item targets with legacy compatibility
+- ✨ feat(palette): add an unbound hold shortcut for temporary palettes

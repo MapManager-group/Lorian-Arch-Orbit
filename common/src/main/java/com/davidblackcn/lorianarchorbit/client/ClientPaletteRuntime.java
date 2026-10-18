@@ -30,6 +30,9 @@ public final class ClientPaletteRuntime {
     private static final String OWNER = "palette_wheel";
     private static KeyMapping openWheel;
     private static KeyMapping openEditor;
+    private static KeyMapping openTemporary;
+    private static GestureRegistration temporaryRegistration;
+    private static boolean temporaryKeyActive;
     private static GestureRegistration gestureRegistration;
     private static WheelLease lease;
     private static RadialMenuSnapshot<PaletteEntry> radial;
@@ -49,6 +52,8 @@ public final class ClientPaletteRuntime {
         openEditor = new KeyMapping("key.lorian_arch_orbit.palette_editor", InputConstants.KEY_P, category);
         KeyMappingRegistry.register(openWheel);
         KeyMappingRegistry.register(openEditor);
+        openTemporary = new KeyMapping("key.lorian_arch_orbit.temporary_palette", InputConstants.UNKNOWN.getValue(), category);
+        KeyMappingRegistry.register(openTemporary);
         gestureRegistration = ClientInteractionRuntime.inputs().register(
                 OWNER,
                 new PressTiming(180, 250),
@@ -57,6 +62,11 @@ public final class ClientPaletteRuntime {
                 ClientPaletteRuntime::enabled,
                 ClientPaletteRuntime::onGesture
         );
+        temporaryRegistration = ClientInteractionRuntime.inputs().register(
+                OWNER + ".temporary", new PressTiming(180, 250), openTemporary::saveString,
+                openTemporary::isDown, () -> enabled() && !openTemporary.isUnbound()
+                        && !openTemporary.saveString().equals(openWheel.saveString()),
+                ClientPaletteRuntime::onTemporaryGesture);
     }
 
     public static void tick(Minecraft minecraft) {
@@ -75,18 +85,30 @@ public final class ClientPaletteRuntime {
     public static boolean canHandleCurrentInput(Minecraft minecraft) {
         if (openWheel == null
                 || !enabled()
+                || minecraft.gui.screen() != null
+                || !minecraft.isWindowActive()
                 || minecraft.player == null
                 || minecraft.gameMode == null
                 || !minecraft.player.isCreative()) {
             return false;
         }
         ItemStack held = minecraft.player.getInventory().getSelectedItem();
-        if (!CreativeInventoryHelper.temporaryPalette().isEmpty()) return true;
         if (held.isEmpty()) {
             return false;
         }
-        return resolve(minecraft, PaletteLayerGestureState.Layer.PRIMARY, held).isPresent()
-                || resolve(minecraft, PaletteLayerGestureState.Layer.SECONDARY, held).isPresent();
+        if (lease != null && lease.active()) return true;
+        return resolve(minecraft, LAYER_GESTURE.nextLayer(ClientInteractionRuntime.nowMillis()), held).isPresent();
+    }
+
+    public static KeyMapping temporaryWheelKey() { return openTemporary; }
+
+    public static boolean canHandleTemporaryInput(Minecraft minecraft) {
+        return openTemporary != null && !openTemporary.isUnbound() && enabled()
+                && !openTemporary.saveString().equals(openWheel.saveString())
+                && minecraft.gui.screen() == null && minecraft.isWindowActive()
+                && minecraft.player != null && minecraft.gameMode != null && minecraft.player.isCreative()
+                && resolve(minecraft, PaletteLayerGestureState.Layer.TEMPORARY,
+                        minecraft.player.getInventory().getSelectedItem()).isPresent();
     }
 
     public static synchronized void configsChanged() {
@@ -98,6 +120,11 @@ public final class ClientPaletteRuntime {
         LAYER_GESTURE.reset();
         lastBinding = null;
         CreativeInventoryHelper.clearSession();
+        temporaryKeyActive = false;
+        if (temporaryRegistration != null) {
+            temporaryRegistration.close();
+            temporaryRegistration = null;
+        }
         if (gestureRegistration != null) {
             gestureRegistration.close();
             gestureRegistration = null;
@@ -118,11 +145,25 @@ public final class ClientPaletteRuntime {
     }
 
     public static synchronized void resetGesture() {
+        temporaryKeyActive = false;
         LAYER_GESTURE.reset();
         close(false);
     }
 
+    private static synchronized void onTemporaryGesture(InputGestureEvent event) {
+        if (event.gesture() == InputGesture.PRESSED) {
+            resetGesture();
+            temporaryKeyActive = true;
+            open(PaletteLayerGestureState.Layer.TEMPORARY, event.timestampMillis());
+        } else if (temporaryKeyActive && (event.gesture() == InputGesture.RELEASED
+                || event.gesture() == InputGesture.CANCELLED)) {
+            temporaryKeyActive = false;
+            close(event.gesture() == InputGesture.RELEASED);
+        }
+    }
+
     private static synchronized void onGesture(InputGestureEvent event) {
+        if (temporaryKeyActive) return;
         LAYER_GESTURE.accept(event).ifPresent(layer -> {
             close(false);
             open(layer, event.timestampMillis());

@@ -90,3 +90,9 @@ Unsaved drafts are not retained after leaving the editor entirely. The temporary
 - Check for key conflicts. On Fabric, when sharing a key with Radial, this mod takes priority if its wheel can open
 
 See [Configuration and Troubleshooting](../CONFIGURATION.md) (Chinese) for more details.
+
+### Radial shared keys and target items
+
+On Fabric, an empty-hand press of a shared wheel key is passed to Radial even when a temporary palette exists. Arbitration checks the next gesture layer rather than merely the existence of saved entries. Once Radial opens, its screen interrupts the multi-press chain. Bind **Temporary Palette (hold)** to a separate key in Controls to access the temporary palette directly; it is unbound by default and must differ from the regular palette key. Release the key to close the wheel. The existing triple-press gesture remains available without that conflict.
+
+Radial's **Pick Item** action has a separate target item field, a selector and a **Use held item** button (including components). Its icon can be configured independently. An empty target retains compatibility with old slots by using the icon item; an invalid non-empty target is rejected instead of falling back. The action remains Creative-only.

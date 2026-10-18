@@ -1,4 +1,9 @@
 {
+  "key.lorian_arch_orbit.temporary_palette": "临时色轮（按住）",
+  "radial.mode.lorian_arch_orbit.target": "目标物品（留空：兼容旧配置的图标物品）",
+  "radial.mode.lorian_arch_orbit.select_target": "选择物品",
+  "radial.mode.lorian_arch_orbit.held_target": "使用手持物品",
+
   "palette_editor.lorian_arch_orbit.world_required": "进入世界后可浏览物品和预览方块。",
   "palette_editor.lorian_arch_orbit.items": "物品",
   "palette_editor.lorian_arch_orbit.preview_tab": "预览",
