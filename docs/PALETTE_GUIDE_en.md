@@ -23,7 +23,7 @@ Scrolling immediately replaces the item in the selected hotbar slot. No extra cl
 | Temporary | Quickly press `R` three times, holding the third press | The complete result from the gradient editor |
 
 - Primary and secondary wheels find a group using the **currently held item**; the group needs at least two valid, distinct members
-- Each layer can use a **block type, block family, or color** preset, or your own groups from the editor
+- Each layer can use a **block type, block family, or Block Color Gradients** preset, or your own groups from the editor
 - Generate and apply a temporary wheel in the gradient editor first. It can then open even with an empty hand, preserves repeated positions, and clears when the game restarts
 
 If the wheel cannot fit every member, a “position / total” counter appears. Keep scrolling to access the rest; a smaller window does not remove any members.
@@ -87,12 +87,18 @@ Unsaved drafts are not retained after leaving the editor entirely. The temporary
 - Check that you are in Creative mode and have enabled the mod and the relevant wheel feature
 - Primary and secondary wheels require a held item that matches a group with at least two valid, distinct members; a temporary wheel needs an applied gradient result first
 - Double- and triple-taps must be quick, with the final press held down
-- Check for key conflicts. On Fabric, when sharing a key with Radial, this mod takes priority if its wheel can open
+- Check for key conflicts. On Fabric, when sharing a key with Radial, an enabled palette feature reserves the shared key whenever the main hand is nonempty, even without a matching group
 
 See [Configuration and Troubleshooting](../CONFIGURATION.md) (Chinese) for more details.
 
 ### Radial shared keys and target items
 
-On Fabric, an empty-hand press of a shared wheel key is passed to Radial even when a temporary palette exists. Arbitration checks the next gesture layer rather than merely the existence of saved entries. Once Radial opens, its screen interrupts the multi-press chain. Bind **Temporary Palette (hold)** to a separate key in Controls to access the temporary palette directly; it is unbound by default and must differ from the regular palette key. Release the key to close the wheel. The existing triple-press gesture remains available without that conflict.
+On Fabric, an empty-hand press of a shared wheel key is passed to Radial even when a temporary palette exists. A nonempty main hand reserves the shared key regardless of the next gesture layer. Once Radial opens, its screen interrupts the multi-press chain. Bind **Temporary Palette (hold)** to a separate key in Controls to access the temporary palette directly; it is unbound by default and must differ from the regular palette key. Release the key to close the wheel. The existing triple-press gesture remains available without that conflict.
 
 Radial's **Pick Item** action has a separate target item field, a selector and a **Use held item** button (including components). Its icon can be configured independently. An empty target retains compatibility with old slots by using the icon item; an invalid non-empty target is rejected instead of falling back. The action remains Creative-only.
+
+## v1.2.0 defaults
+
+New configurations and Restore Defaults use the **Block Color Gradients** primary preset and `EXPAND` animation. The secondary preset remains block family. Existing settings and custom groups are preserved. `CLOCKWISE` reveals entries in sequence with equal expansion durations.
+
+When the palette feature is enabled and shares its regular shortcut with Radial, only an empty main hand yields to Radial. Missing layers on repeated presses do not open Radial. This arbitration also applies outside Creative mode; the offhand does not affect it. Separate Radial shortcuts and a disabled palette feature remain unaffected.

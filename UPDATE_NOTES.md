@@ -93,3 +93,8 @@
 - 🐛 fix(radial): yield empty-hand shared keys and configure independent pick-item targets with legacy compatibility
 - ✨ feat(palette): add an unbound hold shortcut for temporary palettes
 - 🐛 fix(radial): prevent blank pick-item editors on Radial 3.2 while retaining 3.1 support
+- ✨ feat(defaults): use building-friendly gradients, Block Color Gradients primary wheels and EXPAND for new configurations
+- 💄 style(gradient): keep skipped-resource details in hover tooltips instead of the status line
+- 🐛 fix(animation): give CLOCKWISE entries uniform stagger intervals and expansion durations
+- 🐛 fix(radial): reserve shared wheel keys for nonempty main hands even when the next palette layer is missing
+- 🔖 chore(release): bump mod version to 1.2.0

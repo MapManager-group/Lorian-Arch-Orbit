@@ -33,7 +33,7 @@ public final class RadialInputCompat {
         }
         KeyMapping lorianKey = ClientPaletteRuntime.wheelKey();
         KeyMapping temporaryKey = ClientPaletteRuntime.temporaryWheelKey();
-        boolean palette = sharesPressedKey(lorianKey) && ClientPaletteRuntime.canHandleCurrentInput(minecraft);
+        boolean palette = sharesPressedKey(lorianKey) && ClientPaletteRuntime.shouldBlockRadialInput(minecraft);
         boolean temporary = sharesPressedKey(temporaryKey) && ClientPaletteRuntime.canHandleTemporaryInput(minecraft);
         if (!palette && !temporary) return;
         try {

@@ -65,7 +65,7 @@ public final class ClientConfigDraftTest {
         assertTrue(manager.save(reset).successful());
         assertTrue(manager.client().featureEnabled("palette_wheel"));
         assertEquals(5, manager.client().reachDistance());
-        assertEquals(PalettePreset.ITEM_TAG_A, manager.client().primaryPalettePreset());
+        assertEquals(PalettePreset.COLOR_CATEGORIES, manager.client().primaryPalettePreset());
         assertEquals(PalettePreset.ITEM_TAG_B, manager.client().secondaryPalettePreset());
         assertFalse(manager.client().smartPickDebugStats());
         assertTrue(manager.client().fixGlassPanes());

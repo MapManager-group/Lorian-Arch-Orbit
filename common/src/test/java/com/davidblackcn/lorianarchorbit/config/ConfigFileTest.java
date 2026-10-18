@@ -44,7 +44,7 @@ public final class ConfigFileTest {
             assertTrue(Files.isRegularFile(path), name);
             assertEquals(ConfigConstants.CURRENT_VERSION, json(path).get("config_version").getAsInt());
         }
-        assertEquals(PalettePreset.ITEM_TAG_A, client.client().primaryPalettePreset());
+        assertEquals(PalettePreset.COLOR_CATEGORIES, client.client().primaryPalettePreset());
         assertEquals(PalettePreset.ITEM_TAG_B, client.client().secondaryPalettePreset());
         assertEquals(100, client.client().smartPickHoldThresholdMs());
         assertFalse(client.client().invisibleBlocksVisible());
@@ -55,7 +55,7 @@ public final class ConfigFileTest {
         assertTrue(client.client().fixChests());
         assertTrue(client.client().fixNetherPortals());
         assertTrue(client.client().fixEndPortals());
-        assertEquals(68, client.primaryWheel().groups().size());
+        assertEquals(8, client.primaryWheel().groups().size());
         assertEquals(56, client.secondaryWheel().groups().size());
         assertTrue(json(temporaryDirectory.resolve(ConfigConstants.PRIMARY_WHEEL_FILE))
                 .getAsJsonArray("groups").isEmpty());

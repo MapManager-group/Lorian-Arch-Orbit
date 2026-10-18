@@ -71,7 +71,7 @@ public final class ClientConfigScreen {
                 draft::fixNetherPortals, draft::setFixNetherPortals);
         addBoolean(behavior, resettable, "connected_texture_fix.end_portals", true,
                 draft::fixEndPortals, draft::setFixEndPortals);
-        addEnum(behavior, resettable, "palette_wheel.animation", PaletteAnimation.CLOCKWISE,
+        addEnum(behavior, resettable, "palette_wheel.animation", PaletteAnimation.EXPAND,
                 PaletteAnimation.class, draft::paletteAnimation, draft::setPaletteAnimation);
         Option<PaletteRotationDirection> rotationDirection = Option.<PaletteRotationDirection>createBuilder()
                 .name(text("palette_wheel.rotation_direction.name"))
@@ -103,7 +103,7 @@ public final class ClientConfigScreen {
                 .build();
         resettable.add(arrowStyle);
         behavior.option(arrowStyle);
-        addPreset(behavior, resettable, "palette_wheel.primary_default_preset", PalettePreset.ITEM_TAG_A,
+        addPreset(behavior, resettable, "palette_wheel.primary_default_preset", PalettePreset.COLOR_CATEGORIES,
                 draft::primaryPalettePreset, draft::setPrimaryPalettePreset);
         addPreset(behavior, resettable, "palette_wheel.secondary_default_preset", PalettePreset.ITEM_TAG_B,
                 draft::secondaryPalettePreset, draft::setSecondaryPalettePreset);

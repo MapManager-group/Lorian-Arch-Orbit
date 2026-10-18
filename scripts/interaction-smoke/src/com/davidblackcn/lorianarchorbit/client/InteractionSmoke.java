@@ -54,6 +54,46 @@ public final class InteractionSmoke implements net.fabricmc.api.ClientModInitial
             require(!ClientPaletteRuntime.canHandleCurrentInput(c), "empty hand with temporary palette must yield");
             Class<?> radial = Class.forName("dev.velolib.radial.RadialClient");
             var locked = radial.getDeclaredField("keyLocked"); locked.setAccessible(true); locked.setBoolean(null, false);
+            var radialBinding = (net.minecraft.client.KeyMapping) radial.getField("OPEN_RADIAL").get(null);
+            var oldRadialKey = InputConstants.getKey(radialBinding.saveString());
+            var configManager = ClientConfigRuntime.configManager();
+            var oldConfig = configManager.client();
+            try {
+                wheel.setDown(true);
+                for (var heldItem : List.of(Items.STONE, Items.OAK_LOG, Items.STICK)) {
+                    c.player.getInventory().setItem(c.player.getInventory().getSelectedSlot(), new ItemStack(heldItem));
+                    for (int press=0; press<3; press++) {
+                        locked.setBoolean(null, false);
+                        call(RadialInputCompat.class, null, "onStartClientTick", new Class<?>[]{Minecraft.class}, c);
+                        require(locked.getBoolean(null), "held item reserves shared key on repeated presses: " + heldItem);
+                    }
+                }
+                var playerInfo = (net.minecraft.client.multiplayer.PlayerInfo) call(net.minecraft.client.player.AbstractClientPlayer.class,
+                        c.player, "getPlayerInfo", new Class<?>[]{});
+                var oldMode = playerInfo.getGameMode();
+                try {
+                    call(playerInfo.getClass(), playerInfo, "setGameMode", new Class<?>[]{GameType.class}, GameType.SURVIVAL);
+                    require(!c.player.isCreative(), "noncreative fixture");
+                    locked.setBoolean(null, false);
+                    call(RadialInputCompat.class, null, "onStartClientTick", new Class<?>[]{Minecraft.class}, c);
+                    require(locked.getBoolean(null), "noncreative held item still reserves shared key");
+                } finally { call(playerInfo.getClass(), playerInfo, "setGameMode", new Class<?>[]{GameType.class}, oldMode); }
+                radialBinding.setKey(InputConstants.UNKNOWN);
+                locked.setBoolean(null, false);
+                call(RadialInputCompat.class, null, "onStartClientTick", new Class<?>[]{Minecraft.class}, c);
+                require(!locked.getBoolean(null), "independent Radial key is unaffected");
+                radialBinding.setKey(oldRadialKey);
+                var disabled = new com.davidblackcn.lorianarchorbit.config.ClientConfigDraft(oldConfig);
+                disabled.setFeatureEnabled("palette_wheel", false);
+                require(configManager.save(disabled).successful(), "disable palette fixture");
+                locked.setBoolean(null, false);
+                call(RadialInputCompat.class, null, "onStartClientTick", new Class<?>[]{Minecraft.class}, c);
+                require(!locked.getBoolean(null), "disabled palette releases Radial key");
+            } finally {
+                radialBinding.setKey(oldRadialKey);
+                require(configManager.save(new com.davidblackcn.lorianarchorbit.config.ClientConfigDraft(oldConfig)).successful(), "restore palette fixture config");
+                c.player.getInventory().setItem(c.player.getInventory().getSelectedSlot(), ItemStack.EMPTY);
+            }
             wheel.setDown(true);
             call(RadialInputCompat.class, null, "onStartClientTick", new Class<?>[]{Minecraft.class}, c);
             require(!locked.getBoolean(null), "empty hand must not lock Radial");
@@ -137,6 +177,14 @@ public final class InteractionSmoke implements net.fabricmc.api.ClientModInitial
             var sessionConstructor = EditorSession.class.getDeclaredConstructor(net.minecraft.client.gui.screens.Screen.class);
             sessionConstructor.setAccessible(true);
             var session = sessionConstructor.newInstance((Object)null);
+            var gradient = (HueGradientScreen) session.page("gradient"); c.setScreenAndShow(gradient);
+            require(session.gradientState.palette.equals("build"), "gradient defaults to building blocks");
+            require(HueBlocksRuntime.repository().data() != null, "local color data loaded");
+            var summary = (Component) call(HueGradientScreen.class, gradient, "dataStatus", new Class<?>[]{boolean.class}, false);
+            var detail = (Component) call(HueGradientScreen.class, gradient, "dataStatus", new Class<?>[]{boolean.class}, true);
+            String skippedLabel = Component.translatable("hueblocks.lorian_arch_orbit.local_skipped").getString();
+            require(!summary.getString().contains(skippedLabel), "summary hides skipped resources");
+            require(HueBlocksRuntime.repository().skipped().isEmpty() || detail.getString().contains(skippedLabel), "detail retains skipped resources");
             var screen = session.wheel(); c.setScreenAndShow(screen);
             var bounds = (PaletteEditorLayout)call(PaletteEditorScreen.class, screen, "layout", new Class<?>[]{});
             require(!bounds.compact(), "wide editor fixture");

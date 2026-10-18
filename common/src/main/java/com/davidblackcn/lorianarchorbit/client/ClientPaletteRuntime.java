@@ -82,6 +82,13 @@ public final class ClientPaletteRuntime {
         return openWheel;
     }
 
+    /** Shared-key ownership does not depend on whether the next palette layer exists. */
+    public static boolean shouldBlockRadialInput(Minecraft minecraft) {
+        return openWheel != null && enabled() && minecraft.gui.screen() == null
+                && minecraft.isWindowActive() && minecraft.player != null && minecraft.gameMode != null
+                && !minecraft.player.getInventory().getSelectedItem().isEmpty();
+    }
+
     public static boolean canHandleCurrentInput(Minecraft minecraft) {
         if (openWheel == null
                 || !enabled()

@@ -143,3 +143,5 @@ Generated results, positional locks, application targets, and comparison snapsho
 The candidate count is not Minecraft's total block count. Only supported standard model faces with valid textures participate in matching. Tinted faces and special renderers are skipped. Different faces of one block may contribute multiple candidates, and facing, palette, and custom exclusions further affect the count.
 
 The client scans active resources and calculates colors at startup and on resource reload, without downloading data. Regenerate results after changing packs; Recalculate retries the current resources. Gradient and candidate-palette exports use format 2, with format 1 import compatibility; older mod versions cannot read format 2. See [HueBlocks Data and Preset Optimization](HUEBLOCKS.md) and [Configuration and Troubleshooting](../CONFIGURATION.md), both in Chinese, for more details.
+
+Since v1.2.0, new gradients default to the building-friendly block palette; imported recipes retain their own selection. The status line shows coverage and essential warnings. Hover for full skipped-resource details, even when the line fits without truncation.

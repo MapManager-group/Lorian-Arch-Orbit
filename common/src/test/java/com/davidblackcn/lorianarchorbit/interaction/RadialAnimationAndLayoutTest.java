@@ -9,6 +9,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public final class RadialAnimationAndLayoutTest {
     @Test
+    void clockwiseEntriesUseEqualDurationsAndUniformStartIntervals() {
+        var state = new RadialAnimationState(RadialAnimationMode.CLOCKWISE, 0, 1000);
+        for (int i = 0; i < 7; i++) {
+            long start = i * 100L;
+            assertEquals(0.0, state.entryProgress(i, 7, start), 1e-12);
+            assertEquals(0.875, state.entryProgress(i, 7, start + 200), 1e-12);
+            assertEquals(1.0, state.entryProgress(i, 7, start + 400), 1e-12);
+            double previous = 0;
+            for (long time = 0; time <= 1000; time += 10) {
+                double current = state.entryProgress(i, 7, time);
+                assertTrue(current >= previous && current <= 1);
+                previous = current;
+            }
+        }
+        assertEquals(0.875, state.entryProgress(0, 1, 500), 1e-12);
+        assertTrue(RadialGeometry.slots(RadialMenuSnapshot.empty(), new HudPoint(0, 0), 40, state, 500).isEmpty());
+    }
+
+    @Test
     public void expandMovesAllEntriesTogetherAndOffIsImmediate() {
         RadialAnimationState expand = new RadialAnimationState(RadialAnimationMode.EXPAND, 100, 200);
         RadialAnimationState off = new RadialAnimationState(RadialAnimationMode.OFF, 100, 200);
